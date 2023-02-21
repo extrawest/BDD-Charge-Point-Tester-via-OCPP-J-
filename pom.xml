@@ -20,8 +20,7 @@
         <org.java-websocket.version>1.5.1</org.java-websocket.version>
         <google.gson.version>2.9.1</google.gson.version>
         <eu.chargetime.ocpp.version>1.0.1</eu.chargetime.ocpp.version>
-        <cucumber.version>6.10.1</cucumber.version>
-        <junit.version>4.13.2</junit.version>
+        <cucumber.version>7.11.0</cucumber.version>
     </properties>
 
     <dependencies>
@@ -70,13 +69,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
