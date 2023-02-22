@@ -49,37 +49,18 @@ public class BootNotificationConfirmationBddHandler
 
         this.optionalFieldsSetup = Collections.emptyMap();
 
-        this.assertionFactory = Map.of(/*
-                CURRENT_TIME_REQUIRED, (expectedParams, actual) -> compareStringsIncludeWildCard(
-                        expectedParams, actual.getCurrentTime().toString(), CURRENT_TIME_REQUIRED),
-
-                INTERVAL_REQUIRED, (expectedParams, actual) -> compareStringsIncludeWildCard(
-                        expectedParams, String.valueOf(actual.getInterval()), INTERVAL_REQUIRED),
-
-                STATUS_REQUIRED, (expectedParams, actual) -> compareStringsIncludeWildCard(
-                        expectedParams, actual.getStatus().name(), STATUS_REQUIRED)*/
-        );
+        this.assertionFactory = Collections.emptyMap();
     }
 
     @Override
     public boolean validateFields(Map<String, String> params, BootNotificationConfirmation response) {
-            validateForRequiredFields(params);
-
-/*            List<String> nonMatchFields = nonMatchValues(params, response);
-
-            if (!nonMatchFields.isEmpty()) {
-                log.warn("Non match fields: " + nonMatchFields);
-                throw new AssertionException(
-                        String.format(NON_MATCH_FIELDS.getValue(), getParameterizeClassName(), nonMatchFields));
-            }*/
-            return true;
+        return super.validateConfirmationFields(params);
     }
 
     @Override
-    public BootNotificationConfirmation createValidatedConfirmation(Map<String, String> params, BootNotificationConfirmation response) {
-        validateFields(params, response);
-
-        return validateParamsViaLibModel(params);
+    public BootNotificationConfirmation createValidatedConfirmation(Map<String, String> params,
+                                                                    BootNotificationConfirmation response) {
+        return super.createValidatedConfirmation(params, response);
     }
 
 }
