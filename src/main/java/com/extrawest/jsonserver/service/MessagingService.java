@@ -25,10 +25,6 @@ public interface MessagingService {
 
     void validateReceivedMessageOrThrow(ChargePoint chargePoint, RequiredChargingData requiredData, Request request);
 
-    boolean holdChargingSessionWithComparingData(ChargePoint chargePoint, RequiredChargingData requiredData);
-
-    void sendRemoteStartTransaction(ChargePoint chargePoint, UUID sessionIndex, String idTag);
-
     void validateRequest(Map<String, String> parameters, Request request);
 
     Confirmation sendConfirmationResponse(Map<String, String> parameters, Confirmation response);

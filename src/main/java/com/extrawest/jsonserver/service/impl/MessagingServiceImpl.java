@@ -1,6 +1,5 @@
  package com.extrawest.jsonserver.service.impl;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +29,6 @@ import eu.chargetime.ocpp.model.core.BootNotificationRequest;
 import eu.chargetime.ocpp.model.core.HeartbeatRequest;
 import eu.chargetime.ocpp.model.core.MeterValue;
 import eu.chargetime.ocpp.model.core.MeterValuesRequest;
-import eu.chargetime.ocpp.model.core.RemoteStartTransactionRequest;
 import eu.chargetime.ocpp.model.core.ResetRequest;
 import eu.chargetime.ocpp.model.core.ResetType;
 import eu.chargetime.ocpp.model.core.SampledValue;
@@ -58,8 +56,6 @@ public class MessagingServiceImpl implements MessagingService {
     private final BootNotificationRequestBddHandler bootNotificationRequestFactory;
 
     private final BootNotificationConfirmationBddHandler bootNotificationConfirmationFactory;
-
-    private boolean isChargingSessionIsOpen = true;
 
     @Override
     public void sendTriggerMessage(String chargePointId, TriggerMessageRequestType type) {
@@ -208,46 +204,6 @@ public class MessagingServiceImpl implements MessagingService {
     }
 
     @Override
-    public boolean holdChargingSessionWithComparingData(ChargePoint chargePoint, RequiredChargingData requiredData) {
-        isChargingSessionIsOpen = true;
-        Optional<List<Request>> requestedMessages = bddDataRepository.getRequestedMessage(chargePoint.getChargePointId());
-        List<Request> messagesWithMistakes = new ArrayList<>();
-        while (isChargingSessionIsOpen) {
-            if (requestedMessages.isPresent() && (requestedMessages.get().size() > 0)) {
-                List<Request> messages = List.copyOf(requestedMessages.get());
-                List<Request> messagesForDelete = new ArrayList<>();
-                for (Request message : messages) {
-                    if (!compareData(chargePoint, requiredData, message)) {
-                        log.error("Message has wrong data: " + message);
-                        messagesWithMistakes.add(message);
-                    }
-                    messagesForDelete.add(message);
-                }
-                bddDataRepository.removeRequestedMessages(chargePoint.getChargePointId(), messagesForDelete);
-            }
-            sleep(500L);
-            requestedMessages = bddDataRepository.getRequestedMessage(chargePoint.getChargePointId());
-        }
-        if (!messagesWithMistakes.isEmpty()) {
-            log.error(String.format("Received %s messages with wrong data: %s",
-                    messagesWithMistakes.size(), messagesWithMistakes));
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public void sendRemoteStartTransaction(ChargePoint chargePoint, UUID sessionIndex, String idTag) {
-        Request request = new RemoteStartTransactionRequest(idTag);
-        try {
-            server.send(sessionIndex, request);
-            log.info("RemoteStartTransactionRequest sent: " + request);
-        } catch (OccurenceConstraintException | UnsupportedFeatureException | NotConnectedException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
     public void validateRequest(Map<String, String> parameters, Request request) {
         if (request instanceof BootNotificationRequest message) {
             bootNotificationRequestFactory.validateFields(parameters, message);
@@ -310,7 +266,6 @@ public class MessagingServiceImpl implements MessagingService {
                     && Objects.equals(message.getConnectorId(), requiredData.getConnectorId()));
         } else if (request instanceof StopTransactionRequest message) {
             log.info("StopTransaction message: " + message);
-            isChargingSessionIsOpen = false;
             return Objects.nonNull(message.getMeterStop())
                     && Objects.nonNull(message.getTimestamp())
                     && Objects.nonNull(message.getTransactionId())
