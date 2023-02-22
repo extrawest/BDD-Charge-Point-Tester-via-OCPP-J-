@@ -19,15 +19,13 @@ public class ServerFirmwareManagementEventHandlerImpl implements ServerFirmwareM
     public DiagnosticsStatusNotificationConfirmation handleDiagnosticsStatusNotificationRequest(
             UUID sessionIndex, DiagnosticsStatusNotificationRequest request
     ) {
-        DiagnosticsStatusNotificationConfirmation confirmation = new DiagnosticsStatusNotificationConfirmation();
-        return confirmation;
+        return new DiagnosticsStatusNotificationConfirmation();
     }
 
     @Override
     public FirmwareStatusNotificationConfirmation handleFirmwareStatusNotificationRequest(
             UUID sessionIndex, FirmwareStatusNotificationRequest request
     ) {
-        FirmwareStatusNotificationConfirmation confirmation = new FirmwareStatusNotificationConfirmation();
-        return confirmation;
+        return new FirmwareStatusNotificationConfirmation();
     }
 }
