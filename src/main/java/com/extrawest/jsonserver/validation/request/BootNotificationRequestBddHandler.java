@@ -1,10 +1,6 @@
 package com.extrawest.jsonserver.validation.request;
 
-import static com.extrawest.jsonserver.model.emun.ApiErrorMessage.NON_MATCH_FIELDS;
-
-import java.util.List;
 import java.util.Map;
-import com.extrawest.jsonserver.model.exception.AssertionException;
 import com.extrawest.jsonserver.validation.ValidationAndAssertionFieldsFactory;
 import com.extrawest.jsonserver.validation.RequestFactory;
 import eu.chargetime.ocpp.model.core.BootNotificationRequest;
@@ -116,17 +112,7 @@ public class BootNotificationRequestBddHandler
 
     @Override
     public boolean validateFields(Map<String, String> params, BootNotificationRequest actualRequest) {
-        validateForRequiredFields(params);
-        validateParamsViaLibModel(params);
-
-        List<String> nonMatchFields = nonMatchValues(params, actualRequest);
-
-        if (!nonMatchFields.isEmpty()) {
-            log.warn("Non match fields: " + nonMatchFields);
-            throw new AssertionException(
-                    String.format(NON_MATCH_FIELDS.getValue(), getParameterizeClassName(), nonMatchFields));
-        }
-        return true;
+        return super.validateRequestFields(params, actualRequest);
     }
 
 }
