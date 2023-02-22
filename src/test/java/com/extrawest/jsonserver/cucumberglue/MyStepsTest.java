@@ -29,6 +29,7 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 
 /**
  * All time variables in seconds
@@ -53,6 +54,10 @@ public class MyStepsTest extends SpringIntegrationTest {
     private String scenarioName;
     private UUID sessionIndex;
     private int stepNumber;
+
+    @Value("${wildcard:any}")
+    private String wildCard;
+
 
     @Before
     public void scenarioIncrease(Scenario scenario) {
@@ -139,16 +144,47 @@ public class MyStepsTest extends SpringIntegrationTest {
     public void chargePointIsConnected() {
         UUID sessionIndex = null;
         LocalDateTime finishTime = LocalDateTime.now().plusSeconds(connectionWaitingTime);
-        log.info(String.format("Scenario №%s, STEP %s: waiting for %s connection up to %s seconds...",
-                scenarioId, stepNumber, chargePoint.getChargePointId(), connectionWaitingTime));
+        log.info(String.format("Scenario №%s, STEP %s: waiting for any connection up to %s seconds...",
+                scenarioId, stepNumber, connectionWaitingTime));
         while (Objects.isNull(sessionIndex) && LocalDateTime.now().isBefore(finishTime)) {
             try {
-                sessionIndex = sessionRepository.getSessionByChargerId(chargePoint.getChargePointId());
+                sessionIndex = sessionRepository.getSessionForWildCard();
+                String chargerPointId = sessionRepository.getChargerIdBySession(sessionIndex);
+                chargePoint.setChargePointId(chargerPointId);
+                log.info(String.format("Scenario №%s, STEP %s: Charge point %s is connected!",
+                        scenarioId, stepNumber, chargerPointId));
+            } catch (Exception e) {
+                messagingService.sleep(1000L);
+            }
+        }
+        if (Objects.isNull(sessionIndex)) {
+            throw new BddTestingException(String.format("Scenario №%s, STEP %s: %s didn't connect.",
+                    scenarioId, stepNumber, chargePoint.getChargePointId()));
+        }
+        this.sessionIndex = sessionIndex;
+        if (Objects.nonNull(initiateCharging) && initiateCharging) {
+            messagingService.sendRemoteStartTransaction(chargePoint, sessionIndex, requiredData.getIdTag());
+        }
+    }
+
+    @Given("the Charge Point {string} is connected")
+    public void chargePointIsConnected(String chargePointId) {
+        if (Objects.equals(chargePointId, wildCard)) {
+            chargePointIsConnected();
+            return;
+        }
+        UUID sessionIndex = null;
+        LocalDateTime finishTime = LocalDateTime.now().plusSeconds(connectionWaitingTime);
+        log.info(String.format("Scenario №%s, STEP %s: waiting for %s connection up to %s seconds...",
+                scenarioId, stepNumber, chargePointId, connectionWaitingTime));
+        while (Objects.isNull(sessionIndex) && LocalDateTime.now().isBefore(finishTime)) {
+            try {
+                sessionIndex = sessionRepository.getSessionByChargerId(chargePointId);
                 log.info(String.format("Scenario №%s, STEP %s: Charge point %s is connected!",
                         scenarioId, stepNumber, chargePoint.getChargePointId()));
             } catch (Exception e) {
                 messagingService.sleep(1000L);
-                stepsSupporterService.closeAllSessionsExceptGiven(chargePoint.getChargePointId());
+                stepsSupporterService.closeAllSessionsExceptGiven(chargePointId);
             }
         }
         if (Objects.isNull(sessionIndex)) {
