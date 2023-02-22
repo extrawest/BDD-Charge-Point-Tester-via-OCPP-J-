@@ -1,13 +1,16 @@
 package com.extrawest.jsonserver.service.impl;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import com.extrawest.jsonserver.service.MessagingService;
+import com.extrawest.jsonserver.validation.confirmation.BootNotificationConfirmationBddHandler;
+import com.extrawest.jsonserver.validation.request.BootNotificationRequestBddHandler;
+import com.extrawest.jsonserver.ws.handler.ServerCoreEventHandlerImpl;
 import eu.chargetime.ocpp.NotConnectedException;
 import eu.chargetime.ocpp.OccurenceConstraintException;
 import eu.chargetime.ocpp.UnsupportedFeatureException;
@@ -21,11 +24,11 @@ import com.extrawest.jsonserver.ws.JsonWsServer;
 import eu.chargetime.ocpp.model.Confirmation;
 import eu.chargetime.ocpp.model.Request;
 import eu.chargetime.ocpp.model.core.AuthorizeRequest;
+import eu.chargetime.ocpp.model.core.BootNotificationConfirmation;
 import eu.chargetime.ocpp.model.core.BootNotificationRequest;
 import eu.chargetime.ocpp.model.core.HeartbeatRequest;
 import eu.chargetime.ocpp.model.core.MeterValue;
 import eu.chargetime.ocpp.model.core.MeterValuesRequest;
-import eu.chargetime.ocpp.model.core.RemoteStartTransactionRequest;
 import eu.chargetime.ocpp.model.core.ResetRequest;
 import eu.chargetime.ocpp.model.core.ResetType;
 import eu.chargetime.ocpp.model.core.SampledValue;
@@ -38,20 +41,23 @@ import eu.chargetime.ocpp.model.remotetrigger.TriggerMessageRequest;
 import eu.chargetime.ocpp.model.remotetrigger.TriggerMessageRequestType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
-import static com.extrawest.jsonserver.util.TimeUtil.waitHalfSecond;
 import static com.extrawest.jsonserver.util.TimeUtil.waitOneSecond;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class MessagingServiceImpl implements MessagingService {
+    private final ApplicationContext springBootContext;
     private final BddDataRepository bddDataRepository;
     private final JsonWsServer server;
     private final ServerSessionRepository sessionRepository;
 
-    private boolean isChargingSessionIsOpen = true;
+    private final BootNotificationRequestBddHandler bootNotificationRequestFactory;
+
+    private final BootNotificationConfirmationBddHandler bootNotificationConfirmationFactory;
 
     @Override
     public void sendTriggerMessage(String chargePointId, TriggerMessageRequestType type) {
@@ -197,43 +203,25 @@ public class MessagingServiceImpl implements MessagingService {
     }
 
     @Override
-    public boolean holdChargingSessionWithComparingData(ChargePoint chargePoint, RequiredChargingData requiredData) {
-        isChargingSessionIsOpen = true;
-        Optional<List<Request>> requestedMessages = bddDataRepository.getRequestedMessage(chargePoint.getChargePointId());
-        List<Request> messagesWithMistakes = new ArrayList<>();
-        while (isChargingSessionIsOpen) {
-            if (requestedMessages.isPresent() && (!requestedMessages.get().isEmpty())) {
-                List<Request> messages = List.copyOf(requestedMessages.get());
-                List<Request> messagesForDelete = new ArrayList<>();
-                for (Request message : messages) {
-                    if (!compareData(chargePoint, requiredData, message)) {
-                        log.error("Message has wrong data: " + message);
-                        messagesWithMistakes.add(message);
-                    }
-                    messagesForDelete.add(message);
-                }
-                bddDataRepository.removeRequestedMessages(chargePoint.getChargePointId(), messagesForDelete);
-            }
-            waitHalfSecond();
-            requestedMessages = bddDataRepository.getRequestedMessage(chargePoint.getChargePointId());
+    public void validateRequest(Map<String, String> parameters, Request request) {
+        if (request instanceof BootNotificationRequest message) {
+            bootNotificationRequestFactory.validateFields(parameters, message);
+        } else {
+            throw new BddTestingException("Type is not implemented. Request: " + request);
         }
-        if (!messagesWithMistakes.isEmpty()) {
-            log.error(String.format("Received %s messages with wrong data: %s",
-                    messagesWithMistakes.size(), messagesWithMistakes));
-            return false;
-        }
-        return true;
     }
 
     @Override
-    public void sendRemoteStartTransaction(ChargePoint chargePoint, UUID sessionIndex, String idTag) {
-        Request request = new RemoteStartTransactionRequest(idTag);
-        try {
-            server.send(sessionIndex, request);
-            log.info("RemoteStartTransactionRequest sent: " + request);
-        } catch (OccurenceConstraintException | UnsupportedFeatureException | NotConnectedException e) {
-            throw new RuntimeException(e);
+    public Confirmation sendConfirmationResponse(Map<String, String> parameters, Confirmation response) {
+        ServerCoreEventHandlerImpl handler = springBootContext.getBean(ServerCoreEventHandlerImpl.class);
+        handler.setResponse(response);
+        while (Objects.nonNull(handler.getResponse())) {
+            waitOneSecond();
         }
+        if (response instanceof BootNotificationConfirmation message) {
+            return bootNotificationConfirmationFactory.createValidatedConfirmation(parameters, message);
+        }
+        throw new BddTestingException("Ups...");
     }
 
     private boolean compareData(ChargePoint chargePoint, RequiredChargingData requiredData, Request request) {
@@ -277,7 +265,6 @@ public class MessagingServiceImpl implements MessagingService {
                     && Objects.equals(message.getConnectorId(), requiredData.getConnectorId()));
         } else if (request instanceof StopTransactionRequest message) {
             log.info("StopTransaction message: " + message);
-            isChargingSessionIsOpen = false;
             return Objects.nonNull(message.getMeterStop())
                     && Objects.nonNull(message.getTimestamp())
                     && Objects.nonNull(message.getTransactionId())

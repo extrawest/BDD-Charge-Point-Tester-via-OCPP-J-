@@ -1,5 +1,6 @@
 package com.extrawest.jsonserver.service;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -22,7 +23,7 @@ public interface MessagingService {
 
     void validateReceivedMessageOrThrow(ChargePoint chargePoint, RequiredChargingData requiredData, Request request);
 
-    boolean holdChargingSessionWithComparingData(ChargePoint chargePoint, RequiredChargingData requiredData);
+    void validateRequest(Map<String, String> parameters, Request request);
 
-    void sendRemoteStartTransaction(ChargePoint chargePoint, UUID sessionIndex, String idTag);
+    Confirmation sendConfirmationResponse(Map<String, String> parameters, Confirmation response);
 }
