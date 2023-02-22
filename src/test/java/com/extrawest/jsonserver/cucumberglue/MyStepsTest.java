@@ -17,6 +17,7 @@ import com.extrawest.jsonserver.repository.BddDataRepository;
 import com.extrawest.jsonserver.repository.ServerSessionRepository;
 import eu.chargetime.ocpp.model.Confirmation;
 import eu.chargetime.ocpp.model.Request;
+import eu.chargetime.ocpp.model.core.BootNotificationConfirmation;
 import eu.chargetime.ocpp.model.core.ResetType;
 import eu.chargetime.ocpp.model.remotetrigger.TriggerMessageRequestType;
 import io.cucumber.datatable.DataTable;
@@ -54,6 +55,7 @@ public class MyStepsTest extends SpringIntegrationTest {
     private String scenarioName;
     private UUID sessionIndex;
     private int stepNumber;
+    private ImplementedReceivedMessageType availableConfirmationMessageType;
 
     @Value("${wildcard:any}")
     private String wildCard;
@@ -79,6 +81,7 @@ public class MyStepsTest extends SpringIntegrationTest {
     }
 
     @Given("Charge Point data")
+    @Deprecated
     public void settingChargePointData(DataTable table) {
         log.info(String.format("Scenario №%s, STEP %s: setting Charge Point data", scenarioId, stepNumber));
         Map<String, String> map = table.asMap(String.class, String.class);
@@ -314,6 +317,7 @@ public class MyStepsTest extends SpringIntegrationTest {
         Map<String, String> parameters = table.asMap();
         ImplementedReceivedMessageType type = ImplementedReceivedMessageType
                 .valueOf(messageType.replace(".req", "").replace(".conf", ""));
+        availableConfirmationMessageType = type;
         storage.addRequestedMessageType(chargePoint.getChargePointId(), type);
         Optional<Request> request = messagingService.waitForRequestedMessage(chargePoint, messageWaitingTime, type);
         if (request.isEmpty()) {
@@ -324,6 +328,19 @@ public class MyStepsTest extends SpringIntegrationTest {
         messagingService.validateRequest(parameters, request.get());
         log.info(String.format("Scenario №%s, STEP %s: handled. %s message is valid: \n%s ",
                 scenarioId, stepNumber, type, request.get()));
+    }
+
+    @Then("the Central System must sends confirmation response with given data")
+    public void theCentralSystemMustSendsConfirmationResponseWithGivenData(DataTable table) {
+        Map<String, String> parameters = table.asMap();
+        Confirmation response;
+        switch (availableConfirmationMessageType) {
+            case BootNotification -> response = new BootNotificationConfirmation();
+            default -> throw new BddTestingException("Message type is unavailable");
+        }
+        Confirmation confirmation = messagingService.sendConfirmationResponse(parameters, response);
+        log.info(String.format("Scenario №%s, STEP %s: %s confirmation message sent: \n%s ",
+                scenarioId, stepNumber, availableConfirmationMessageType, confirmation));
     }
 
 }
