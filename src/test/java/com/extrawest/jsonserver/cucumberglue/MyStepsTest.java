@@ -38,6 +38,9 @@ import org.java_websocket.drafts.Draft_6455;
 import org.java_websocket.protocols.IProtocol;
 import org.java_websocket.protocols.Protocol;
 
+import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.*;
+import static com.extrawest.jsonserver.util.TimeUtil.waitOneSecond;
+
 /**
  * All time variables in seconds
  */
@@ -136,8 +139,8 @@ public class MyStepsTest extends SpringIntegrationTest {
     public void theCentralSystemIsStartedAndMustHoldOneChargingSession() {
         String hostAddress = startCS();
         storage.addChargingChargePoint(chargePoint.getChargePointId());
-        storage.addRequestedMessageType(chargePoint.getChargePointId(), ImplementedReceivedMessageType.BootNotification);
-        storage.addRequestedMessageType(chargePoint.getChargePointId(), ImplementedReceivedMessageType.Authorize);
+        storage.addRequestedMessageType(chargePoint.getChargePointId(), BOOT_NOTIFICATION);
+        storage.addRequestedMessageType(chargePoint.getChargePointId(), AUTHORIZE);
         log.info(String.format("Scenario №%s, STEP %s: Server for charging session started on %s ",
                 scenarioId, stepNumber, hostAddress));
     }
@@ -147,8 +150,8 @@ public class MyStepsTest extends SpringIntegrationTest {
         initiateCharging = true;
         String hostAddress = startCS();
         storage.addChargingChargePoint(chargePoint.getChargePointId());
-        storage.addRequestedMessageType(chargePoint.getChargePointId(), ImplementedReceivedMessageType.BootNotification);
-        storage.addRequestedMessageType(chargePoint.getChargePointId(), ImplementedReceivedMessageType.Authorize);
+        storage.addRequestedMessageType(chargePoint.getChargePointId(), BOOT_NOTIFICATION);
+        storage.addRequestedMessageType(chargePoint.getChargePointId(), AUTHORIZE);
         log.info(String.format("Scenario №%s, STEP %s: Server for charging session started on %s ",
                 scenarioId, stepNumber, hostAddress));
     }
@@ -237,8 +240,7 @@ public class MyStepsTest extends SpringIntegrationTest {
     public void csMustReceiveMessageRequestAndCompareData() {
         log.info(String.format("Scenario №%s, STEP %s: Waiting for request up to %s...",
                 scenarioId, stepNumber, messageWaitingTime));
-        ImplementedReceivedMessageType type =
-                ImplementedReceivedMessageType.valueOf(requiredData.getMessageType());
+        ImplementedReceivedMessageType type = valueOf(requiredData.getMessageType());
         Optional<Request> request = messagingService.waitForRequestedMessage(chargePoint, messageWaitingTime, type);
         if (request.isEmpty()) {
             throw new BddTestingException(
@@ -284,14 +286,13 @@ public class MyStepsTest extends SpringIntegrationTest {
         log.info(String.format("Scenario №%s, STEP %s: Setting data for receive messages ",
                 scenarioId, stepNumber));
         setRequiredDate(table);
-        storage.addRequestedMessageType(chargePoint.getChargePointId(),
-                ImplementedReceivedMessageType.valueOf(requiredData.getMessageType()));
-        System.out.println("Awaiting message type: " + ImplementedReceivedMessageType.valueOf(requiredData.getMessageType()));
+        storage.addRequestedMessageType(chargePoint.getChargePointId(), valueOf(requiredData.getMessageType()));
+        System.out.println("Awaiting message type: " + valueOf(requiredData.getMessageType()));
     }
 
     @Then("the Central System must receive message with given data")
     public void theCentralSystemMustReceiveMessageWithGivenData() {
-        ImplementedReceivedMessageType type = ImplementedReceivedMessageType.valueOf(requiredData.getMessageType());
+        ImplementedReceivedMessageType type = valueOf(requiredData.getMessageType());
         Optional<Request> request = messagingService.waitForRequestedMessage(chargePoint, messageWaitingTime, type);
         if (request.isEmpty()) {
             throw new BddTestingException(

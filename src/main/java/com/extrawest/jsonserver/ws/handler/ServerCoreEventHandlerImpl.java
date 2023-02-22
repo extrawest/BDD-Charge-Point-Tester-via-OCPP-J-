@@ -1,13 +1,13 @@
 package com.extrawest.jsonserver.ws.handler;
 
-import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.Authorize;
-import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.BootNotification;
-import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.DataTransfer;
-import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.Heartbeat;
-import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.MeterValue;
-import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.StartTransaction;
-import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.StatusNotification;
-import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.StopTransaction;
+import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.AUTHORIZE;
+import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.BOOT_NOTIFICATION;
+import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.DATA_TRANSFER;
+import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.HEARTBEAT;
+import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.METER_VALUE;
+import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.START_TRANSACTION;
+import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.STATUS_NOTIFICATION;
+import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.STOP_TRANSACTION;
 
 import java.time.ZonedDateTime;
 import java.util.Arrays;
@@ -63,11 +63,11 @@ public class ServerCoreEventHandlerImpl implements ServerCoreEventHandler {
         AuthorizeConfirmation confirmation = new AuthorizeConfirmation(idTagInfo);
 
         String chargePointId = sessionRepository.getChargerIdBySession(sessionIndex);
-        storeMessageIfItIsNeededForBDDPurpose(sessionIndex, request, Authorize);
+        storeMessageIfItIsNeededForBDDPurpose(sessionIndex, request, AUTHORIZE);
         if (bddDataRepository.isCharging(chargePointId)) {
-            bddDataRepository.addRequestedMessageType(chargePointId, StartTransaction);
-            bddDataRepository.addRequestedMessageType(chargePointId, StopTransaction);
-            bddDataRepository.removeRequestedMessageType(chargePointId, Authorize);
+            bddDataRepository.addRequestedMessageType(chargePointId, START_TRANSACTION);
+            bddDataRepository.addRequestedMessageType(chargePointId, STOP_TRANSACTION);
+            bddDataRepository.removeRequestedMessageType(chargePointId, AUTHORIZE);
         }
         return confirmation;
     }
@@ -80,10 +80,10 @@ public class ServerCoreEventHandlerImpl implements ServerCoreEventHandler {
                 new BootNotificationConfirmation(ZonedDateTime.now(), 300, RegistrationStatus.Accepted);
 
         String chargePointId = sessionRepository.getChargerIdBySession(sessionIndex);
-        bddDataRepository.addRequestedMessageType(chargePointId, Authorize);
-        bddDataRepository.addRequestedMessageType(chargePointId, Heartbeat);
-        storeMessageIfItIsNeededForBDDPurpose(sessionIndex, request, BootNotification);
-        bddDataRepository.removeRequestedMessageType(chargePointId, BootNotification);
+        bddDataRepository.addRequestedMessageType(chargePointId, AUTHORIZE);
+        bddDataRepository.addRequestedMessageType(chargePointId, HEARTBEAT);
+        storeMessageIfItIsNeededForBDDPurpose(sessionIndex, request, BOOT_NOTIFICATION);
+        bddDataRepository.removeRequestedMessageType(chargePointId, BOOT_NOTIFICATION);
 
         return confirmation;
     }
@@ -96,7 +96,7 @@ public class ServerCoreEventHandlerImpl implements ServerCoreEventHandler {
         DataTransferConfirmation confirmation = new DataTransferConfirmation(DataTransferStatus.UnknownVendorId);
         confirmation.setData("lalala");
 
-        storeMessageIfItIsNeededForBDDPurpose(sessionIndex, request, DataTransfer);
+        storeMessageIfItIsNeededForBDDPurpose(sessionIndex, request, DATA_TRANSFER);
         return confirmation;
     }
 
@@ -106,7 +106,7 @@ public class ServerCoreEventHandlerImpl implements ServerCoreEventHandler {
 
         HeartbeatConfirmation confirmation = new HeartbeatConfirmation(ZonedDateTime.now());
 
-        storeMessageIfItIsNeededForBDDPurpose(sessionIndex, request, Heartbeat);
+        storeMessageIfItIsNeededForBDDPurpose(sessionIndex, request, HEARTBEAT);
 
         return confirmation;
     }
@@ -119,7 +119,7 @@ public class ServerCoreEventHandlerImpl implements ServerCoreEventHandler {
 
         MeterValuesConfirmation confirmation = new MeterValuesConfirmation();
 
-        storeMessageIfItIsNeededForBDDPurpose(sessionIndex, request, MeterValue);
+        storeMessageIfItIsNeededForBDDPurpose(sessionIndex, request, METER_VALUE);
 
         return confirmation;
     }
@@ -136,11 +136,11 @@ public class ServerCoreEventHandlerImpl implements ServerCoreEventHandler {
         int transactionId = transactionRepository.addTransaction(chargePointId);
         StartTransactionConfirmation confirmation = new StartTransactionConfirmation(idTagInfo, transactionId);
 
-        bddDataRepository.addRequestedMessageType(sessionRepository.getChargerIdBySession(sessionIndex), Authorize);
-        bddDataRepository.addRequestedMessageType(sessionRepository.getChargerIdBySession(sessionIndex), MeterValue);
-        bddDataRepository.addRequestedMessageType(sessionRepository.getChargerIdBySession(sessionIndex), StopTransaction);
-        storeMessageIfItIsNeededForBDDPurpose(sessionIndex, request, StartTransaction);
-        bddDataRepository.removeRequestedMessageType(sessionRepository.getChargerIdBySession(sessionIndex), StartTransaction);
+        bddDataRepository.addRequestedMessageType(sessionRepository.getChargerIdBySession(sessionIndex), AUTHORIZE);
+        bddDataRepository.addRequestedMessageType(sessionRepository.getChargerIdBySession(sessionIndex), METER_VALUE);
+        bddDataRepository.addRequestedMessageType(sessionRepository.getChargerIdBySession(sessionIndex), STOP_TRANSACTION);
+        storeMessageIfItIsNeededForBDDPurpose(sessionIndex, request, START_TRANSACTION);
+        bddDataRepository.removeRequestedMessageType(sessionRepository.getChargerIdBySession(sessionIndex), START_TRANSACTION);
 
         return confirmation;
     }
@@ -151,7 +151,7 @@ public class ServerCoreEventHandlerImpl implements ServerCoreEventHandler {
 
         StatusNotificationConfirmation confirmation = new StatusNotificationConfirmation();
 
-        storeMessageIfItIsNeededForBDDPurpose(sessionIndex, request, StatusNotification);
+        storeMessageIfItIsNeededForBDDPurpose(sessionIndex, request, STATUS_NOTIFICATION);
         return confirmation;
     }
 
@@ -166,10 +166,10 @@ public class ServerCoreEventHandlerImpl implements ServerCoreEventHandler {
 
         confirmation.setIdTagInfo(idTagInfo);
 
-        storeMessageIfItIsNeededForBDDPurpose(sessionIndex, request, StopTransaction);
-        bddDataRepository.removeRequestedMessageType(sessionRepository.getChargerIdBySession(sessionIndex), Authorize);
-        bddDataRepository.removeRequestedMessageType(sessionRepository.getChargerIdBySession(sessionIndex), MeterValue);
-        bddDataRepository.removeRequestedMessageType(sessionRepository.getChargerIdBySession(sessionIndex), StopTransaction);
+        storeMessageIfItIsNeededForBDDPurpose(sessionIndex, request, STOP_TRANSACTION);
+        bddDataRepository.removeRequestedMessageType(sessionRepository.getChargerIdBySession(sessionIndex), AUTHORIZE);
+        bddDataRepository.removeRequestedMessageType(sessionRepository.getChargerIdBySession(sessionIndex), METER_VALUE);
+        bddDataRepository.removeRequestedMessageType(sessionRepository.getChargerIdBySession(sessionIndex), STOP_TRANSACTION);
 
         return confirmation;
     }

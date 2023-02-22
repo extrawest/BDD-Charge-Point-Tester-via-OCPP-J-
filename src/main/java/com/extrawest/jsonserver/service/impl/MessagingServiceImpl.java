@@ -155,42 +155,48 @@ public class MessagingServiceImpl implements MessagingService {
         }
         for (Request request : requests) {
             switch (messageType) {
-                case BootNotification:
+                case BOOT_NOTIFICATION:
                     if (request instanceof BootNotificationRequest) {
                         bddDataRepository.removeRequestedMessage(chargePointId, request);
                         return Optional.of(request);
                     }
-                case Heartbeat:
+                    break;
+                case HEARTBEAT:
                     if (request instanceof HeartbeatRequest) {
                         bddDataRepository.removeRequestedMessage(chargePointId, request);
                         return Optional.of(request);
                     }
-                case MeterValue:
+                    break;
+                case METER_VALUE:
                     if (request instanceof MeterValuesRequest) {
                         bddDataRepository.removeRequestedMessage(chargePointId, request);
                         return Optional.of(request);
                     }
-                case StatusNotification:
+                    break;
+                case STATUS_NOTIFICATION:
                     if (request instanceof StatusNotificationRequest) {
                         bddDataRepository.removeRequestedMessage(chargePointId, request);
                         return Optional.of(request);
                     }
-                case FirmwareStatusNotification:
+                    break;
+                case FIRMWARE_STATUS_NOTIFICATION:
                     if (request instanceof FirmwareStatusNotificationRequest) {
                         bddDataRepository.removeRequestedMessage(chargePointId, request);
                         return Optional.of(request);
                     }
-                case DiagnosticsStatusNotification:
+                    break;
+                case DIAGNOSTICS_STATUS_NOTIFICATION:
                     if (request instanceof DiagnosticsStatusNotificationRequest) {
                         bddDataRepository.removeRequestedMessage(chargePointId, request);
                         return Optional.of(request);
                     }
-                case Authorize:
+                    break;
+                case AUTHORIZE:
                     if (request instanceof AuthorizeRequest) {
                         bddDataRepository.removeRequestedMessage(chargePointId, request);
                         return Optional.of(request);
                     }
-                default:
+                    break;
             }
         }
         return Optional.empty();
