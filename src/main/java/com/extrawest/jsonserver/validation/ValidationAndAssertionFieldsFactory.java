@@ -3,6 +3,7 @@ package com.extrawest.jsonserver.validation;
 import static com.extrawest.jsonserver.model.emun.ApiErrorMessage.BUG_CREATING_INSTANCE;
 import static com.extrawest.jsonserver.model.emun.ApiErrorMessage.INVALID_FIELD_VALUE;
 import static com.extrawest.jsonserver.model.emun.ApiErrorMessage.INVALID_REQUIRED_PARAM;
+import static com.extrawest.jsonserver.model.emun.ApiErrorMessage.NON_MATCH_FIELDS;
 import static com.extrawest.jsonserver.model.emun.ApiErrorMessage.REDUNDANT_EXPECTED_PARAM;
 import static java.util.Objects.isNull;
 
@@ -17,6 +18,7 @@ import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
+import com.extrawest.jsonserver.model.exception.AssertionException;
 import com.extrawest.jsonserver.model.exception.BddTestingException;
 import com.extrawest.jsonserver.model.exception.ValidationException;
 import eu.chargetime.ocpp.PropertyConstraintException;
@@ -47,6 +49,31 @@ public abstract class ValidationAndAssertionFieldsFactory<T extends Validatable>
     protected Map<String, BiConsumer<T, String>> requiredFieldsSetup;
     protected Map<String, BiConsumer<T, String>> optionalFieldsSetup;
     protected Map<String, BiFunction<Map<String, String>, T, Boolean>> assertionFactory;
+
+    protected boolean validateRequestFields(Map<String, String> params, T actualRequest) {
+        validateForRequiredFields(params);
+        validateParamsViaLibModel(params);
+
+        List<String> nonMatchFields = nonMatchValues(params, actualRequest);
+
+        if (!nonMatchFields.isEmpty()) {
+            log.warn("Non match fields: " + nonMatchFields);
+            throw new AssertionException(
+                    String.format(NON_MATCH_FIELDS.getValue(), getParameterizeClassName(), nonMatchFields));
+        }
+        return true;
+    }
+
+    protected boolean validateConfirmationFields(Map<String, String> params) {
+        validateForRequiredFields(params);
+        return true;
+    }
+
+    protected T createValidatedConfirmation(Map<String, String> params, T response) {
+        validateRequestFields(params, response);
+
+        return validateParamsViaLibModel(params);
+    }
 
     protected void validateForRequiredFields(Map<String, String> params) {
         String messageType = getParameterizeClassName();
