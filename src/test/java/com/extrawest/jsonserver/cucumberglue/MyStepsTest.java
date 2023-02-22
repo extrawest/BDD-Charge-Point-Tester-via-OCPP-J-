@@ -1,24 +1,20 @@
 package com.extrawest.jsonserver.cucumberglue;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import eu.chargetime.ocpp.ServerEvents;
+import com.extrawest.jsonserver.model.exception.ValidationException;
+import com.extrawest.jsonserver.service.StepsSupporterService;
 import com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType;
 import com.extrawest.jsonserver.model.exception.BddTestingException;
 import com.extrawest.jsonserver.model.ChargePoint;
 import com.extrawest.jsonserver.model.RequiredChargingData;
 import com.extrawest.jsonserver.service.MessagingService;
-import com.extrawest.jsonserver.config.ApplicationConfiguration;
 import com.extrawest.jsonserver.repository.BddDataRepository;
 import com.extrawest.jsonserver.repository.ServerSessionRepository;
-import com.extrawest.jsonserver.ws.JsonWsServer;
 import eu.chargetime.ocpp.model.Confirmation;
 import eu.chargetime.ocpp.model.Request;
 import eu.chargetime.ocpp.model.core.ResetType;
@@ -33,10 +29,6 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.java_websocket.drafts.Draft;
-import org.java_websocket.drafts.Draft_6455;
-import org.java_websocket.protocols.IProtocol;
-import org.java_websocket.protocols.Protocol;
 
 /**
  * All time variables in seconds
@@ -45,20 +37,18 @@ import org.java_websocket.protocols.Protocol;
 @Slf4j
 @RequiredArgsConstructor
 public class MyStepsTest extends SpringIntegrationTest {
-    private final ApplicationConfiguration applicationConfiguration;
-    private final ServerEvents serverEvents;
     private final ServerSessionRepository sessionRepository;
 
     private final MessagingService messagingService;
+    private final StepsSupporterService stepsSupporterService;
     private final BddDataRepository storage;
-    private final JsonWsServer server;
 
     private final ChargePoint chargePoint = new ChargePoint();
     private final int connectionWaitingTime = 300; // in seconds
     private final int messageWaitingTime = 120; // in seconds
     private final RequiredChargingData requiredData = new RequiredChargingData();
 
-    private boolean initiateCharging;
+    private Boolean initiateCharging;
     private int scenarioId;
     private String scenarioName;
     private UUID sessionIndex;
@@ -69,7 +59,7 @@ public class MyStepsTest extends SpringIntegrationTest {
         scenarioId = scenario.getLine();
         scenarioName = scenario.getName();
         log.info("\nNew Scenario: " + scenarioName);
-        initiateCharging = false;
+        initiateCharging = null;
         stepNumber = 0;
     }
 
@@ -107,34 +97,23 @@ public class MyStepsTest extends SpringIntegrationTest {
 
     @Given("the Central System is started")
     public void csIsStarted() {
-        String hostAddress = startCS();
+        String hostAddress = stepsSupporterService.startCS();
         log.info(String.format("Scenario №%s, STEP %s: Server started on %s ", scenarioId, stepNumber, hostAddress));
     }
 
-    private String startCS() {
-        String availableProtocol = "ocpp1.6";
-
-        if (!server.isClosed()) {
-            server.close();
-        }
-
-        String hostAddress = applicationConfiguration.getHostAddress();
-        server.open(hostAddress, applicationConfiguration.getServerPort(), serverEvents);
-
-        setAvailableOcppProtocol(availableProtocol);
-        return hostAddress;
-    }
-
-    private void setAvailableOcppProtocol(String protocol) {
-        ArrayList<IProtocol> protocols = new ArrayList<>();
-        protocols.add(new Protocol(protocol));
-        Draft draftOcppOnly = new Draft_6455(Collections.emptyList(), protocols);
-        server.getListener().setDrafts(List.of(draftOcppOnly));
+    @Given("the Central System is started on {string}")
+    public void csIsStarted(String host) {
+        String hostAddress = stepsSupporterService.startCS(host);
+        log.info(String.format("Scenario №%s, STEP %s: Server started on %s ", scenarioId, stepNumber, hostAddress));
     }
 
     @Given("the Central System is started and must hold one charging session")
     public void theCentralSystemIsStartedAndMustHoldOneChargingSession() {
-        String hostAddress = startCS();
+        initiateCharging = false;
+        if (Objects.isNull(chargePoint.getChargePointId()) || chargePoint.getChargePointId().isBlank()) {
+            throw new ValidationException("You must set charge point id before running this step. Use 'Given Charge Point data'");
+        }
+        String hostAddress = stepsSupporterService.startCS();
         storage.addChargingChargePoint(chargePoint.getChargePointId());
         storage.addRequestedMessageType(chargePoint.getChargePointId(), ImplementedReceivedMessageType.BootNotification);
         storage.addRequestedMessageType(chargePoint.getChargePointId(), ImplementedReceivedMessageType.Authorize);
@@ -145,7 +124,10 @@ public class MyStepsTest extends SpringIntegrationTest {
     @Given("the Central System is started and must initiate one charging session")
     public void theCentralSystemIsStartedAndMustInitiateOneChargingSession() {
         initiateCharging = true;
-        String hostAddress = startCS();
+        if (Objects.isNull(chargePoint.getChargePointId()) || chargePoint.getChargePointId().isBlank()) {
+            throw new ValidationException("You must set charge point id before running this step. Use 'Given Charge Point data'");
+        }
+        String hostAddress = stepsSupporterService.startCS();
         storage.addChargingChargePoint(chargePoint.getChargePointId());
         storage.addRequestedMessageType(chargePoint.getChargePointId(), ImplementedReceivedMessageType.BootNotification);
         storage.addRequestedMessageType(chargePoint.getChargePointId(), ImplementedReceivedMessageType.Authorize);
@@ -166,6 +148,7 @@ public class MyStepsTest extends SpringIntegrationTest {
                         scenarioId, stepNumber, chargePoint.getChargePointId()));
             } catch (Exception e) {
                 messagingService.sleep(1000L);
+                stepsSupporterService.closeAllSessionsExceptGiven(chargePoint.getChargePointId());
             }
         }
         if (Objects.isNull(sessionIndex)) {
@@ -173,10 +156,11 @@ public class MyStepsTest extends SpringIntegrationTest {
                     scenarioId, stepNumber, chargePoint.getChargePointId()));
         }
         this.sessionIndex = sessionIndex;
-        if (initiateCharging) {
+        if (Objects.nonNull(initiateCharging) && initiateCharging) {
             messagingService.sendRemoteStartTransaction(chargePoint, sessionIndex, requiredData.getIdTag());
         }
     }
+
     @When("the Central System sends {string} request on {string} and receives confirmation")
     public void csSendsTriggerMessageRequestAndGetsConfirmation(String messageType, String requestedMessageType) {
         requiredData.setMessageType(requestedMessageType);
@@ -289,17 +273,20 @@ public class MyStepsTest extends SpringIntegrationTest {
         System.out.println("Awaiting message type: " + ImplementedReceivedMessageType.valueOf(requiredData.getMessageType()));
     }
 
-    @Then("the Central System must receive message with given data")
-    public void theCentralSystemMustReceiveMessageWithGivenData() {
-        ImplementedReceivedMessageType type = ImplementedReceivedMessageType.valueOf(requiredData.getMessageType());
+    @When("the Central System must receives {string} with given data")
+    public void theCentralSystemMustReceivesMessageWithGivenData(String messageType, DataTable table) {
+        Map<String, String> parameters = table.asMap();
+        ImplementedReceivedMessageType type = ImplementedReceivedMessageType
+                .valueOf(messageType.replace(".req", "").replace(".conf", ""));
+        storage.addRequestedMessageType(chargePoint.getChargePointId(), type);
         Optional<Request> request = messagingService.waitForRequestedMessage(chargePoint, messageWaitingTime, type);
         if (request.isEmpty()) {
             throw new BddTestingException(
                     String.format("Scenario №%s, STEP %s: %s message is not handled or invalid.",
                             scenarioId, stepNumber, type));
         }
-        messagingService.validateReceivedMessageOrThrow(chargePoint, requiredData, request.get());
-        log.info(String.format("Scenario №%s, STEP %s: handled. %s message is valid: %s ",
+        messagingService.validateRequest(parameters, request.get());
+        log.info(String.format("Scenario №%s, STEP %s: handled. %s message is valid: \n%s ",
                 scenarioId, stepNumber, type, request.get()));
     }
 
