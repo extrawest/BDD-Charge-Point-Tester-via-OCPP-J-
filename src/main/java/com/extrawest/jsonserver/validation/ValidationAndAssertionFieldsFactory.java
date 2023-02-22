@@ -169,6 +169,10 @@ public abstract class ValidationAndAssertionFieldsFactory<T extends Validatable>
         }
     }
 
+    protected String getValidatedStringValueOrThrow(String paramValue, String defaultValue) {
+        return chooseValueConsideringWildCard(paramValue, defaultValue);
+    }
+
     protected <E extends Enum<E>> E getValidatedEnumValueOrThrow(Class<E> clazz, String paramValue,
                                                                  String defaultValue, String fieldName) {
         String value = chooseValueConsideringWildCard(paramValue, defaultValue);
