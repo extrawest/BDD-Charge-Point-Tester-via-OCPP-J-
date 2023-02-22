@@ -12,7 +12,9 @@ public enum ApiErrorMessage {
     NON_MATCH_FIELDS("%s has non match field(s): %s"),
     CONNECTION_LIMIT_EXCEEDED("Connection limit exceeded"),
     ONLY_ONE_CONNECTION_ALLOWED("Only one connection allowed"),
-    BUG_CREATING_INSTANCE("Unexpected bug: can't create instance of %s. ");
+    BUG_CREATING_INSTANCE("Unexpected bug: can't create instance of %s. "),
+    WRONG_INSTANCE_OF("Requested method available only for %s inherit. ");
 
     private final String value;
+
 }
