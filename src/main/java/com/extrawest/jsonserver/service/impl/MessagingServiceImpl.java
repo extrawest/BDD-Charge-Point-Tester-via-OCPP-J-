@@ -1,4 +1,4 @@
- package com.extrawest.jsonserver.service.impl;
+package com.extrawest.jsonserver.service.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,6 +39,9 @@ import eu.chargetime.ocpp.model.remotetrigger.TriggerMessageRequestType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import static com.extrawest.jsonserver.util.TimeUtil.waitHalfSecond;
+import static com.extrawest.jsonserver.util.TimeUtil.waitOneSecond;
 
 @Slf4j
 @Service
@@ -89,19 +92,10 @@ public class MessagingServiceImpl implements MessagingService {
                 if (completed.isPresent()) {
                     return completed;
                 }
-                sleep(1000L);
+                waitOneSecond();
             }
         }
         return completed;
-    }
-
-    @Override
-    public void sleep(long l) {
-        try {
-            Thread.sleep(l);
-        } catch (InterruptedException ignored) {
-        }
-
     }
 
     @Override
@@ -129,9 +123,9 @@ public class MessagingServiceImpl implements MessagingService {
                 request = getAndHandleIfListContainMessage(chargePointId, requestedMessages.get(), type);
             }
             if (request.isPresent()) {
-               break;
+                break;
             }
-            sleep(1000L);
+            waitOneSecond();
         }
 
         return request;
@@ -139,8 +133,8 @@ public class MessagingServiceImpl implements MessagingService {
 
     @Override
     public void validateReceivedMessageOrThrow(ChargePoint chargePoint,
-                                                  RequiredChargingData requiredData,
-                                                  Request request) {
+                                               RequiredChargingData requiredData,
+                                               Request request) {
         boolean isEquals = compareData(chargePoint, requiredData, request);
         if (!isEquals) {
             throw new BddTestingException("Received data is not equal to expected data. ");
@@ -208,7 +202,7 @@ public class MessagingServiceImpl implements MessagingService {
         Optional<List<Request>> requestedMessages = bddDataRepository.getRequestedMessage(chargePoint.getChargePointId());
         List<Request> messagesWithMistakes = new ArrayList<>();
         while (isChargingSessionIsOpen) {
-            if (requestedMessages.isPresent() && (requestedMessages.get().size() > 0)) {
+            if (requestedMessages.isPresent() && (!requestedMessages.get().isEmpty())) {
                 List<Request> messages = List.copyOf(requestedMessages.get());
                 List<Request> messagesForDelete = new ArrayList<>();
                 for (Request message : messages) {
@@ -220,7 +214,7 @@ public class MessagingServiceImpl implements MessagingService {
                 }
                 bddDataRepository.removeRequestedMessages(chargePoint.getChargePointId(), messagesForDelete);
             }
-            sleep(500L);
+            waitHalfSecond();
             requestedMessages = bddDataRepository.getRequestedMessage(chargePoint.getChargePointId());
         }
         if (!messagesWithMistakes.isEmpty()) {

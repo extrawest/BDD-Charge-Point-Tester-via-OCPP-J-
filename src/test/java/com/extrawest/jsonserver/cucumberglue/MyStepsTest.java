@@ -168,7 +168,7 @@ public class MyStepsTest extends SpringIntegrationTest {
                 log.info(String.format("Scenario №%s, STEP %s: Charge point %s is connected!",
                         scenarioId, stepNumber, chargePoint.getChargePointId()));
             } catch (Exception e) {
-                messagingService.sleep(1000L);
+                waitOneSecond();
             }
         }
         if (Objects.isNull(sessionIndex)) {
