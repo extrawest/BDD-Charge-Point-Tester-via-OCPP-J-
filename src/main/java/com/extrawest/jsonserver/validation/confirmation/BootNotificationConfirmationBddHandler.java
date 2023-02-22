@@ -53,7 +53,7 @@ public class BootNotificationConfirmationBddHandler
     }
 
     @Override
-    public boolean validateFields(Map<String, String> params, BootNotificationConfirmation response) {
+    public boolean validateFields(Map<String, String> params) {
         return super.validateConfirmationFields(params);
     }
 

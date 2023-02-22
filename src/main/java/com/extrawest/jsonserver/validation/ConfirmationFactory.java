@@ -5,7 +5,7 @@ import eu.chargetime.ocpp.model.Confirmation;
 
 public interface ConfirmationFactory<T extends Confirmation> {
 
-    boolean validateFields(Map<String, String> params, T response);
+    boolean validateFields(Map<String, String> params);
 
     T createValidatedConfirmation(Map<String, String> params, T response);
 
