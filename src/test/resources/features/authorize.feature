@@ -1,6 +1,6 @@
 Feature:
 
-  Scenario: The Central System receiving 'BootNotification.req' message from Charge Point
+  Scenario: The Central System receiving 'Authorize.req' message from Charge Point
     Given the Central System is started on "localhost"
     Given the Charge Point is connected
     When the Central System must receives "Authorize.req" with given data
