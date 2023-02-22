@@ -8,7 +8,9 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import com.extrawest.jsonserver.service.MessagingService;
+import com.extrawest.jsonserver.validation.confirmation.AuthorizeConfirmationBddHandler;
 import com.extrawest.jsonserver.validation.confirmation.BootNotificationConfirmationBddHandler;
+import com.extrawest.jsonserver.validation.request.AuthorizeRequestBddHandler;
 import com.extrawest.jsonserver.validation.request.BootNotificationRequestBddHandler;
 import com.extrawest.jsonserver.ws.handler.ServerCoreEventHandlerImpl;
 import eu.chargetime.ocpp.NotConnectedException;
@@ -23,6 +25,7 @@ import com.extrawest.jsonserver.repository.ServerSessionRepository;
 import com.extrawest.jsonserver.ws.JsonWsServer;
 import eu.chargetime.ocpp.model.Confirmation;
 import eu.chargetime.ocpp.model.Request;
+import eu.chargetime.ocpp.model.core.AuthorizeConfirmation;
 import eu.chargetime.ocpp.model.core.AuthorizeRequest;
 import eu.chargetime.ocpp.model.core.BootNotificationConfirmation;
 import eu.chargetime.ocpp.model.core.BootNotificationRequest;
@@ -53,9 +56,10 @@ public class MessagingServiceImpl implements MessagingService {
     private final JsonWsServer server;
     private final ServerSessionRepository sessionRepository;
 
-    private final BootNotificationRequestBddHandler bootNotificationRequestFactory;
-
-    private final BootNotificationConfirmationBddHandler bootNotificationConfirmationFactory;
+    private final AuthorizeRequestBddHandler authorizeRequestBddHandler;
+    private final AuthorizeConfirmationBddHandler authorizeConfirmationBddHandler;
+    private final BootNotificationRequestBddHandler bootNotificationRequestBddHandler;
+    private final BootNotificationConfirmationBddHandler bootNotificationConfirmationBddHandler;
 
     @Override
     public void sendTriggerMessage(String chargePointId, TriggerMessageRequestType type) {
@@ -206,23 +210,30 @@ public class MessagingServiceImpl implements MessagingService {
     @Override
     public void validateRequest(Map<String, String> parameters, Request request) {
         if (request instanceof BootNotificationRequest message) {
-            bootNotificationRequestFactory.validateFields(parameters, message);
+            bootNotificationRequestBddHandler.validateFields(parameters, message);
+        } else if (request instanceof AuthorizeRequest message) {
+            authorizeConfirmationBddHandler.setReceivedIdTag(message.getIdTag());
+            authorizeRequestBddHandler.validateFields(parameters, message);
         } else {
-            throw new BddTestingException("Type is not implemented. Request: " + request);
+             throw new BddTestingException("Type is not implemented. Request: " + request);
         }
     }
 
     @Override
     public Confirmation sendConfirmationResponse(Map<String, String> parameters, Confirmation response) {
         ServerCoreEventHandlerImpl handler = springBootContext.getBean(ServerCoreEventHandlerImpl.class);
-        handler.setResponse(response);
         while (Objects.nonNull(handler.getResponse())) {
             sleep(100L);
         }
         if (response instanceof BootNotificationConfirmation message) {
-            return bootNotificationConfirmationFactory.createValidatedConfirmation(parameters, message);
+            response = bootNotificationConfirmationBddHandler.createValidatedConfirmation(parameters, message);
+        } else if (response instanceof AuthorizeConfirmation message) {
+            response = authorizeConfirmationBddHandler.createValidatedConfirmation(parameters, message);
+        } else {
+            throw new BddTestingException("This type of confirmation message is not implemented. ");
         }
-        throw new BddTestingException("Ups...");
+        handler.setResponse(response);
+        return response;
     }
 
     private boolean compareData(ChargePoint chargePoint, RequiredChargingData requiredData, Request request) {
