@@ -16,6 +16,7 @@ import com.extrawest.jsonserver.repository.BddDataRepository;
 import com.extrawest.jsonserver.repository.ServerSessionRepository;
 import eu.chargetime.ocpp.model.Confirmation;
 import eu.chargetime.ocpp.model.Request;
+import eu.chargetime.ocpp.model.core.AuthorizeConfirmation;
 import eu.chargetime.ocpp.model.core.BootNotificationConfirmation;
 import eu.chargetime.ocpp.model.core.ResetType;
 import eu.chargetime.ocpp.model.remotetrigger.TriggerMessageRequestType;
@@ -238,6 +239,7 @@ public class MyStepsTest extends SpringIntegrationTest {
         Confirmation response;
         switch (availableConfirmationMessageType) {
             case BootNotification -> response = new BootNotificationConfirmation();
+            case Authorize ->  response = new AuthorizeConfirmation();
             default -> throw new BddTestingException("Message type is unavailable");
         }
         Confirmation confirmation = messagingService.sendConfirmationResponse(parameters, response);
