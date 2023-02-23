@@ -1,7 +1,6 @@
 package com.extrawest.jsonserver.ws;
 
 import java.io.IOException;
-import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.util.Arrays;
 import java.util.List;
@@ -26,6 +25,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class JsonWsServerListener implements Listener {
+
+    private static final String RESOURCE_DESCRIPTOR_ERROR = "On error (resource descriptor: %s) triggered caused by:";
     private static final Logger logger = LoggerFactory.getLogger(JsonWsServerListener.class);
     private final ISessionFactory sessionFactory;
     @Getter
@@ -96,12 +97,7 @@ public class JsonWsServerListener implements Listener {
                 var resourceDescriptor = Optional.ofNullable(webSocket)
                         .map(WebSocket::getResourceDescriptor)
                         .orElse("not defined (webSocket is null)");
-                if (ex instanceof ConnectException) {
-                    logger.error("On error (resource descriptor: " + resourceDescriptor + ") triggered caused by:", ex);
-                } else {
-                    logger.error("On error (resource descriptor: " + resourceDescriptor + ") triggered:", ex);
-                }
-
+                logger.error(RESOURCE_DESCRIPTOR_ERROR.formatted(resourceDescriptor), ex);
             }
 
             public void onStart() {
