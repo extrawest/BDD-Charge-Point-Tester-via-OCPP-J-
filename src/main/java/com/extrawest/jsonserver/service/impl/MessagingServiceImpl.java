@@ -1,4 +1,4 @@
- package com.extrawest.jsonserver.service.impl;
+package com.extrawest.jsonserver.service.impl;
 
 import java.util.Arrays;
 import java.util.List;
@@ -53,6 +53,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
+
+import static com.extrawest.jsonserver.util.TimeUtil.waitOneSecond;
 
 @Slf4j
 @Service
@@ -111,19 +113,10 @@ public class MessagingServiceImpl implements MessagingService {
                 if (completed.isPresent()) {
                     return completed;
                 }
-                sleep(1000L);
+                waitOneSecond();
             }
         }
         return completed;
-    }
-
-    @Override
-    public void sleep(long l) {
-        try {
-            Thread.sleep(l);
-        } catch (InterruptedException ignored) {
-        }
-
     }
 
     @Override
@@ -151,9 +144,9 @@ public class MessagingServiceImpl implements MessagingService {
                 request = getAndHandleIfListContainMessage(chargePointId, requestedMessages.get(), type);
             }
             if (request.isPresent()) {
-               break;
+                break;
             }
-            sleep(1000L);
+            waitOneSecond();
         }
 
         return request;
@@ -161,8 +154,8 @@ public class MessagingServiceImpl implements MessagingService {
 
     @Override
     public void validateReceivedMessageOrThrow(ChargePoint chargePoint,
-                                                  RequiredChargingData requiredData,
-                                                  Request request) {
+                                               RequiredChargingData requiredData,
+                                               Request request) {
         boolean isEquals = compareData(chargePoint, requiredData, request);
         if (!isEquals) {
             throw new BddTestingException("Received data is not equal to expected data. ");
@@ -177,47 +170,53 @@ public class MessagingServiceImpl implements MessagingService {
         }
         for (Request request : requests) {
             switch (messageType) {
-                case BootNotification:
+                case BOOT_NOTIFICATION:
                     if (request instanceof BootNotificationRequest) {
                         bddDataRepository.removeRequestedMessage(chargePointId, request);
                         return Optional.of(request);
                     }
-                case Heartbeat:
+                    break;
+                case HEARTBEAT:
                     if (request instanceof HeartbeatRequest) {
                         bddDataRepository.removeRequestedMessage(chargePointId, request);
                         return Optional.of(request);
                     }
-                case MeterValue:
+                    break;
+                case METER_VALUE:
                     if (request instanceof MeterValuesRequest) {
                         bddDataRepository.removeRequestedMessage(chargePointId, request);
                         return Optional.of(request);
                     }
-                case StatusNotification:
+                    break;
+                case STATUS_NOTIFICATION:
                     if (request instanceof StatusNotificationRequest) {
                         bddDataRepository.removeRequestedMessage(chargePointId, request);
                         return Optional.of(request);
                     }
-                case FirmwareStatusNotification:
+                    break;
+                case FIRMWARE_STATUS_NOTIFICATION:
                     if (request instanceof FirmwareStatusNotificationRequest) {
                         bddDataRepository.removeRequestedMessage(chargePointId, request);
                         return Optional.of(request);
                     }
-                case DiagnosticsStatusNotification:
+                    break;
+                case DIAGNOSTICS_STATUS_NOTIFICATION:
                     if (request instanceof DiagnosticsStatusNotificationRequest) {
                         bddDataRepository.removeRequestedMessage(chargePointId, request);
                         return Optional.of(request);
                     }
-                case Authorize:
+                    break;
+                case AUTHORIZE:
                     if (request instanceof AuthorizeRequest) {
                         bddDataRepository.removeRequestedMessage(chargePointId, request);
                         return Optional.of(request);
                     }
-                case DataTransfer:
+                case DATA_TRANSFER:
                     if (request instanceof DataTransferRequest) {
                         bddDataRepository.removeRequestedMessage(chargePointId, request);
                         return Optional.of(request);
                     }
-                default:
+                    break;
             }
         }
         return Optional.empty();
@@ -243,7 +242,7 @@ public class MessagingServiceImpl implements MessagingService {
     public Confirmation sendConfirmationResponse(Map<String, String> parameters, Confirmation response) {
         ServerCoreEventHandlerImpl handler = springBootContext.getBean(ServerCoreEventHandlerImpl.class);
         while (Objects.nonNull(handler.getResponse())) {
-            sleep(100L);
+            waitOneSecond();
         }
         if (response instanceof BootNotificationConfirmation message) {
             response = bootNotificationConfirmationBddHandler.createValidatedConfirmation(parameters, message);
