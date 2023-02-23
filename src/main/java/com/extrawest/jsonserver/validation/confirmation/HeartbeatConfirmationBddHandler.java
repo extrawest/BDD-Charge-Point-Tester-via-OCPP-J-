@@ -31,7 +31,8 @@ public class HeartbeatConfirmationBddHandler
 
         this.requiredFieldsSetup = Map.of(
                 CURRENT_TIME_REQUIRED, (req, timeStr) -> req.setCurrentTime(
-                        getValidatedZonedDateTimeOrThrow(timeStr, defaultCurrentTime, CURRENT_TIME_REQUIRED))
+                        getValidatedZonedDateTimeOrCurrentTimeIfEmptyOrThrow(timeStr, defaultCurrentTime,
+                                CURRENT_TIME_REQUIRED))
         );
 
         this.optionalFieldsSetup = Collections.emptyMap();
