@@ -39,7 +39,8 @@ public class BootNotificationConfirmationBddHandler
 
         this.requiredFieldsSetup = Map.of(
                 CURRENT_TIME_REQUIRED, (req, timeStr) -> req.setCurrentTime(
-                        getValidatedZonedDateTimeOrThrow(timeStr, defaultCurrentTime, CURRENT_TIME_REQUIRED)),
+                        getValidatedZonedDateTimeOrCurrentTimeIfEmptyOrThrow(timeStr, defaultCurrentTime,
+                                CURRENT_TIME_REQUIRED)),
                 INTERVAL_REQUIRED, (req, intervalStr) -> req.setInterval(
                         getValidatedIntegerOrThrow(intervalStr, defaultInterval, INTERVAL_REQUIRED)),
                 STATUS_REQUIRED, (req, status) -> req.setStatus(

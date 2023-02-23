@@ -145,7 +145,9 @@ public abstract class ValidationAndAssertionFieldsFactory<T extends Validatable>
         return result;
     }
 
-    protected ZonedDateTime getValidatedZonedDateTimeOrThrow(String paramValue, String defaultValue, String fieldName) {
+    protected ZonedDateTime getValidatedZonedDateTimeOrCurrentTimeIfEmptyOrThrow(String paramValue,
+                                                                                 String defaultValue,
+                                                                                 String fieldName) {
         String value = chooseValueConsideringWildCard(paramValue, defaultValue);
         if (isNull(value) || value.isEmpty()) {
             return ZonedDateTime.now();
