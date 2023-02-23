@@ -135,7 +135,9 @@ public class JsonServer {
                                     }
 
                                     @Override
-                                    public void handleConnectionOpened() {}
+                                    public void handleConnectionOpened() {
+                                        // not implemented yet
+                                    }
                                 });
 
                         sessions.put(session.getSessionId(), session);

@@ -19,8 +19,6 @@ public interface MessagingService {
 
     Optional<CompletableFuture<Confirmation>> waitForSuccessfulResponse(UUID sessionIndex, int waitingTimeSec);
 
-    void sleep(long l);
-
     Optional<Request> waitForRequestedMessage(ChargePoint chargePoint, int waitingTimeSec, ImplementedReceivedMessageType type);
 
     void validateReceivedMessageOrThrow(ChargePoint chargePoint, RequiredChargingData requiredData, Request request);

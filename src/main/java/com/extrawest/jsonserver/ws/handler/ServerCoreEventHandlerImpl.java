@@ -1,14 +1,14 @@
 package com.extrawest.jsonserver.ws.handler;
 
-import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.Authorize;
-import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.BootNotification;
-import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.DataTransfer;
-import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.Heartbeat;
-import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.MeterValue;
-import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.StartTransaction;
-import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.StatusNotification;
-import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.StopTransaction;
-
+import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.AUTHORIZE;
+import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.BOOT_NOTIFICATION;
+import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.DATA_TRANSFER;
+import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.HEARTBEAT;
+import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.METER_VALUE;
+import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.START_TRANSACTION;
+import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.STATUS_NOTIFICATION;
+import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.STOP_TRANSACTION;
+import static com.extrawest.jsonserver.util.TimeUtil.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -49,9 +49,14 @@ import org.springframework.stereotype.Component;
 @Primary
 @RequiredArgsConstructor
 public class ServerCoreEventHandlerImpl implements ServerCoreEventHandler {
+
     private final BddDataRepository bddDataRepository;
+
     private final ServerSessionRepository sessionRepository;
-    @Getter @Setter private Confirmation response = null;
+
+    @Getter
+    @Setter
+    private Confirmation response = null;
 
     @Value("${default.sleep.awaiting.time:100}")
     private long defaultSleepAwaitingTime;
@@ -59,10 +64,10 @@ public class ServerCoreEventHandlerImpl implements ServerCoreEventHandler {
     @Override
     public AuthorizeConfirmation handleAuthorizeRequest(UUID sessionIndex, AuthorizeRequest request) {
         log.debug("AuthorizeRequest: " + request);
-        storeMessageIfItIsNeededForBDDPurpose(sessionIndex, request, Authorize);
+        storeMessageIfItIsNeededForBDDPurpose(sessionIndex, request, AUTHORIZE);
 
         while (Objects.isNull(response) || !(response instanceof AuthorizeConfirmation)) {
-            waitingDefaultTime();
+            sleep(defaultSleepAwaitingTime);
         }
         AuthorizeConfirmation confirmation = (AuthorizeConfirmation) response;
         response = null;
@@ -73,10 +78,10 @@ public class ServerCoreEventHandlerImpl implements ServerCoreEventHandler {
     public BootNotificationConfirmation handleBootNotificationRequest(UUID sessionIndex,
                                                                       BootNotificationRequest request) {
         log.debug("BootNotificationRequest: " + request);
-        storeMessageIfItIsNeededForBDDPurpose(sessionIndex, request, BootNotification);
+        storeMessageIfItIsNeededForBDDPurpose(sessionIndex, request, BOOT_NOTIFICATION);
 
         while (Objects.isNull(response) || !(response instanceof BootNotificationConfirmation)) {
-            waitingDefaultTime();
+            sleep(defaultSleepAwaitingTime);
         }
         BootNotificationConfirmation confirmation = (BootNotificationConfirmation) response;
         response = null;
@@ -86,10 +91,10 @@ public class ServerCoreEventHandlerImpl implements ServerCoreEventHandler {
     @Override
     public DataTransferConfirmation handleDataTransferRequest(UUID sessionIndex, DataTransferRequest request) {
         log.debug("DataTransferRequest: " + request);
-        storeMessageIfItIsNeededForBDDPurpose(sessionIndex, request, DataTransfer);
+        storeMessageIfItIsNeededForBDDPurpose(sessionIndex, request, DATA_TRANSFER);
 
         while (Objects.isNull(response) || !(response instanceof DataTransferConfirmation)) {
-            waitingDefaultTime();
+            sleep(defaultSleepAwaitingTime);
         }
         DataTransferConfirmation confirmation = (DataTransferConfirmation) response;
         response = null;
@@ -99,10 +104,10 @@ public class ServerCoreEventHandlerImpl implements ServerCoreEventHandler {
     @Override
     public HeartbeatConfirmation handleHeartbeatRequest(UUID sessionIndex, HeartbeatRequest request) {
         log.debug("HeartbeatRequest: " + request);
-        storeMessageIfItIsNeededForBDDPurpose(sessionIndex, request, Heartbeat);
+        storeMessageIfItIsNeededForBDDPurpose(sessionIndex, request, HEARTBEAT);
 
         while (Objects.isNull(response) || !(response instanceof HeartbeatConfirmation)) {
-            waitingDefaultTime();
+            sleep(defaultSleepAwaitingTime);
         }
         HeartbeatConfirmation confirmation = (HeartbeatConfirmation) response;
         response = null;
@@ -113,13 +118,13 @@ public class ServerCoreEventHandlerImpl implements ServerCoreEventHandler {
     public MeterValuesConfirmation handleMeterValuesRequest(UUID sessionIndex, MeterValuesRequest request) {
         log.debug("MeterValuesRequest: " + request + ", with SampledValues: "
                 + Arrays.stream(request.getMeterValue())
-                        .flatMap(x -> Arrays.stream(x.getSampledValue()))
-                        .toList()
+                .flatMap(x -> Arrays.stream(x.getSampledValue()))
+                .toList()
         );
-        storeMessageIfItIsNeededForBDDPurpose(sessionIndex, request, MeterValue);
+        storeMessageIfItIsNeededForBDDPurpose(sessionIndex, request, METER_VALUE);
 
         while (Objects.isNull(response) || !(response instanceof MeterValuesConfirmation)) {
-            waitingDefaultTime();
+            sleep(defaultSleepAwaitingTime);
         }
         MeterValuesConfirmation confirmation = (MeterValuesConfirmation) response;
         response = null;
@@ -130,10 +135,10 @@ public class ServerCoreEventHandlerImpl implements ServerCoreEventHandler {
     public StartTransactionConfirmation handleStartTransactionRequest(UUID sessionIndex,
                                                                       StartTransactionRequest request) {
         log.debug("StartTransactionRequest: " + request);
-        storeMessageIfItIsNeededForBDDPurpose(sessionIndex, request, StartTransaction);
+        storeMessageIfItIsNeededForBDDPurpose(sessionIndex, request, START_TRANSACTION);
 
         while (Objects.isNull(response) || !(response instanceof StartTransactionConfirmation)) {
-            waitingDefaultTime();
+            sleep(defaultSleepAwaitingTime);
         }
         StartTransactionConfirmation confirmation = (StartTransactionConfirmation) response;
         response = null;
@@ -144,10 +149,10 @@ public class ServerCoreEventHandlerImpl implements ServerCoreEventHandler {
     public StatusNotificationConfirmation handleStatusNotificationRequest(UUID sessionIndex,
                                                                           StatusNotificationRequest request) {
         log.debug("StatusNotificationRequest: " + request);
-        storeMessageIfItIsNeededForBDDPurpose(sessionIndex, request, StatusNotification);
+        storeMessageIfItIsNeededForBDDPurpose(sessionIndex, request, STATUS_NOTIFICATION);
 
         while (Objects.isNull(response) || !(response instanceof StatusNotificationConfirmation)) {
-            waitingDefaultTime();
+            sleep(defaultSleepAwaitingTime);
         }
         StatusNotificationConfirmation confirmation = (StatusNotificationConfirmation) response;
         response = null;
@@ -158,10 +163,10 @@ public class ServerCoreEventHandlerImpl implements ServerCoreEventHandler {
     public StopTransactionConfirmation handleStopTransactionRequest(UUID sessionIndex,
                                                                     StopTransactionRequest request) {
         log.debug("StopTransactionRequest: " + request);
-        storeMessageIfItIsNeededForBDDPurpose(sessionIndex, request, StopTransaction);
+        storeMessageIfItIsNeededForBDDPurpose(sessionIndex, request, STOP_TRANSACTION);
 
         while (Objects.isNull(response) || !(response instanceof StopTransactionConfirmation)) {
-            waitingDefaultTime();
+            sleep(defaultSleepAwaitingTime);
         }
         StopTransactionConfirmation confirmation = (StopTransactionConfirmation) response;
         response = null;
@@ -177,14 +182,6 @@ public class ServerCoreEventHandlerImpl implements ServerCoreEventHandler {
             return;
         }
         bddDataRepository.addRequestedMessage(chargePointId, request);
-    }
-
-    private void waitingDefaultTime() {
-        try {
-            Thread.sleep(defaultSleepAwaitingTime);
-        } catch (InterruptedException e) {
-            log.warn("Ups... sleep is unavailable... ");
-        }
     }
 
 }

@@ -1,11 +1,11 @@
 package com.extrawest.jsonserver.ws;
 
 import java.io.IOException;
-import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import eu.chargetime.ocpp.ISessionFactory;
 import eu.chargetime.ocpp.JSONCommunicator;
@@ -25,9 +25,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class JsonWsServerListener implements Listener {
+
+    private static final String RESOURCE_DESCRIPTOR_ERROR = "On error (resource descriptor: %s) triggered caused by:";
     private static final Logger logger = LoggerFactory.getLogger(JsonWsServerListener.class);
     private final ISessionFactory sessionFactory;
-    @Getter @Setter private List<Draft> drafts;
+    @Getter
+    @Setter
+    private List<Draft> drafts;
     private final JSONConfiguration configuration;
     private volatile WebSocketServer server;
     private WssFactoryBuilder wssFactoryBuilder;
@@ -46,7 +50,7 @@ public class JsonWsServerListener implements Listener {
     public void open(String hostname, int port, final ListenerEvents handler) {
         this.server = new WebSocketServer(new InetSocketAddress(hostname, port), this.drafts) {
             public void onOpen(final WebSocket webSocket, ClientHandshake clientHandshake) {
-                JsonWsServerListener.logger.debug("On connection open (resource descriptor: {})", clientHandshake.getResourceDescriptor());
+                logger.debug("On connection open (resource descriptor: {})", clientHandshake.getResourceDescriptor());
                 JsonWsServerReceiver receiver = new JsonWsServerReceiver(new WebSocketReceiverEvents() {
                     public boolean isClosed() {
                         return JsonWsServerListener.this.closed;
@@ -60,19 +64,27 @@ public class JsonWsServerListener implements Listener {
                         webSocket.send(message);
                     }
                 });
+
                 JsonWsServerListener.this.sockets.put(webSocket, receiver);
-                SessionInformation information = (new SessionInformation.Builder()).Identifier(clientHandshake.getResourceDescriptor()).InternetAddress(webSocket.getRemoteSocketAddress()).build();
-                handler.newSession(JsonWsServerListener.this.sessionFactory.createSession(new JSONCommunicator(receiver)), information);
+                SessionInformation information = (new SessionInformation.Builder())
+                        .Identifier(clientHandshake.getResourceDescriptor())
+                        .InternetAddress(webSocket.getRemoteSocketAddress())
+                        .build();
+                handler.newSession(JsonWsServerListener
+                        .this.sessionFactory
+                        .createSession(new JSONCommunicator(receiver)), information);
             }
 
             public void onClose(WebSocket webSocket, int code, String reason, boolean remote) {
-                JsonWsServerListener.logger.debug("On connection close (resource descriptor: {}, code: {}, reason: {}, remote: {})", new Object[]{webSocket.getResourceDescriptor(), code, reason, remote});
+                logger.debug("On connection close (resource descriptor: {}, code: {}, reason: {}, remote: {})",
+                        new Object[]{webSocket.getResourceDescriptor(), code, reason, remote});
+
                 JsonWsServerReceiver receiver = JsonWsServerListener.this.sockets.get(webSocket);
                 if (receiver != null) {
                     receiver.disconnect();
                     JsonWsServerListener.this.sockets.remove(webSocket);
                 } else {
-                    JsonWsServerListener.logger.debug("Receiver for socket not found: {}", webSocket);
+                    logger.debug("Receiver for socket not found: {}", webSocket);
                 }
 
             }
@@ -82,17 +94,14 @@ public class JsonWsServerListener implements Listener {
             }
 
             public void onError(WebSocket webSocket, Exception ex) {
-                String resourceDescriptor = webSocket != null ? webSocket.getResourceDescriptor() : "not defined (webSocket is null)";
-                if (ex instanceof ConnectException) {
-                    JsonWsServerListener.logger.error("On error (resource descriptor: " + resourceDescriptor + ") triggered caused by:", ex);
-                } else {
-                    JsonWsServerListener.logger.error("On error (resource descriptor: " + resourceDescriptor + ") triggered:", ex);
-                }
-
+                var resourceDescriptor = Optional.ofNullable(webSocket)
+                        .map(WebSocket::getResourceDescriptor)
+                        .orElse("not defined (webSocket is null)");
+                logger.error(RESOURCE_DESCRIPTOR_ERROR.formatted(resourceDescriptor), ex);
             }
 
             public void onStart() {
-                JsonWsServerListener.logger.debug("Server socket bound");
+                logger.debug("Server socket bound");
             }
         };
         if (this.wssFactoryBuilder != null) {

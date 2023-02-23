@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
+
 import com.extrawest.jsonserver.model.exception.BddTestingException;
 import com.extrawest.jsonserver.repository.ServerSessionRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,6 +16,10 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ServerSessionRepositoryImpl implements ServerSessionRepository {
+
+    private static final String NO_SESSIONS_FOR_CP = "No open session with Charge Point(id=%s)";
+    private static final String NO_SESSIONS = "No open sessions!";
+
     @Value("${max.connections.count:1}")
     private int maxConnectionCount;
     private final Map<UUID, String> chargePointIdsBySessions = new ConcurrentHashMap<>();
@@ -37,9 +41,9 @@ public class ServerSessionRepositoryImpl implements ServerSessionRepository {
     public UUID getSessionByChargerId(String chargePointId) {
         return chargePointIdsBySessions.entrySet().stream()
                 .filter(set -> Objects.equals(set.getValue(), chargePointId))
-                .findFirst().orElseThrow(
-                        () -> new RuntimeException("No open session with Charge Point(id=" + chargePointId + ")")
-                ).getKey();
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException(NO_SESSIONS_FOR_CP.formatted(chargePointId)))
+                .getKey();
     }
 
     @Override
@@ -47,8 +51,11 @@ public class ServerSessionRepositoryImpl implements ServerSessionRepository {
         if (chargePointIdsBySessions.size() > 1) {
             throw new BddTestingException(ONLY_ONE_CONNECTION_ALLOWED.getValue());
         }
-        return chargePointIdsBySessions.keySet().stream()
-                .findFirst().orElseThrow(() -> new RuntimeException("No open session. "));
+
+        return chargePointIdsBySessions.keySet()
+                .stream()
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException(NO_SESSIONS));
     }
 
     @Override
@@ -61,7 +68,7 @@ public class ServerSessionRepositoryImpl implements ServerSessionRepository {
         return chargePointIdsBySessions.entrySet().stream()
                 .filter(s -> Objects.equals(s.getValue(), chargePointId))
                 .map(Map.Entry::getKey)
-                .collect(Collectors.toList());
+                .toList();
     }
 
 }

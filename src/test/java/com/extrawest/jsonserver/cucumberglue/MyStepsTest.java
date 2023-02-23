@@ -6,6 +6,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+
 import com.extrawest.jsonserver.service.StepsSupporterService;
 import com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType;
 import com.extrawest.jsonserver.model.exception.BddTestingException;
@@ -34,6 +35,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 
+import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.*;
+import static com.extrawest.jsonserver.util.TimeUtil.waitOneSecond;
+
 /**
  * All time variables in seconds
  */
@@ -41,10 +45,13 @@ import org.springframework.beans.factory.annotation.Value;
 @Slf4j
 @RequiredArgsConstructor
 public class MyStepsTest extends SpringIntegrationTest {
+
     private final ServerSessionRepository sessionRepository;
 
     private final MessagingService messagingService;
+
     private final StepsSupporterService stepsSupporterService;
+
     private final BddDataRepository storage;
 
     private final ChargePoint chargePoint = new ChargePoint();
@@ -107,7 +114,7 @@ public class MyStepsTest extends SpringIntegrationTest {
                 log.info(String.format("Scenario №%s, STEP %s: Charge point %s is connected!",
                         scenarioId, stepNumber, chargerPointId));
             } catch (Exception e) {
-                messagingService.sleep(1000L);
+                waitOneSecond();
             }
         }
         if (Objects.isNull(sessionIndex)) {
@@ -133,7 +140,7 @@ public class MyStepsTest extends SpringIntegrationTest {
                 log.info(String.format("Scenario №%s, STEP %s: Charge point %s is connected!",
                         scenarioId, stepNumber, chargePoint.getChargePointId()));
             } catch (Exception e) {
-                messagingService.sleep(1000L);
+                waitOneSecond();
                 stepsSupporterService.closeAllSessionsExceptGiven(chargePointId);
             }
         }
@@ -204,8 +211,7 @@ public class MyStepsTest extends SpringIntegrationTest {
     public void csMustReceiveMessageRequestAndCompareData() {
         log.info(String.format("Scenario №%s, STEP %s: Waiting for request up to %s...",
                 scenarioId, stepNumber, messageWaitingTime));
-        ImplementedReceivedMessageType type =
-                ImplementedReceivedMessageType.valueOf(requiredData.getMessageType());
+        ImplementedReceivedMessageType type = valueOf(requiredData.getMessageType());
         Optional<Request> request = messagingService.waitForRequestedMessage(chargePoint, messageWaitingTime, type);
         if (request.isEmpty()) {
             throw new BddTestingException(
@@ -221,7 +227,7 @@ public class MyStepsTest extends SpringIntegrationTest {
     public void theCentralSystemMustReceivesMessageWithGivenData(String messageType, DataTable table) {
         Map<String, String> parameters = table.asMap();
         ImplementedReceivedMessageType type = ImplementedReceivedMessageType
-                .valueOf(messageType.replace(".req", "").replace(".conf", ""));
+                .fromValue(messageType.replace(".req", "").replace(".conf", ""));
         availableConfirmationMessageType = type;
         storage.addRequestedMessageType(chargePoint.getChargePointId(), type);
         Optional<Request> request = messagingService.waitForRequestedMessage(chargePoint, messageWaitingTime, type);
@@ -240,10 +246,10 @@ public class MyStepsTest extends SpringIntegrationTest {
         Map<String, String> parameters = table.asMap();
         Confirmation response;
         switch (availableConfirmationMessageType) {
-            case BootNotification -> response = new BootNotificationConfirmation();
-            case Authorize ->  response = new AuthorizeConfirmation();
-            case DataTransfer -> response = new DataTransferConfirmation();
-            case Heartbeat -> response = new HeartbeatConfirmation();
+            case BOOT_NOTIFICATION -> response = new BootNotificationConfirmation();
+            case AUTHORIZE ->  response = new AuthorizeConfirmation();
+            case DATA_TRANSFER -> response = new DataTransferConfirmation();
+            case HEARTBEAT -> response = new HeartbeatConfirmation();
             default -> throw new BddTestingException("Message type is unavailable");
         }
         Confirmation confirmation = messagingService.sendConfirmationResponse(parameters, response);
