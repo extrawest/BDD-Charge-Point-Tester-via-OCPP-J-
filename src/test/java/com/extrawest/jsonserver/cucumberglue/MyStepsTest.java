@@ -19,6 +19,7 @@ import eu.chargetime.ocpp.model.Request;
 import eu.chargetime.ocpp.model.core.AuthorizeConfirmation;
 import eu.chargetime.ocpp.model.core.BootNotificationConfirmation;
 import eu.chargetime.ocpp.model.core.DataTransferConfirmation;
+import eu.chargetime.ocpp.model.core.HeartbeatConfirmation;
 import eu.chargetime.ocpp.model.core.ResetType;
 import eu.chargetime.ocpp.model.remotetrigger.TriggerMessageRequestType;
 import io.cucumber.datatable.DataTable;
@@ -242,6 +243,7 @@ public class MyStepsTest extends SpringIntegrationTest {
             case BootNotification -> response = new BootNotificationConfirmation();
             case Authorize ->  response = new AuthorizeConfirmation();
             case DataTransfer -> response = new DataTransferConfirmation();
+            case Heartbeat -> response = new HeartbeatConfirmation();
             default -> throw new BddTestingException("Message type is unavailable");
         }
         Confirmation confirmation = messagingService.sendConfirmationResponse(parameters, response);
