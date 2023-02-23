@@ -1,6 +1,7 @@
 package com.extrawest.jsonserver.cucumberglue;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -217,9 +218,19 @@ public class MyStepsTest extends SpringIntegrationTest {
                 scenarioId, stepNumber, type, request.get()));
     }
 
+    @When("the Central System must receives {string}")
+    public void theCentralSystemMustReceivesMessageWithGivenData(String messageType) {
+        Map<String, String> parameters = Collections.emptyMap();
+        theCSReceivesMessageWithGivenData(messageType, parameters);
+    }
+
     @When("the Central System must receives {string} with given data")
     public void theCentralSystemMustReceivesMessageWithGivenData(String messageType, DataTable table) {
         Map<String, String> parameters = table.asMap();
+        theCSReceivesMessageWithGivenData(messageType, parameters);
+    }
+
+    private void theCSReceivesMessageWithGivenData(String messageType, Map<String, String> parameters) {
         ImplementedReceivedMessageType type = ImplementedReceivedMessageType
                 .valueOf(messageType.replace(".req", "").replace(".conf", ""));
         availableConfirmationMessageType = type;
