@@ -1,6 +1,6 @@
 package com.extrawest.jsonserver.repository.impl;
 
-import static java.lang.Thread.sleep;
+import static com.extrawest.jsonserver.util.TimeUtil.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -74,10 +74,7 @@ public class BddDataRepositoryImpl implements BddDataRepository {
 
     @Override
     public Optional<CompletableFuture<Confirmation>> getCompleted(UUID sessionIndex) {
-        try {
-            sleep(1000);
-        } catch (InterruptedException ignored) {
-        }
+        waitOneSecond();
         String chargePointId = serverSessionRepository.getChargerIdBySession(sessionIndex);
         String uniqueId = uniqueIdByChargePointId.getOrDefault(chargePointId, null);
         return Optional.ofNullable(completedPromises.getOrDefault(uniqueId, null));
@@ -92,7 +89,7 @@ public class BddDataRepositoryImpl implements BddDataRepository {
     @Override
     public void addRequestedMessageType(String chargePointId, TriggerMessageRequestType type) {
         List<ImplementedReceivedMessageType> messageTypes = requestedMessageTypes.getOrDefault(chargePointId, new ArrayList<>());
-        messageTypes.add(ImplementedReceivedMessageType.valueOf(type.name()));
+        messageTypes.add(ImplementedReceivedMessageType.fromValue(type.name()));
         requestedMessageTypes.put(chargePointId, messageTypes);
     }
 

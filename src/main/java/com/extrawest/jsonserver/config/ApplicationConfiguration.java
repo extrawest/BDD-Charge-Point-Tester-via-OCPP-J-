@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 @EnableConfigurationProperties
 @Getter
 public class ApplicationConfiguration {
+
     @Value("${host.address:}")
     @Setter private String hostAddress;
 

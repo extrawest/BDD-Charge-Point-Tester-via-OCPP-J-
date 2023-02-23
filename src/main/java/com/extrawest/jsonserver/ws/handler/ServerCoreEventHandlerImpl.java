@@ -1,182 +1,183 @@
 package com.extrawest.jsonserver.ws.handler;
 
-import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.Authorize;
-import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.BootNotification;
-import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.DataTransfer;
-import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.Heartbeat;
-import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.MeterValue;
-import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.StartTransaction;
-import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.StatusNotification;
-import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.StopTransaction;
-
-import java.time.ZonedDateTime;
+import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.AUTHORIZE;
+import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.BOOT_NOTIFICATION;
+import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.DATA_TRANSFER;
+import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.HEARTBEAT;
+import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.METER_VALUE;
+import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.START_TRANSACTION;
+import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.STATUS_NOTIFICATION;
+import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.STOP_TRANSACTION;
+import static com.extrawest.jsonserver.util.TimeUtil.*;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import com.extrawest.jsonserver.repository.TransactionRepository;
 import eu.chargetime.ocpp.feature.profile.ServerCoreEventHandler;
 import com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType;
 import com.extrawest.jsonserver.repository.BddDataRepository;
 import com.extrawest.jsonserver.repository.ServerSessionRepository;
+import eu.chargetime.ocpp.model.Confirmation;
 import eu.chargetime.ocpp.model.Request;
-import eu.chargetime.ocpp.model.core.AuthorizationStatus;
 import eu.chargetime.ocpp.model.core.AuthorizeConfirmation;
 import eu.chargetime.ocpp.model.core.AuthorizeRequest;
 import eu.chargetime.ocpp.model.core.BootNotificationConfirmation;
 import eu.chargetime.ocpp.model.core.BootNotificationRequest;
 import eu.chargetime.ocpp.model.core.DataTransferConfirmation;
 import eu.chargetime.ocpp.model.core.DataTransferRequest;
-import eu.chargetime.ocpp.model.core.DataTransferStatus;
 import eu.chargetime.ocpp.model.core.HeartbeatConfirmation;
 import eu.chargetime.ocpp.model.core.HeartbeatRequest;
-import eu.chargetime.ocpp.model.core.IdTagInfo;
 import eu.chargetime.ocpp.model.core.MeterValuesConfirmation;
 import eu.chargetime.ocpp.model.core.MeterValuesRequest;
-import eu.chargetime.ocpp.model.core.RegistrationStatus;
 import eu.chargetime.ocpp.model.core.StartTransactionConfirmation;
 import eu.chargetime.ocpp.model.core.StartTransactionRequest;
 import eu.chargetime.ocpp.model.core.StatusNotificationConfirmation;
 import eu.chargetime.ocpp.model.core.StatusNotificationRequest;
 import eu.chargetime.ocpp.model.core.StopTransactionConfirmation;
 import eu.chargetime.ocpp.model.core.StopTransactionRequest;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
+@Primary
 @RequiredArgsConstructor
 public class ServerCoreEventHandlerImpl implements ServerCoreEventHandler {
+
     private final BddDataRepository bddDataRepository;
-    private final TransactionRepository transactionRepository;
+
     private final ServerSessionRepository sessionRepository;
+
+    @Getter
+    @Setter
+    private Confirmation response = null;
+
+    @Value("${default.sleep.awaiting.time:100}")
+    private long defaultSleepAwaitingTime;
 
     @Override
     public AuthorizeConfirmation handleAuthorizeRequest(UUID sessionIndex, AuthorizeRequest request) {
-        log.info("AuthorizeRequest: " + request);
+        log.debug("AuthorizeRequest: " + request);
+        storeMessageIfItIsNeededForBDDPurpose(sessionIndex, request, AUTHORIZE);
 
-        IdTagInfo idTagInfo = new IdTagInfo(AuthorizationStatus.Accepted);
-        idTagInfo.setExpiryDate(ZonedDateTime.now().plusMonths(1));
-        idTagInfo.setParentIdTag(request.getIdTag());
-
-        AuthorizeConfirmation confirmation = new AuthorizeConfirmation(idTagInfo);
-
-        String chargePointId = sessionRepository.getChargerIdBySession(sessionIndex);
-        storeMessageIfItIsNeededForBDDPurpose(sessionIndex, request, Authorize);
-        if (bddDataRepository.isCharging(chargePointId)) {
-            bddDataRepository.addRequestedMessageType(chargePointId, StartTransaction);
-            bddDataRepository.addRequestedMessageType(chargePointId, StopTransaction);
-            bddDataRepository.removeRequestedMessageType(chargePointId, Authorize);
+        while (Objects.isNull(response) || !(response instanceof AuthorizeConfirmation)) {
+            sleep(defaultSleepAwaitingTime);
         }
+        AuthorizeConfirmation confirmation = (AuthorizeConfirmation) response;
+        response = null;
         return confirmation;
     }
 
     @Override
-    public BootNotificationConfirmation handleBootNotificationRequest(UUID sessionIndex, BootNotificationRequest request) {
-        log.info("BootNotificationRequest: " + request);
+    public BootNotificationConfirmation handleBootNotificationRequest(UUID sessionIndex,
+                                                                      BootNotificationRequest request) {
+        log.debug("BootNotificationRequest: " + request);
+        storeMessageIfItIsNeededForBDDPurpose(sessionIndex, request, BOOT_NOTIFICATION);
 
-        BootNotificationConfirmation confirmation =
-                new BootNotificationConfirmation(ZonedDateTime.now(), 300, RegistrationStatus.Accepted);
-
-        String chargePointId = sessionRepository.getChargerIdBySession(sessionIndex);
-        bddDataRepository.addRequestedMessageType(chargePointId, Authorize);
-        bddDataRepository.addRequestedMessageType(chargePointId, Heartbeat);
-        storeMessageIfItIsNeededForBDDPurpose(sessionIndex, request, BootNotification);
-        bddDataRepository.removeRequestedMessageType(chargePointId, BootNotification);
-
+        while (Objects.isNull(response) || !(response instanceof BootNotificationConfirmation)) {
+            sleep(defaultSleepAwaitingTime);
+        }
+        BootNotificationConfirmation confirmation = (BootNotificationConfirmation) response;
+        response = null;
         return confirmation;
     }
 
     @Override
     public DataTransferConfirmation handleDataTransferRequest(UUID sessionIndex, DataTransferRequest request) {
-        log.info("DataTransferRequest: " + request);
-        // ... handle event
+        log.debug("DataTransferRequest: " + request);
+        storeMessageIfItIsNeededForBDDPurpose(sessionIndex, request, DATA_TRANSFER);
 
-        DataTransferConfirmation confirmation = new DataTransferConfirmation(DataTransferStatus.UnknownVendorId);
-        confirmation.setData("lalala");
-
-        storeMessageIfItIsNeededForBDDPurpose(sessionIndex, request, DataTransfer);
+        while (Objects.isNull(response) || !(response instanceof DataTransferConfirmation)) {
+            sleep(defaultSleepAwaitingTime);
+        }
+        DataTransferConfirmation confirmation = (DataTransferConfirmation) response;
+        response = null;
         return confirmation;
     }
 
     @Override
     public HeartbeatConfirmation handleHeartbeatRequest(UUID sessionIndex, HeartbeatRequest request) {
-        log.info("HeartbeatRequest: " + request);
+        log.debug("HeartbeatRequest: " + request);
+        storeMessageIfItIsNeededForBDDPurpose(sessionIndex, request, HEARTBEAT);
 
-        HeartbeatConfirmation confirmation = new HeartbeatConfirmation(ZonedDateTime.now());
-
-        storeMessageIfItIsNeededForBDDPurpose(sessionIndex, request, Heartbeat);
-
+        while (Objects.isNull(response) || !(response instanceof HeartbeatConfirmation)) {
+            sleep(defaultSleepAwaitingTime);
+        }
+        HeartbeatConfirmation confirmation = (HeartbeatConfirmation) response;
+        response = null;
         return confirmation;
     }
 
     @Override
     public MeterValuesConfirmation handleMeterValuesRequest(UUID sessionIndex, MeterValuesRequest request) {
-        log.info("MeterValuesRequest: " + request + ", with SampledValues: " + Arrays.stream(request.getMeterValue())
+        log.debug("MeterValuesRequest: " + request + ", with SampledValues: "
+                + Arrays.stream(request.getMeterValue())
                 .flatMap(x -> Arrays.stream(x.getSampledValue()))
-                .toList());
+                .toList()
+        );
+        storeMessageIfItIsNeededForBDDPurpose(sessionIndex, request, METER_VALUE);
 
-        MeterValuesConfirmation confirmation = new MeterValuesConfirmation();
-
-        storeMessageIfItIsNeededForBDDPurpose(sessionIndex, request, MeterValue);
-
+        while (Objects.isNull(response) || !(response instanceof MeterValuesConfirmation)) {
+            sleep(defaultSleepAwaitingTime);
+        }
+        MeterValuesConfirmation confirmation = (MeterValuesConfirmation) response;
+        response = null;
         return confirmation;
     }
 
     @Override
-    public StartTransactionConfirmation handleStartTransactionRequest(UUID sessionIndex, StartTransactionRequest request) {
-        log.info("StartTransactionRequest: " + request);
+    public StartTransactionConfirmation handleStartTransactionRequest(UUID sessionIndex,
+                                                                      StartTransactionRequest request) {
+        log.debug("StartTransactionRequest: " + request);
+        storeMessageIfItIsNeededForBDDPurpose(sessionIndex, request, START_TRANSACTION);
 
-        IdTagInfo idTagInfo = new IdTagInfo(AuthorizationStatus.Accepted);
-        idTagInfo.setExpiryDate(ZonedDateTime.now().plusMonths(1));
-        idTagInfo.setParentIdTag(request.getIdTag());
+        while (Objects.isNull(response) || !(response instanceof StartTransactionConfirmation)) {
+            sleep(defaultSleepAwaitingTime);
+        }
+        StartTransactionConfirmation confirmation = (StartTransactionConfirmation) response;
+        response = null;
+        return confirmation;
+    }
 
+    @Override
+    public StatusNotificationConfirmation handleStatusNotificationRequest(UUID sessionIndex,
+                                                                          StatusNotificationRequest request) {
+        log.debug("StatusNotificationRequest: " + request);
+        storeMessageIfItIsNeededForBDDPurpose(sessionIndex, request, STATUS_NOTIFICATION);
+
+        while (Objects.isNull(response) || !(response instanceof StatusNotificationConfirmation)) {
+            sleep(defaultSleepAwaitingTime);
+        }
+        StatusNotificationConfirmation confirmation = (StatusNotificationConfirmation) response;
+        response = null;
+        return confirmation;
+    }
+
+    @Override
+    public StopTransactionConfirmation handleStopTransactionRequest(UUID sessionIndex,
+                                                                    StopTransactionRequest request) {
+        log.debug("StopTransactionRequest: " + request);
+        storeMessageIfItIsNeededForBDDPurpose(sessionIndex, request, STOP_TRANSACTION);
+
+        while (Objects.isNull(response) || !(response instanceof StopTransactionConfirmation)) {
+            sleep(defaultSleepAwaitingTime);
+        }
+        StopTransactionConfirmation confirmation = (StopTransactionConfirmation) response;
+        response = null;
+        return confirmation;
+    }
+
+    private void storeMessageIfItIsNeededForBDDPurpose(UUID sessionIndex, Request request,
+                                                       ImplementedReceivedMessageType type) {
         String chargePointId = sessionRepository.getChargerIdBySession(sessionIndex);
-        int transactionId = transactionRepository.addTransaction(chargePointId);
-        StartTransactionConfirmation confirmation = new StartTransactionConfirmation(idTagInfo, transactionId);
-
-        bddDataRepository.addRequestedMessageType(sessionRepository.getChargerIdBySession(sessionIndex), Authorize);
-        bddDataRepository.addRequestedMessageType(sessionRepository.getChargerIdBySession(sessionIndex), MeterValue);
-        bddDataRepository.addRequestedMessageType(sessionRepository.getChargerIdBySession(sessionIndex), StopTransaction);
-        storeMessageIfItIsNeededForBDDPurpose(sessionIndex, request, StartTransaction);
-        bddDataRepository.removeRequestedMessageType(sessionRepository.getChargerIdBySession(sessionIndex), StartTransaction);
-
-        return confirmation;
-    }
-
-    @Override
-    public StatusNotificationConfirmation handleStatusNotificationRequest(UUID sessionIndex, StatusNotificationRequest request) {
-        log.info("StatusNotificationRequest: " + request);
-
-        StatusNotificationConfirmation confirmation = new StatusNotificationConfirmation();
-
-        storeMessageIfItIsNeededForBDDPurpose(sessionIndex, request, StatusNotification);
-        return confirmation;
-    }
-
-    @Override
-    public StopTransactionConfirmation handleStopTransactionRequest(UUID sessionIndex, StopTransactionRequest request) {
-        log.info("StopTransactionRequest: " + request);
-
-        StopTransactionConfirmation confirmation = new StopTransactionConfirmation();
-        IdTagInfo idTagInfo = new IdTagInfo(AuthorizationStatus.Accepted);
-        idTagInfo.setExpiryDate(ZonedDateTime.now().plusMonths(1));
-        idTagInfo.setParentIdTag(request.getIdTag());
-
-        confirmation.setIdTagInfo(idTagInfo);
-
-        storeMessageIfItIsNeededForBDDPurpose(sessionIndex, request, StopTransaction);
-        bddDataRepository.removeRequestedMessageType(sessionRepository.getChargerIdBySession(sessionIndex), Authorize);
-        bddDataRepository.removeRequestedMessageType(sessionRepository.getChargerIdBySession(sessionIndex), MeterValue);
-        bddDataRepository.removeRequestedMessageType(sessionRepository.getChargerIdBySession(sessionIndex), StopTransaction);
-
-        return confirmation;
-    }
-
-    private void storeMessageIfItIsNeededForBDDPurpose(UUID sessionIndex, Request request, ImplementedReceivedMessageType type) {
-        String chargePointId = sessionRepository.getChargerIdBySession(sessionIndex);
-        Optional<List<ImplementedReceivedMessageType>> requestedMessageTypes = bddDataRepository.getRequestedMessageTypes(chargePointId);
+        Optional<List<ImplementedReceivedMessageType>> requestedMessageTypes =
+                bddDataRepository.getRequestedMessageTypes(chargePointId);
         if (requestedMessageTypes.isEmpty() || !requestedMessageTypes.get().contains(type)) {
             return;
         }

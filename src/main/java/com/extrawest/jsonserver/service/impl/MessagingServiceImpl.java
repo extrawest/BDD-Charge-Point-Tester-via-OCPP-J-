@@ -1,13 +1,22 @@
- package com.extrawest.jsonserver.service.impl;
+package com.extrawest.jsonserver.service.impl;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import com.extrawest.jsonserver.service.MessagingService;
+import com.extrawest.jsonserver.validation.confirmation.AuthorizeConfirmationBddHandler;
+import com.extrawest.jsonserver.validation.confirmation.BootNotificationConfirmationBddHandler;
+import com.extrawest.jsonserver.validation.confirmation.DataTransferConfirmationBddHandler;
+import com.extrawest.jsonserver.validation.confirmation.HeartbeatConfirmationBddHandler;
+import com.extrawest.jsonserver.validation.request.AuthorizeRequestBddHandler;
+import com.extrawest.jsonserver.validation.request.BootNotificationRequestBddHandler;
+import com.extrawest.jsonserver.validation.request.DataTransferRequestBddHandler;
+import com.extrawest.jsonserver.validation.request.HeartbeatRequestBddHandler;
+import com.extrawest.jsonserver.ws.handler.ServerCoreEventHandlerImpl;
 import eu.chargetime.ocpp.NotConnectedException;
 import eu.chargetime.ocpp.OccurenceConstraintException;
 import eu.chargetime.ocpp.UnsupportedFeatureException;
@@ -20,12 +29,16 @@ import com.extrawest.jsonserver.repository.ServerSessionRepository;
 import com.extrawest.jsonserver.ws.JsonWsServer;
 import eu.chargetime.ocpp.model.Confirmation;
 import eu.chargetime.ocpp.model.Request;
+import eu.chargetime.ocpp.model.core.AuthorizeConfirmation;
 import eu.chargetime.ocpp.model.core.AuthorizeRequest;
+import eu.chargetime.ocpp.model.core.BootNotificationConfirmation;
 import eu.chargetime.ocpp.model.core.BootNotificationRequest;
+import eu.chargetime.ocpp.model.core.DataTransferConfirmation;
+import eu.chargetime.ocpp.model.core.DataTransferRequest;
+import eu.chargetime.ocpp.model.core.HeartbeatConfirmation;
 import eu.chargetime.ocpp.model.core.HeartbeatRequest;
 import eu.chargetime.ocpp.model.core.MeterValue;
 import eu.chargetime.ocpp.model.core.MeterValuesRequest;
-import eu.chargetime.ocpp.model.core.RemoteStartTransactionRequest;
 import eu.chargetime.ocpp.model.core.ResetRequest;
 import eu.chargetime.ocpp.model.core.ResetType;
 import eu.chargetime.ocpp.model.core.SampledValue;
@@ -38,17 +51,28 @@ import eu.chargetime.ocpp.model.remotetrigger.TriggerMessageRequest;
 import eu.chargetime.ocpp.model.remotetrigger.TriggerMessageRequestType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
+
+import static com.extrawest.jsonserver.util.TimeUtil.waitOneSecond;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class MessagingServiceImpl implements MessagingService {
+    private final ApplicationContext springBootContext;
     private final BddDataRepository bddDataRepository;
     private final JsonWsServer server;
     private final ServerSessionRepository sessionRepository;
 
-    private boolean isChargingSessionIsOpen = true;
+    private final AuthorizeRequestBddHandler authorizeRequestBddHandler;
+    private final AuthorizeConfirmationBddHandler authorizeConfirmationBddHandler;
+    private final BootNotificationRequestBddHandler bootNotificationRequestBddHandler;
+    private final BootNotificationConfirmationBddHandler bootNotificationConfirmationBddHandler;
+    private final DataTransferRequestBddHandler dataTransferRequestBddHandler;
+    private final DataTransferConfirmationBddHandler dataTransferConfirmationBddHandler;
+    private final HeartbeatRequestBddHandler heartbeatRequestBddHandler;
+    private final HeartbeatConfirmationBddHandler heartbeatConfirmationBddHandler;
 
     @Override
     public void sendTriggerMessage(String chargePointId, TriggerMessageRequestType type) {
@@ -89,19 +113,10 @@ public class MessagingServiceImpl implements MessagingService {
                 if (completed.isPresent()) {
                     return completed;
                 }
-                sleep(1000L);
+                waitOneSecond();
             }
         }
         return completed;
-    }
-
-    @Override
-    public void sleep(long l) {
-        try {
-            Thread.sleep(l);
-        } catch (InterruptedException ignored) {
-        }
-
     }
 
     @Override
@@ -129,9 +144,9 @@ public class MessagingServiceImpl implements MessagingService {
                 request = getAndHandleIfListContainMessage(chargePointId, requestedMessages.get(), type);
             }
             if (request.isPresent()) {
-               break;
+                break;
             }
-            sleep(1000L);
+            waitOneSecond();
         }
 
         return request;
@@ -139,8 +154,8 @@ public class MessagingServiceImpl implements MessagingService {
 
     @Override
     public void validateReceivedMessageOrThrow(ChargePoint chargePoint,
-                                                  RequiredChargingData requiredData,
-                                                  Request request) {
+                                               RequiredChargingData requiredData,
+                                               Request request) {
         boolean isEquals = compareData(chargePoint, requiredData, request);
         if (!isEquals) {
             throw new BddTestingException("Received data is not equal to expected data. ");
@@ -155,85 +170,93 @@ public class MessagingServiceImpl implements MessagingService {
         }
         for (Request request : requests) {
             switch (messageType) {
-                case BootNotification:
+                case BOOT_NOTIFICATION:
                     if (request instanceof BootNotificationRequest) {
                         bddDataRepository.removeRequestedMessage(chargePointId, request);
                         return Optional.of(request);
                     }
-                case Heartbeat:
+                    break;
+                case HEARTBEAT:
                     if (request instanceof HeartbeatRequest) {
                         bddDataRepository.removeRequestedMessage(chargePointId, request);
                         return Optional.of(request);
                     }
-                case MeterValue:
+                    break;
+                case METER_VALUE:
                     if (request instanceof MeterValuesRequest) {
                         bddDataRepository.removeRequestedMessage(chargePointId, request);
                         return Optional.of(request);
                     }
-                case StatusNotification:
+                    break;
+                case STATUS_NOTIFICATION:
                     if (request instanceof StatusNotificationRequest) {
                         bddDataRepository.removeRequestedMessage(chargePointId, request);
                         return Optional.of(request);
                     }
-                case FirmwareStatusNotification:
+                    break;
+                case FIRMWARE_STATUS_NOTIFICATION:
                     if (request instanceof FirmwareStatusNotificationRequest) {
                         bddDataRepository.removeRequestedMessage(chargePointId, request);
                         return Optional.of(request);
                     }
-                case DiagnosticsStatusNotification:
+                    break;
+                case DIAGNOSTICS_STATUS_NOTIFICATION:
                     if (request instanceof DiagnosticsStatusNotificationRequest) {
                         bddDataRepository.removeRequestedMessage(chargePointId, request);
                         return Optional.of(request);
                     }
-                case Authorize:
+                    break;
+                case AUTHORIZE:
                     if (request instanceof AuthorizeRequest) {
                         bddDataRepository.removeRequestedMessage(chargePointId, request);
                         return Optional.of(request);
                     }
-                default:
+                case DATA_TRANSFER:
+                    if (request instanceof DataTransferRequest) {
+                        bddDataRepository.removeRequestedMessage(chargePointId, request);
+                        return Optional.of(request);
+                    }
+                    break;
             }
         }
         return Optional.empty();
     }
 
     @Override
-    public boolean holdChargingSessionWithComparingData(ChargePoint chargePoint, RequiredChargingData requiredData) {
-        isChargingSessionIsOpen = true;
-        Optional<List<Request>> requestedMessages = bddDataRepository.getRequestedMessage(chargePoint.getChargePointId());
-        List<Request> messagesWithMistakes = new ArrayList<>();
-        while (isChargingSessionIsOpen) {
-            if (requestedMessages.isPresent() && (requestedMessages.get().size() > 0)) {
-                List<Request> messages = List.copyOf(requestedMessages.get());
-                List<Request> messagesForDelete = new ArrayList<>();
-                for (Request message : messages) {
-                    if (!compareData(chargePoint, requiredData, message)) {
-                        log.error("Message has wrong data: " + message);
-                        messagesWithMistakes.add(message);
-                    }
-                    messagesForDelete.add(message);
-                }
-                bddDataRepository.removeRequestedMessages(chargePoint.getChargePointId(), messagesForDelete);
-            }
-            sleep(500L);
-            requestedMessages = bddDataRepository.getRequestedMessage(chargePoint.getChargePointId());
+    public void validateRequest(Map<String, String> parameters, Request request) {
+        if (request instanceof BootNotificationRequest message) {
+            bootNotificationRequestBddHandler.validateFields(parameters, message);
+        } else if (request instanceof AuthorizeRequest message) {
+            authorizeConfirmationBddHandler.setReceivedIdTag(message.getIdTag());
+            authorizeRequestBddHandler.validateFields(parameters, message);
+        } else if (request instanceof DataTransferRequest message) {
+            dataTransferRequestBddHandler.validateFields(parameters, message);
+        } else if (request instanceof HeartbeatRequest message) {
+            heartbeatRequestBddHandler.validateFields(parameters, message);
+        } else {
+             throw new BddTestingException("Type is not implemented. Request: " + request);
         }
-        if (!messagesWithMistakes.isEmpty()) {
-            log.error(String.format("Received %s messages with wrong data: %s",
-                    messagesWithMistakes.size(), messagesWithMistakes));
-            return false;
-        }
-        return true;
     }
 
     @Override
-    public void sendRemoteStartTransaction(ChargePoint chargePoint, UUID sessionIndex, String idTag) {
-        Request request = new RemoteStartTransactionRequest(idTag);
-        try {
-            server.send(sessionIndex, request);
-            log.info("RemoteStartTransactionRequest sent: " + request);
-        } catch (OccurenceConstraintException | UnsupportedFeatureException | NotConnectedException e) {
-            throw new RuntimeException(e);
+    public Confirmation sendConfirmationResponse(Map<String, String> parameters, Confirmation response) {
+        ServerCoreEventHandlerImpl handler = springBootContext.getBean(ServerCoreEventHandlerImpl.class);
+        while (Objects.nonNull(handler.getResponse())) {
+            waitOneSecond();
         }
+        if (response instanceof BootNotificationConfirmation message) {
+            response = bootNotificationConfirmationBddHandler.createValidatedConfirmation(parameters, message);
+        } else if (response instanceof AuthorizeConfirmation message) {
+            response = authorizeConfirmationBddHandler.createValidatedConfirmation(parameters, message);
+        } else if (response instanceof DataTransferConfirmation message) {
+            response = dataTransferConfirmationBddHandler.createValidatedConfirmation(parameters, message);
+        } else if (response instanceof HeartbeatConfirmation message) {
+            response = heartbeatConfirmationBddHandler.createValidatedConfirmation(parameters, message);
+        } else {
+            throw new BddTestingException("This type of confirmation message is not implemented. ");
+        }
+        handler.setResponse(response);
+        return response;
     }
 
     private boolean compareData(ChargePoint chargePoint, RequiredChargingData requiredData, Request request) {
@@ -277,7 +300,6 @@ public class MessagingServiceImpl implements MessagingService {
                     && Objects.equals(message.getConnectorId(), requiredData.getConnectorId()));
         } else if (request instanceof StopTransactionRequest message) {
             log.info("StopTransaction message: " + message);
-            isChargingSessionIsOpen = false;
             return Objects.nonNull(message.getMeterStop())
                     && Objects.nonNull(message.getTimestamp())
                     && Objects.nonNull(message.getTransactionId())
