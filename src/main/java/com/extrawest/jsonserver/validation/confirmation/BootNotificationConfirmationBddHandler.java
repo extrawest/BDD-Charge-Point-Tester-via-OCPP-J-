@@ -30,7 +30,6 @@ public class BootNotificationConfirmationBddHandler
 
     @PostConstruct
     private void init() {
-        String className = BootNotificationConfirmation.class.getName();
 
         this.defaultValues = Map.of(
                 CURRENT_TIME_REQUIRED, defaultCurrentTime,
