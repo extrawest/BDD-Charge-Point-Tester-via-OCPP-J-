@@ -1,17 +1,42 @@
-#### ....is in the process....
 
 # BDD Charge Point Tester via OCPP J
 
-## Description
+OCPP Charge Point Tester on Cucumber is a software tool that is designed to simulate a charge point in the Open Charge Point Protocol (OCPP) 1.6 specification using the Cucumber testing framework.
 
-Project can test simple OCPP messaging between a charge point and Central System(CS) using BDD tests.
-Supported protocol: [OCPP 1.6 JSON version](https://www.openchargealliance.org/protocols/ocpp-16/).
+Cucumber is a behavior-driven development (BDD) testing framework that uses the Gherkin language to write test cases in a human-readable format. With the OCPP Charge Point Simulator on Cucumber, test cases can be written in Gherkin and automated using Cucumber's testing framework.
+
+The simulator provides a set of predefined OCPP messages that can be sent and received by the charge point. These messages include basic operations such as boot notification, status notification.
+
+
+
+## Badges
+
+![OCPP](https://img.shields.io/badge/OCPP-1.6-brightgreen)
+
+
+
 
 ## Technologies used
-
 - [Spring Boot](https://spring.io/projects/spring-boot)
 - [Cucumber for Java](https://cucumber.io/docs/cucumber/api/?lang=java)
 - [OCPP library EuChargetime](https://github.com/ChargeTimeEU/Java-OCA-OCPP)
+
+## Requirements
+- Java 17 or higher
+- Maven 3.6 or higher
+## Features
+- Boot Notification
+- Authorize
+- Data Transfer
+- Heart Beat
+## Usage
+
+To use this application, you can modify the Cucumber scenarios in the 'src/test/resources/features' directory to fit your testing needs. You can also add new scenarios and steps in the 'src/test/java' directory.
+
+
+
+
+## Running Tests
 
 ### Starting Central System
 
@@ -52,9 +77,9 @@ All required parameters MUST be specified. The optional parameters can be set or
       | interval    | 60 |
       | status      | Accepted |
 ```
-If parameters specified for sent message then message will be created with these values 
+If parameters specified for sent message then message will be created with these values
 
-#### Validation 
+#### Validation
 All specified parameters will be validated according documentation.
 
 #### Assertion
