@@ -6,6 +6,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+
 import com.extrawest.jsonserver.service.StepsSupporterService;
 import com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType;
 import com.extrawest.jsonserver.model.exception.BddTestingException;
@@ -44,7 +45,9 @@ public class MyStepsTest extends SpringIntegrationTest {
     private final ServerSessionRepository sessionRepository;
 
     private final MessagingService messagingService;
+
     private final StepsSupporterService stepsSupporterService;
+
     private final BddDataRepository storage;
 
     private final ChargePoint chargePoint = new ChargePoint();
@@ -107,7 +110,7 @@ public class MyStepsTest extends SpringIntegrationTest {
                 log.info(String.format("Scenario №%s, STEP %s: Charge point %s is connected!",
                         scenarioId, stepNumber, chargerPointId));
             } catch (Exception e) {
-                messagingService.sleep(1000L);
+                waitOneSecond();
             }
         }
         if (Objects.isNull(sessionIndex)) {
@@ -220,7 +223,7 @@ public class MyStepsTest extends SpringIntegrationTest {
     public void theCentralSystemMustReceivesMessageWithGivenData(String messageType, DataTable table) {
         Map<String, String> parameters = table.asMap();
         ImplementedReceivedMessageType type = ImplementedReceivedMessageType
-                .valueOf(messageType.replace(".req", "").replace(".conf", ""));
+                .fromValue(messageType.replace(".req", "").replace(".conf", ""));
         availableConfirmationMessageType = type;
         storage.addRequestedMessageType(chargePoint.getChargePointId(), type);
         Optional<Request> request = messagingService.waitForRequestedMessage(chargePoint, messageWaitingTime, type);
@@ -238,7 +241,7 @@ public class MyStepsTest extends SpringIntegrationTest {
     public void theCentralSystemMustSendsConfirmationResponseWithGivenData(DataTable table) {
         Map<String, String> parameters = table.asMap();
         Confirmation response;
-        if (availableConfirmationMessageType == BootNotification) {
+        if (availableConfirmationMessageType == BOOT_NOTIFICATION) {
             response = new BootNotificationConfirmation();
         } else {
             throw new BddTestingException("Message type is unavailable");

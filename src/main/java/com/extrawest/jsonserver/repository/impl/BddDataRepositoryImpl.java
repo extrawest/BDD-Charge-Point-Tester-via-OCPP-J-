@@ -89,7 +89,7 @@ public class BddDataRepositoryImpl implements BddDataRepository {
     @Override
     public void addRequestedMessageType(String chargePointId, TriggerMessageRequestType type) {
         List<ImplementedReceivedMessageType> messageTypes = requestedMessageTypes.getOrDefault(chargePointId, new ArrayList<>());
-        messageTypes.add(ImplementedReceivedMessageType.valueOf(type.name()));
+        messageTypes.add(ImplementedReceivedMessageType.fromValue(type.name()));
         requestedMessageTypes.put(chargePointId, messageTypes);
     }
 
