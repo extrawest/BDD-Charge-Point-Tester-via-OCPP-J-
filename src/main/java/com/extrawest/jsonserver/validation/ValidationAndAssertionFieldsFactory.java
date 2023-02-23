@@ -5,6 +5,7 @@ import static com.extrawest.jsonserver.model.emun.ApiErrorMessage.INVALID_FIELD_
 import static com.extrawest.jsonserver.model.emun.ApiErrorMessage.INVALID_REQUIRED_PARAM;
 import static com.extrawest.jsonserver.model.emun.ApiErrorMessage.NON_MATCH_FIELDS;
 import static com.extrawest.jsonserver.model.emun.ApiErrorMessage.REDUNDANT_EXPECTED_PARAM;
+import static com.extrawest.jsonserver.model.emun.ApiErrorMessage.WRONG_INSTANCE_OF;
 import static java.util.Objects.isNull;
 
 import java.lang.reflect.InvocationTargetException;
@@ -22,7 +23,11 @@ import com.extrawest.jsonserver.model.exception.AssertionException;
 import com.extrawest.jsonserver.model.exception.BddTestingException;
 import com.extrawest.jsonserver.model.exception.ValidationException;
 import eu.chargetime.ocpp.PropertyConstraintException;
+import eu.chargetime.ocpp.model.Confirmation;
+import eu.chargetime.ocpp.model.Request;
 import eu.chargetime.ocpp.model.Validatable;
+import io.cucumber.core.internal.com.fasterxml.jackson.core.JsonProcessingException;
+import io.cucumber.core.internal.com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -51,6 +56,9 @@ public abstract class ValidationAndAssertionFieldsFactory<T extends Validatable>
     protected Map<String, BiFunction<Map<String, String>, T, Boolean>> assertionFactory;
 
     protected boolean validateRequestFields(Map<String, String> params, T actualRequest) {
+        if (!(actualRequest instanceof Request)) {
+            throw new BddTestingException(String.format(WRONG_INSTANCE_OF.getValue(), Request.class.getName()));
+        }
         validateForRequiredFields(params);
         validateParamsViaLibModel(params);
 
@@ -64,14 +72,15 @@ public abstract class ValidationAndAssertionFieldsFactory<T extends Validatable>
         return true;
     }
 
-    protected boolean validateConfirmationFields(Map<String, String> params) {
+    protected void validateConfirmationFields(Map<String, String> params) {
         validateForRequiredFields(params);
-        return true;
     }
 
     protected T createValidatedConfirmation(Map<String, String> params, T response) {
-        validateRequestFields(params, response);
-
+        if (!(response instanceof Confirmation)) {
+            throw new BddTestingException(String.format(WRONG_INSTANCE_OF.getValue(), Confirmation.class.getName()));
+        }
+        validateForRequiredFields(params);
         return validateParamsViaLibModel(params);
     }
 
@@ -136,7 +145,8 @@ public abstract class ValidationAndAssertionFieldsFactory<T extends Validatable>
         return result;
     }
 
-    protected ZonedDateTime getValidatedZonedDateTimeOrThrow(String value, String fieldName) {
+    protected ZonedDateTime getValidatedZonedDateTimeOrThrow(String paramValue, String defaultValue, String fieldName) {
+        String value = chooseValueConsideringWildCard(paramValue, defaultValue);
         if (isNull(value) || value.isEmpty()) {
             return ZonedDateTime.now();
         } else {
@@ -149,7 +159,8 @@ public abstract class ValidationAndAssertionFieldsFactory<T extends Validatable>
         }
     }
 
-    protected Integer getValidatedIntegerOrThrow(String value, String fieldName) {
+    protected Integer getValidatedIntegerOrThrow(String paramValue, String defaultValue, String fieldName) {
+        String value = chooseValueConsideringWildCard(paramValue, defaultValue);
         try {
             return Integer.parseInt(value);
         } catch (Exception cause) {
@@ -158,7 +169,13 @@ public abstract class ValidationAndAssertionFieldsFactory<T extends Validatable>
         }
     }
 
-    protected <E extends Enum<E>> E getValidatedEnumValueOrThrow(Class<E> clazz, String value, String fieldName) {
+    protected String getValidatedStringValueOrThrow(String paramValue, String defaultValue) {
+        return chooseValueConsideringWildCard(paramValue, defaultValue);
+    }
+
+    protected <E extends Enum<E>> E getValidatedEnumValueOrThrow(Class<E> clazz, String paramValue,
+                                                                 String defaultValue, String fieldName) {
+        String value = chooseValueConsideringWildCard(paramValue, defaultValue);
         for (E en : EnumSet.allOf(clazz)) {
             if (Objects.equals(en.name(), value)) {
                 return en;
@@ -166,6 +183,20 @@ public abstract class ValidationAndAssertionFieldsFactory<T extends Validatable>
         }
         throw new ValidationException(String.format(INVALID_REQUIRED_PARAM.getValue(),
                 fieldName, getParameterizeClassName()));
+    }
+
+    protected <M extends Validatable> M getValidatedModelFromJSON(String paramValue, String defaultValue,
+                                                                  String fieldName, Class<M> clazz) {
+        String value = chooseValueConsideringWildCard(paramValue, defaultValue);
+        ObjectMapper mapper = new ObjectMapper();
+        M model;
+        try {
+            model = mapper.readValue(value, clazz);
+        } catch (JsonProcessingException e) {
+            throw new ValidationException(
+                    String.format(INVALID_FIELD_VALUE.getValue(), getParameterizeClassName(), fieldName, value));
+        }
+        return model;
     }
 
     protected Class<T> getParameterizeClass() {
@@ -181,6 +212,13 @@ public abstract class ValidationAndAssertionFieldsFactory<T extends Validatable>
 
     protected boolean nonEqual(Object firstValue, Object secondValue) {
         return !Objects.equals(firstValue, secondValue);
+    }
+
+    private String chooseValueConsideringWildCard(String paramValue, String defaultValue) {
+        if (Objects.equals(paramValue, wildCard)) {
+            return defaultValue;
+        }
+        return paramValue;
     }
 
 }

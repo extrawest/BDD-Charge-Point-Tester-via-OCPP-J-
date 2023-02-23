@@ -38,12 +38,12 @@ public class BootNotificationConfirmationBddHandler
         );
 
         this.requiredFieldsSetup = Map.of(
-                CURRENT_TIME_REQUIRED, (req, currentTimeStr) -> req
-                        .setCurrentTime(getValidatedZonedDateTimeOrThrow(defaultCurrentTime, CURRENT_TIME_REQUIRED)),
-                INTERVAL_REQUIRED, (req, intervalStr) -> req
-                        .setInterval(getValidatedIntegerOrThrow(defaultInterval, INTERVAL_REQUIRED)),
-                STATUS_REQUIRED, (req, statusStr) -> req
-                        .setStatus(getValidatedEnumValueOrThrow(RegistrationStatus.class, statusStr, STATUS_REQUIRED))
+                CURRENT_TIME_REQUIRED, (req, timeStr) -> req.setCurrentTime(
+                        getValidatedZonedDateTimeOrThrow(timeStr, defaultCurrentTime, CURRENT_TIME_REQUIRED)),
+                INTERVAL_REQUIRED, (req, intervalStr) -> req.setInterval(
+                        getValidatedIntegerOrThrow(intervalStr, defaultInterval, INTERVAL_REQUIRED)),
+                STATUS_REQUIRED, (req, status) -> req.setStatus(
+                        getValidatedEnumValueOrThrow(RegistrationStatus.class, status, defaultStatus, STATUS_REQUIRED))
         );
 
         this.optionalFieldsSetup = Collections.emptyMap();
@@ -52,8 +52,8 @@ public class BootNotificationConfirmationBddHandler
     }
 
     @Override
-    public boolean validateFields(Map<String, String> params, BootNotificationConfirmation response) {
-        return super.validateConfirmationFields(params);
+    public void validateFields(Map<String, String> params) {
+        super.validateConfirmationFields(params);
     }
 
     @Override

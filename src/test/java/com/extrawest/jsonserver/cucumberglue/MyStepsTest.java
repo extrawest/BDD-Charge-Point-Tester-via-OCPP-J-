@@ -17,7 +17,10 @@ import com.extrawest.jsonserver.repository.BddDataRepository;
 import com.extrawest.jsonserver.repository.ServerSessionRepository;
 import eu.chargetime.ocpp.model.Confirmation;
 import eu.chargetime.ocpp.model.Request;
+import eu.chargetime.ocpp.model.core.AuthorizeConfirmation;
 import eu.chargetime.ocpp.model.core.BootNotificationConfirmation;
+import eu.chargetime.ocpp.model.core.DataTransferConfirmation;
+import eu.chargetime.ocpp.model.core.HeartbeatConfirmation;
 import eu.chargetime.ocpp.model.core.ResetType;
 import eu.chargetime.ocpp.model.remotetrigger.TriggerMessageRequestType;
 import io.cucumber.datatable.DataTable;
@@ -42,6 +45,7 @@ import static com.extrawest.jsonserver.util.TimeUtil.waitOneSecond;
 @Slf4j
 @RequiredArgsConstructor
 public class MyStepsTest extends SpringIntegrationTest {
+
     private final ServerSessionRepository sessionRepository;
 
     private final MessagingService messagingService;
@@ -241,10 +245,12 @@ public class MyStepsTest extends SpringIntegrationTest {
     public void theCentralSystemMustSendsConfirmationResponseWithGivenData(DataTable table) {
         Map<String, String> parameters = table.asMap();
         Confirmation response;
-        if (availableConfirmationMessageType == BOOT_NOTIFICATION) {
-            response = new BootNotificationConfirmation();
-        } else {
-            throw new BddTestingException("Message type is unavailable");
+        switch (availableConfirmationMessageType) {
+            case BOOT_NOTIFICATION -> response = new BootNotificationConfirmation();
+            case AUTHORIZE ->  response = new AuthorizeConfirmation();
+            case DATA_TRANSFER -> response = new DataTransferConfirmation();
+            case HEARTBEAT -> response = new HeartbeatConfirmation();
+            default -> throw new BddTestingException("Message type is unavailable");
         }
         Confirmation confirmation = messagingService.sendConfirmationResponse(parameters, response);
         log.info(String.format("Scenario №%s, STEP %s: %s confirmation message sent: \n%s ",
