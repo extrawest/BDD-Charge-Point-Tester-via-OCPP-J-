@@ -182,7 +182,7 @@ public class MessagingServiceImpl implements MessagingService {
                         return Optional.of(request);
                     }
                     break;
-                case METER_VALUE:
+                case METER_VALUES:
                     if (request instanceof MeterValuesRequest) {
                         bddDataRepository.removeRequestedMessage(chargePointId, request);
                         return Optional.of(request);
@@ -236,6 +236,7 @@ public class MessagingServiceImpl implements MessagingService {
         } else {
              throw new BddTestingException("Type is not implemented. Request: " + request);
         }
+
     }
 
     @Override
