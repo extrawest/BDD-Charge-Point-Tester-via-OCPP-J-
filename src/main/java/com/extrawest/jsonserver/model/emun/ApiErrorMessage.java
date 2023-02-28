@@ -13,7 +13,9 @@ public enum ApiErrorMessage {
     CONNECTION_LIMIT_EXCEEDED("Connection limit exceeded"),
     ONLY_ONE_CONNECTION_ALLOWED("Only one connection allowed"),
     BUG_CREATING_INSTANCE("Unexpected bug: can't create instance of %s. "),
-    WRONG_INSTANCE_OF("Requested method available only for %s inherit. ");
+    BUG_PARSING_MODEL("Unexpected bug: can't parse model %s to string. "),
+    WRONG_INSTANCE_OF("Requested method available only for %s inherit. "),
+    UNEXPECTED_MESSAGE_RECEIVED("Unexpected %s message received: %s. ");
 
     private final String value;
 
