@@ -1,9 +1,8 @@
 package com.extrawest.jsonserver.validation.confirmation;
 
-import java.util.Collections;
 import java.util.Map;
 import com.extrawest.jsonserver.validation.ConfirmationFactory;
-import com.extrawest.jsonserver.validation.ValidationAndAssertionFieldsFactory;
+import com.extrawest.jsonserver.validation.ValidationAndAssertionConfirmationFieldsFactory;
 import eu.chargetime.ocpp.model.core.DataTransferConfirmation;
 import eu.chargetime.ocpp.model.core.DataTransferStatus;
 import jakarta.annotation.PostConstruct;
@@ -16,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class DataTransferConfirmationBddHandler
-        extends ValidationAndAssertionFieldsFactory<DataTransferConfirmation>
+        extends ValidationAndAssertionConfirmationFieldsFactory<DataTransferConfirmation>
         implements ConfirmationFactory<DataTransferConfirmation> {
     public static final String STATUS_REQUIRED = "status";
     public static final String DATA = "data";
@@ -35,15 +34,13 @@ public class DataTransferConfirmationBddHandler
         );
 
         this.requiredFieldsSetup = Map.of(
-                STATUS_REQUIRED, (req, status) -> req.setStatus(
+                STATUS_REQUIRED, (conf, status) -> conf.setStatus(
                         (getValidatedEnumValueOrThrow(DataTransferStatus.class, status, defaultStatus, DATA)))
         );
 
         this.optionalFieldsSetup = Map.of(
-                DATA, (req, data) -> req.setData(getValidatedStringValueOrThrow(data, defaultStatus))
+                DATA, (conf, data) -> conf.setData(getValidatedStringValueOrThrow(data, defaultStatus))
         );
-
-        this.assertionFactory = Collections.emptyMap();
     }
 
     @Override

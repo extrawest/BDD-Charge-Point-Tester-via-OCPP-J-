@@ -1,16 +1,10 @@
 package com.extrawest.jsonserver.validation.confirmation;
 
-import static java.util.Objects.isNull;
-
-import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.Map;
-import java.util.Objects;
 import com.extrawest.jsonserver.validation.ConfirmationFactory;
-import com.extrawest.jsonserver.validation.ValidationAndAssertionFieldsFactory;
-import eu.chargetime.ocpp.model.core.AuthorizationStatus;
+import com.extrawest.jsonserver.validation.ValidationAndAssertionConfirmationFieldsFactory;
 import eu.chargetime.ocpp.model.core.AuthorizeConfirmation;
-import eu.chargetime.ocpp.model.core.IdTagInfo;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -22,11 +16,11 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class AuthorizeConfirmationBddHandler
-        extends ValidationAndAssertionFieldsFactory<AuthorizeConfirmation>
+        extends ValidationAndAssertionConfirmationFieldsFactory<AuthorizeConfirmation>
         implements ConfirmationFactory<AuthorizeConfirmation> {
-    public static final String ID_TAG_INFO = "idTagInfo";
-    @Value("${authorize.confirmation.idTagInfo:}")
-    private String defaultIdTag;
+    public static final String ID_TAG_INFO_REQUIRED = "idTagInfo";
+    @Value("${authorize.confirmation.idTagInfo:{\"expiryDate\":\"2023-12-31T23:23:59.278930403Z\",\"parentIdTag\":\"idTag-chargePointId\",\"status\":\"Accepted\"}}")
+    private String defaultIdTagInfo;
     @Setter private String receivedIdTag = null;
 
     @PostConstruct
@@ -34,25 +28,15 @@ public class AuthorizeConfirmationBddHandler
         String className = AuthorizeConfirmation.class.getName();
 
         this.defaultValues = Map.of(
-                ID_TAG_INFO, defaultIdTag
+                ID_TAG_INFO_REQUIRED, defaultIdTagInfo
         );
 
         this.requiredFieldsSetup = Map.of(
-                ID_TAG_INFO, (req, idTagStr) -> {
-                    if (Objects.equals(idTagStr, wildCard) && (isNull(defaultIdTag) || defaultIdTag.isBlank())) {
-                        IdTagInfo idTagInfo = new IdTagInfo(AuthorizationStatus.Accepted);
-                        idTagInfo.setExpiryDate(ZonedDateTime.now().plusDays(1));
-                        idTagInfo.setParentIdTag(isNull(receivedIdTag) ? "CSIdTag" : receivedIdTag);
-                        req.setIdTagInfo(idTagInfo);
-                    } else {
-                        req.setIdTagInfo(getValidatedModelFromJSON(idTagStr, defaultIdTag, ID_TAG_INFO, IdTagInfo.class));
-                    }
-                }
+                ID_TAG_INFO_REQUIRED, (conf, idTagStr) -> conf.setIdTagInfo(
+                        getValidatedIdTagInfo(idTagStr, defaultIdTagInfo, ID_TAG_INFO_REQUIRED, receivedIdTag))
         );
 
         this.optionalFieldsSetup = Collections.emptyMap();
-
-        this.assertionFactory = Collections.emptyMap();
     }
 
     @Override

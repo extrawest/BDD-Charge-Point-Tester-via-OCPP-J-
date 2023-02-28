@@ -3,7 +3,7 @@ package com.extrawest.jsonserver.validation.confirmation;
 import java.util.Collections;
 import java.util.Map;
 import com.extrawest.jsonserver.validation.ConfirmationFactory;
-import com.extrawest.jsonserver.validation.ValidationAndAssertionFieldsFactory;
+import com.extrawest.jsonserver.validation.ValidationAndAssertionConfirmationFieldsFactory;
 import eu.chargetime.ocpp.model.core.BootNotificationConfirmation;
 import eu.chargetime.ocpp.model.core.RegistrationStatus;
 import jakarta.annotation.PostConstruct;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class BootNotificationConfirmationBddHandler
-        extends ValidationAndAssertionFieldsFactory<BootNotificationConfirmation>
+        extends ValidationAndAssertionConfirmationFieldsFactory<BootNotificationConfirmation>
         implements ConfirmationFactory<BootNotificationConfirmation> {
     public static final String CURRENT_TIME_REQUIRED = "currentTime";
     public static final String INTERVAL_REQUIRED = "interval";
@@ -38,18 +38,16 @@ public class BootNotificationConfirmationBddHandler
         );
 
         this.requiredFieldsSetup = Map.of(
-                CURRENT_TIME_REQUIRED, (req, timeStr) -> req.setCurrentTime(
+                CURRENT_TIME_REQUIRED, (conf, timeStr) -> conf.setCurrentTime(
                         getValidatedZonedDateTimeOrCurrentTimeIfEmptyOrThrow(timeStr, defaultCurrentTime,
                                 CURRENT_TIME_REQUIRED)),
-                INTERVAL_REQUIRED, (req, intervalStr) -> req.setInterval(
+                INTERVAL_REQUIRED, (conf, intervalStr) -> conf.setInterval(
                         getValidatedIntegerOrThrow(intervalStr, defaultInterval, INTERVAL_REQUIRED)),
-                STATUS_REQUIRED, (req, status) -> req.setStatus(
+                STATUS_REQUIRED, (conf, status) -> conf.setStatus(
                         getValidatedEnumValueOrThrow(RegistrationStatus.class, status, defaultStatus, STATUS_REQUIRED))
         );
 
         this.optionalFieldsSetup = Collections.emptyMap();
-
-        this.assertionFactory = Collections.emptyMap();
     }
 
     @Override
