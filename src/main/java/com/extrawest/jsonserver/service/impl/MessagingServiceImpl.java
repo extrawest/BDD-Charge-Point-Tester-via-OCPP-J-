@@ -54,6 +54,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
+import static com.extrawest.jsonserver.util.TimeUtil.waitHalfSecond;
 import static com.extrawest.jsonserver.util.TimeUtil.waitOneSecond;
 
 @Slf4j
@@ -243,7 +244,7 @@ public class MessagingServiceImpl implements MessagingService {
     public Confirmation sendConfirmationResponse(Map<String, String> parameters, Confirmation response) {
         ServerCoreEventHandlerImpl handler = springBootContext.getBean(ServerCoreEventHandlerImpl.class);
         while (Objects.nonNull(handler.getResponse())) {
-            waitOneSecond();
+            waitHalfSecond();
         }
         if (response instanceof BootNotificationConfirmation message) {
             response = bootNotificationConfirmationBddHandler.createValidatedConfirmation(parameters, message);
@@ -257,6 +258,11 @@ public class MessagingServiceImpl implements MessagingService {
             throw new BddTestingException("This type of confirmation message is not implemented. ");
         }
         handler.setResponse(response);
+
+        while (Objects.nonNull(handler.getResponse())) {
+            waitOneSecond();
+        }
+
         return response;
     }
 
