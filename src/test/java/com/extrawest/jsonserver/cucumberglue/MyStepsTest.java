@@ -46,14 +46,11 @@ import static com.extrawest.jsonserver.util.TimeUtil.waitOneSecond;
 @Slf4j
 @RequiredArgsConstructor
 public class MyStepsTest extends SpringIntegrationTest {
-
+    private final BddDataRepository storage;
     private final ServerSessionRepository sessionRepository;
 
     private final MessagingService messagingService;
-
     private final StepsSupporterService stepsSupporterService;
-
-    private final BddDataRepository storage;
 
     private final ChargePoint chargePoint = new ChargePoint();
     private final int connectionWaitingTime = 300; // in seconds
@@ -252,9 +249,15 @@ public class MyStepsTest extends SpringIntegrationTest {
                 scenarioId, stepNumber, type, request.get()));
     }
 
+    @Then("the Central System must sends confirmation response")
+    public void theCentralSystemMustSendsConfirmationResponseWithGivenData() {
+        DataTable table = DataTable.emptyDataTable();
+        theCentralSystemMustSendsConfirmationResponseWithGivenData(table);
+    }
+
     @Then("the Central System must sends confirmation response with given data")
     public void theCentralSystemMustSendsConfirmationResponseWithGivenData(DataTable table) {
-        Map<String, String> parameters = table.asMap();
+        Map<String, String> parameters = table.isEmpty() ? Collections.emptyMap() : table.asMap();
         Confirmation response;
         switch (availableConfirmationMessageType) {
             case BOOT_NOTIFICATION -> response = new BootNotificationConfirmation();
@@ -264,6 +267,7 @@ public class MyStepsTest extends SpringIntegrationTest {
             default -> throw new BddTestingException("Message type is unavailable");
         }
         Confirmation confirmation = messagingService.sendConfirmationResponse(parameters, response);
+
         log.info(String.format("Scenario №%s, STEP %s: %s confirmation message sent: \n%s ",
                 scenarioId, stepNumber, availableConfirmationMessageType, confirmation));
     }
