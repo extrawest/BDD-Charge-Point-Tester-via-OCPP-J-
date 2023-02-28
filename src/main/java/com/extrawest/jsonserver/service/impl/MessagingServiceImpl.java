@@ -12,10 +12,12 @@ import com.extrawest.jsonserver.validation.confirmation.AuthorizeConfirmationBdd
 import com.extrawest.jsonserver.validation.confirmation.BootNotificationConfirmationBddHandler;
 import com.extrawest.jsonserver.validation.confirmation.DataTransferConfirmationBddHandler;
 import com.extrawest.jsonserver.validation.confirmation.HeartbeatConfirmationBddHandler;
+import com.extrawest.jsonserver.validation.confirmation.StartTransactionConfirmationBddHandler;
 import com.extrawest.jsonserver.validation.request.AuthorizeRequestBddHandler;
 import com.extrawest.jsonserver.validation.request.BootNotificationRequestBddHandler;
 import com.extrawest.jsonserver.validation.request.DataTransferRequestBddHandler;
 import com.extrawest.jsonserver.validation.request.HeartbeatRequestBddHandler;
+import com.extrawest.jsonserver.validation.request.StartTransactionRequestBddHandler;
 import com.extrawest.jsonserver.ws.handler.ServerCoreEventHandlerImpl;
 import eu.chargetime.ocpp.NotConnectedException;
 import eu.chargetime.ocpp.OccurenceConstraintException;
@@ -42,6 +44,7 @@ import eu.chargetime.ocpp.model.core.MeterValuesRequest;
 import eu.chargetime.ocpp.model.core.ResetRequest;
 import eu.chargetime.ocpp.model.core.ResetType;
 import eu.chargetime.ocpp.model.core.SampledValue;
+import eu.chargetime.ocpp.model.core.StartTransactionConfirmation;
 import eu.chargetime.ocpp.model.core.StartTransactionRequest;
 import eu.chargetime.ocpp.model.core.StatusNotificationRequest;
 import eu.chargetime.ocpp.model.core.StopTransactionRequest;
@@ -54,6 +57,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
+import static com.extrawest.jsonserver.util.TimeUtil.waitHalfSecond;
 import static com.extrawest.jsonserver.util.TimeUtil.waitOneSecond;
 
 @Slf4j
@@ -73,6 +77,8 @@ public class MessagingServiceImpl implements MessagingService {
     private final DataTransferConfirmationBddHandler dataTransferConfirmationBddHandler;
     private final HeartbeatRequestBddHandler heartbeatRequestBddHandler;
     private final HeartbeatConfirmationBddHandler heartbeatConfirmationBddHandler;
+    private final StartTransactionRequestBddHandler startTransactionRequestBddHandler;
+    private final StartTransactionConfirmationBddHandler startTransactionConfirmationBddHandler;
 
     @Override
     public void sendTriggerMessage(String chargePointId, TriggerMessageRequestType type) {
@@ -233,6 +239,9 @@ public class MessagingServiceImpl implements MessagingService {
             dataTransferRequestBddHandler.validateFields(parameters, message);
         } else if (request instanceof HeartbeatRequest message) {
             heartbeatRequestBddHandler.validateFields(parameters, message);
+        } else if (request instanceof StartTransactionRequest message) {
+            startTransactionConfirmationBddHandler.setReceivedIdTag(message.getIdTag());
+            startTransactionRequestBddHandler.validateFields(parameters, message);
         } else {
              throw new BddTestingException("Type is not implemented. Request: " + request);
         }
@@ -243,7 +252,7 @@ public class MessagingServiceImpl implements MessagingService {
     public Confirmation sendConfirmationResponse(Map<String, String> parameters, Confirmation response) {
         ServerCoreEventHandlerImpl handler = springBootContext.getBean(ServerCoreEventHandlerImpl.class);
         while (Objects.nonNull(handler.getResponse())) {
-            waitOneSecond();
+            waitHalfSecond();
         }
         if (response instanceof BootNotificationConfirmation message) {
             response = bootNotificationConfirmationBddHandler.createValidatedConfirmation(parameters, message);
@@ -253,10 +262,17 @@ public class MessagingServiceImpl implements MessagingService {
             response = dataTransferConfirmationBddHandler.createValidatedConfirmation(parameters, message);
         } else if (response instanceof HeartbeatConfirmation message) {
             response = heartbeatConfirmationBddHandler.createValidatedConfirmation(parameters, message);
+        } else if (response instanceof StartTransactionConfirmation message) {
+            response = startTransactionConfirmationBddHandler.createValidatedConfirmation(parameters, message);
         } else {
             throw new BddTestingException("This type of confirmation message is not implemented. ");
         }
         handler.setResponse(response);
+
+        while (Objects.nonNull(handler.getResponse())) {
+            waitOneSecond();
+        }
+
         return response;
     }
 
