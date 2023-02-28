@@ -2,7 +2,7 @@ package com.extrawest.jsonserver.validation.request;
 
 import java.util.Map;
 import com.extrawest.jsonserver.validation.RequestFactory;
-import com.extrawest.jsonserver.validation.ValidationAndAssertionFieldsFactory;
+import com.extrawest.jsonserver.validation.ValidationAndAssertionRequestFieldsFactory;
 import eu.chargetime.ocpp.model.core.DataTransferRequest;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class DataTransferRequestBddHandler
-        extends ValidationAndAssertionFieldsFactory<DataTransferRequest>
+        extends ValidationAndAssertionRequestFieldsFactory<DataTransferRequest>
         implements RequestFactory<DataTransferRequest> {
     public static final String VENDOR_ID_REQUIRED = "vendorId";
     public static final String MESSAGE_ID = "messageId";

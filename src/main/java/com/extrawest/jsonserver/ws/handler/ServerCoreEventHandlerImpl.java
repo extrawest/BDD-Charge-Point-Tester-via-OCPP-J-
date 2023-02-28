@@ -1,10 +1,11 @@
 package com.extrawest.jsonserver.ws.handler;
 
+import static com.extrawest.jsonserver.model.emun.ApiErrorMessage.UNEXPECTED_MESSAGE_RECEIVED;
 import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.AUTHORIZE;
 import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.BOOT_NOTIFICATION;
 import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.DATA_TRANSFER;
 import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.HEARTBEAT;
-import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.METER_VALUE;
+import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.METER_VALUES;
 import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.START_TRANSACTION;
 import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.STATUS_NOTIFICATION;
 import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.STOP_TRANSACTION;
@@ -121,7 +122,7 @@ public class ServerCoreEventHandlerImpl implements ServerCoreEventHandler {
                 .flatMap(x -> Arrays.stream(x.getSampledValue()))
                 .toList()
         );
-        storeMessageIfItIsNeededForBDDPurpose(sessionIndex, request, METER_VALUE);
+        storeMessageIfItIsNeededForBDDPurpose(sessionIndex, request, METER_VALUES);
 
         while (Objects.isNull(response) || !(response instanceof MeterValuesConfirmation)) {
             sleep(defaultSleepAwaitingTime);
@@ -179,6 +180,7 @@ public class ServerCoreEventHandlerImpl implements ServerCoreEventHandler {
         Optional<List<ImplementedReceivedMessageType>> requestedMessageTypes =
                 bddDataRepository.getRequestedMessageTypes(chargePointId);
         if (requestedMessageTypes.isEmpty() || !requestedMessageTypes.get().contains(type)) {
+            log.warn(String.format(UNEXPECTED_MESSAGE_RECEIVED.getValue(), request.getClass().getSimpleName(), request));
             return;
         }
         bddDataRepository.addRequestedMessage(chargePointId, request);

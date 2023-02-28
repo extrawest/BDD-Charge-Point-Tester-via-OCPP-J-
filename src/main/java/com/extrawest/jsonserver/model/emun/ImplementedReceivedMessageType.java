@@ -17,7 +17,7 @@ public enum ImplementedReceivedMessageType {
     DIAGNOSTICS_STATUS_NOTIFICATION("DiagnosticsStatusNotification"),
     FIRMWARE_STATUS_NOTIFICATION("FirmwareStatusNotification"),
     HEARTBEAT("Heartbeat"),
-    METER_VALUE("MeterValue"),
+    METER_VALUES("MeterValues"),
     START_TRANSACTION("StartTransaction"),
     STATUS_NOTIFICATION("StatusNotification"),
     STOP_TRANSACTION("StopTransaction");

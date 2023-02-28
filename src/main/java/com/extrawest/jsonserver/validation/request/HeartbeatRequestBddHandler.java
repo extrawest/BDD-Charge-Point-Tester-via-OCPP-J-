@@ -3,7 +3,7 @@ package com.extrawest.jsonserver.validation.request;
 import java.util.Collections;
 import java.util.Map;
 import com.extrawest.jsonserver.validation.RequestFactory;
-import com.extrawest.jsonserver.validation.ValidationAndAssertionFieldsFactory;
+import com.extrawest.jsonserver.validation.ValidationAndAssertionRequestFieldsFactory;
 import eu.chargetime.ocpp.model.core.HeartbeatRequest;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class HeartbeatRequestBddHandler
-        extends ValidationAndAssertionFieldsFactory<HeartbeatRequest>
+        extends ValidationAndAssertionRequestFieldsFactory<HeartbeatRequest>
         implements RequestFactory<HeartbeatRequest> {
 
     @PostConstruct

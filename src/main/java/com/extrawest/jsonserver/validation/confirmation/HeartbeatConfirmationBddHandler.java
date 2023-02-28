@@ -3,7 +3,7 @@ package com.extrawest.jsonserver.validation.confirmation;
 import java.util.Collections;
 import java.util.Map;
 import com.extrawest.jsonserver.validation.ConfirmationFactory;
-import com.extrawest.jsonserver.validation.ValidationAndAssertionFieldsFactory;
+import com.extrawest.jsonserver.validation.ValidationAndAssertionConfirmationFieldsFactory;
 import eu.chargetime.ocpp.model.core.HeartbeatConfirmation;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class HeartbeatConfirmationBddHandler
-        extends ValidationAndAssertionFieldsFactory<HeartbeatConfirmation>
+        extends ValidationAndAssertionConfirmationFieldsFactory<HeartbeatConfirmation>
         implements ConfirmationFactory<HeartbeatConfirmation> {
     public static final String CURRENT_TIME_REQUIRED = "currentTime";
     @Value("${heartbeat.confirmation.currentTime:}")
@@ -30,14 +30,12 @@ public class HeartbeatConfirmationBddHandler
         );
 
         this.requiredFieldsSetup = Map.of(
-                CURRENT_TIME_REQUIRED, (req, timeStr) -> req.setCurrentTime(
+                CURRENT_TIME_REQUIRED, (conf, timeStr) -> conf.setCurrentTime(
                         getValidatedZonedDateTimeOrCurrentTimeIfEmptyOrThrow(timeStr, defaultCurrentTime,
                                 CURRENT_TIME_REQUIRED))
         );
 
         this.optionalFieldsSetup = Collections.emptyMap();
-
-        this.assertionFactory = Collections.emptyMap();
     }
 
     @Override
