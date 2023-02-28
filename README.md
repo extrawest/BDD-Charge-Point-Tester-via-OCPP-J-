@@ -116,3 +116,4 @@ Scenario: The Central System receiving 'BootNotification.req' message from Charg
     | interval | 60 |
     | status | Accepted |
 ```
+
