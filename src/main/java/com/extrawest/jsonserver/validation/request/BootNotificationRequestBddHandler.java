@@ -1,8 +1,8 @@
 package com.extrawest.jsonserver.validation.request;
 
 import java.util.Map;
-import com.extrawest.jsonserver.validation.ValidationAndAssertionFieldsFactory;
 import com.extrawest.jsonserver.validation.RequestFactory;
+import com.extrawest.jsonserver.validation.ValidationAndAssertionRequestFieldsFactory;
 import eu.chargetime.ocpp.model.core.BootNotificationRequest;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class BootNotificationRequestBddHandler
-        extends ValidationAndAssertionFieldsFactory<BootNotificationRequest>
+        extends ValidationAndAssertionRequestFieldsFactory<BootNotificationRequest>
         implements RequestFactory<BootNotificationRequest> {
     public static final String CHARGE_BOX_SERIAL_NUMBER = "chargeBoxSerialNumber";
     public static final String CHARGE_POINT_MODEL_REQUIRED = "chargePointModel";

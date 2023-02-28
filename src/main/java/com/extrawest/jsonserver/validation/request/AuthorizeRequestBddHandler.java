@@ -3,7 +3,7 @@ package com.extrawest.jsonserver.validation.request;
 import java.util.Collections;
 import java.util.Map;
 import com.extrawest.jsonserver.validation.RequestFactory;
-import com.extrawest.jsonserver.validation.ValidationAndAssertionFieldsFactory;
+import com.extrawest.jsonserver.validation.ValidationAndAssertionRequestFieldsFactory;
 import eu.chargetime.ocpp.model.core.AuthorizeRequest;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class AuthorizeRequestBddHandler
-        extends ValidationAndAssertionFieldsFactory<AuthorizeRequest>
+        extends ValidationAndAssertionRequestFieldsFactory<AuthorizeRequest>
         implements RequestFactory<AuthorizeRequest> {
     public static final String ID_TAG = "idTag";
 
