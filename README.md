@@ -1,3 +1,4 @@
+<a href="https://www.extrawest.com/"><img src="https://drive.google.com/uc?export=view&id=1kXfNj5WfW2oSMzQR82xYBI6Bw_W8-LpK" width="20%"></a>
 
 # BDD Charge Point Tester via OCPP J
 
@@ -10,17 +11,17 @@ The simulator provides a set of predefined OCPP messages that can be sent and re
 
 
 ## Badges
-
-![OCPP](https://img.shields.io/badge/OCPP-1.6-brightgreen)
-
-
+![contr](https://img.shields.io/github/contributors/extrawest/BDD-Charge-Point-Tester-via-OCPP-J-?style=flat-square)
+![commits](https://img.shields.io/github/commit-activity/w/extrawest/BDD-Charge-Point-Tester-via-OCPP-J-?style=flat-square)
+![OCPP](https://img.shields.io/badge/OCPP-1.6-brightgreen?style=flat-square)
+![JDK](https://img.shields.io/badge/JDK-17-yellow?style=flat-square)
+![social](https://img.shields.io/github/forks/extrawest/BDD-Charge-Point-Tester-via-OCPP-J-?style=social)
 
 
 ## Technologies used
 - [Spring Boot](https://spring.io/projects/spring-boot)
 - [Cucumber for Java](https://cucumber.io/docs/cucumber/api/?lang=java)
 - [OCPP library EuChargetime](https://github.com/ChargeTimeEU/Java-OCA-OCPP)
-
 ## Requirements
 - Java 17 or higher
 - Maven 3.6 or higher
