@@ -12,11 +12,13 @@ import com.extrawest.jsonserver.validation.confirmation.AuthorizeConfirmationBdd
 import com.extrawest.jsonserver.validation.confirmation.BootNotificationConfirmationBddHandler;
 import com.extrawest.jsonserver.validation.confirmation.DataTransferConfirmationBddHandler;
 import com.extrawest.jsonserver.validation.confirmation.HeartbeatConfirmationBddHandler;
+import com.extrawest.jsonserver.validation.confirmation.MeterValuesConfirmationBddHandler;
 import com.extrawest.jsonserver.validation.confirmation.StartTransactionConfirmationBddHandler;
 import com.extrawest.jsonserver.validation.request.AuthorizeRequestBddHandler;
 import com.extrawest.jsonserver.validation.request.BootNotificationRequestBddHandler;
 import com.extrawest.jsonserver.validation.request.DataTransferRequestBddHandler;
 import com.extrawest.jsonserver.validation.request.HeartbeatRequestBddHandler;
+import com.extrawest.jsonserver.validation.request.MeterValuesRequestBddHandler;
 import com.extrawest.jsonserver.validation.request.StartTransactionRequestBddHandler;
 import com.extrawest.jsonserver.ws.handler.ServerCoreEventHandlerImpl;
 import eu.chargetime.ocpp.NotConnectedException;
@@ -40,6 +42,7 @@ import eu.chargetime.ocpp.model.core.DataTransferRequest;
 import eu.chargetime.ocpp.model.core.HeartbeatConfirmation;
 import eu.chargetime.ocpp.model.core.HeartbeatRequest;
 import eu.chargetime.ocpp.model.core.MeterValue;
+import eu.chargetime.ocpp.model.core.MeterValuesConfirmation;
 import eu.chargetime.ocpp.model.core.MeterValuesRequest;
 import eu.chargetime.ocpp.model.core.ResetRequest;
 import eu.chargetime.ocpp.model.core.ResetType;
@@ -77,6 +80,8 @@ public class MessagingServiceImpl implements MessagingService {
     private final DataTransferConfirmationBddHandler dataTransferConfirmationBddHandler;
     private final HeartbeatRequestBddHandler heartbeatRequestBddHandler;
     private final HeartbeatConfirmationBddHandler heartbeatConfirmationBddHandler;
+    private final MeterValuesRequestBddHandler meterValuesRequestBddHandler;
+    private final MeterValuesConfirmationBddHandler meterValuesConfirmationBddHandler;
     private final StartTransactionRequestBddHandler startTransactionRequestBddHandler;
     private final StartTransactionConfirmationBddHandler startTransactionConfirmationBddHandler;
 
@@ -239,6 +244,8 @@ public class MessagingServiceImpl implements MessagingService {
             dataTransferRequestBddHandler.validateFields(parameters, message);
         } else if (request instanceof HeartbeatRequest message) {
             heartbeatRequestBddHandler.validateFields(parameters, message);
+        } else if (request instanceof MeterValuesRequest message) {
+            meterValuesRequestBddHandler.validateFields(parameters, message);
         } else if (request instanceof StartTransactionRequest message) {
             startTransactionConfirmationBddHandler.setReceivedIdTag(message.getIdTag());
             startTransactionRequestBddHandler.validateFields(parameters, message);
@@ -262,6 +269,8 @@ public class MessagingServiceImpl implements MessagingService {
             response = dataTransferConfirmationBddHandler.createValidatedConfirmation(parameters, message);
         } else if (response instanceof HeartbeatConfirmation message) {
             response = heartbeatConfirmationBddHandler.createValidatedConfirmation(parameters, message);
+        } else if (response instanceof MeterValuesConfirmation message) {
+            response = meterValuesConfirmationBddHandler.createValidatedConfirmation(parameters, message);
         } else if (response instanceof StartTransactionConfirmation message) {
             response = startTransactionConfirmationBddHandler.createValidatedConfirmation(parameters, message);
         } else {
