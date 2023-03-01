@@ -22,7 +22,9 @@ import eu.chargetime.ocpp.model.core.AuthorizeConfirmation;
 import eu.chargetime.ocpp.model.core.BootNotificationConfirmation;
 import eu.chargetime.ocpp.model.core.DataTransferConfirmation;
 import eu.chargetime.ocpp.model.core.HeartbeatConfirmation;
+import eu.chargetime.ocpp.model.core.MeterValuesConfirmation;
 import eu.chargetime.ocpp.model.core.ResetType;
+import eu.chargetime.ocpp.model.core.StartTransactionConfirmation;
 import eu.chargetime.ocpp.model.remotetrigger.TriggerMessageRequestType;
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.After;
@@ -46,14 +48,11 @@ import static com.extrawest.jsonserver.util.TimeUtil.waitOneSecond;
 @Slf4j
 @RequiredArgsConstructor
 public class MyStepsTest extends SpringIntegrationTest {
-
+    private final BddDataRepository storage;
     private final ServerSessionRepository sessionRepository;
 
     private final MessagingService messagingService;
-
     private final StepsSupporterService stepsSupporterService;
-
-    private final BddDataRepository storage;
 
     private final ChargePoint chargePoint = new ChargePoint();
     private final int connectionWaitingTime = 300; // in seconds
@@ -252,18 +251,27 @@ public class MyStepsTest extends SpringIntegrationTest {
                 scenarioId, stepNumber, type, request.get()));
     }
 
+    @Then("the Central System must sends confirmation response")
+    public void theCentralSystemMustSendsConfirmationResponseWithGivenData() {
+        DataTable table = DataTable.emptyDataTable();
+        theCentralSystemMustSendsConfirmationResponseWithGivenData(table);
+    }
+
     @Then("the Central System must sends confirmation response with given data")
     public void theCentralSystemMustSendsConfirmationResponseWithGivenData(DataTable table) {
-        Map<String, String> parameters = table.asMap();
+        Map<String, String> parameters = table.isEmpty() ? Collections.emptyMap() : table.asMap();
         Confirmation response;
         switch (availableConfirmationMessageType) {
             case BOOT_NOTIFICATION -> response = new BootNotificationConfirmation();
             case AUTHORIZE ->  response = new AuthorizeConfirmation();
             case DATA_TRANSFER -> response = new DataTransferConfirmation();
             case HEARTBEAT -> response = new HeartbeatConfirmation();
+            case METER_VALUES -> response = new MeterValuesConfirmation();
+            case START_TRANSACTION -> response = new StartTransactionConfirmation();
             default -> throw new BddTestingException("Message type is unavailable");
         }
         Confirmation confirmation = messagingService.sendConfirmationResponse(parameters, response);
+
         log.info(String.format("Scenario №%s, STEP %s: %s confirmation message sent: \n%s ",
                 scenarioId, stepNumber, availableConfirmationMessageType, confirmation));
     }
