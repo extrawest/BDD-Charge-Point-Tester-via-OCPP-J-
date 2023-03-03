@@ -24,8 +24,9 @@ public enum ImplementedMessageType {
     START_TRANSACTION("StartTransaction"),
     STATUS_NOTIFICATION("StatusNotification"),
     STOP_TRANSACTION("StopTransaction"),
+    RESET("Reset"),
     TRIGGER_MESSAGE("TriggerMessage"),
-    RESET("Reset");
+    UPDATE_FIRMWARE("UpdateFirmware");
 
 
     private final String value;
