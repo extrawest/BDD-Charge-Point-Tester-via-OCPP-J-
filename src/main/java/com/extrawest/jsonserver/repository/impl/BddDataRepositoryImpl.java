@@ -11,7 +11,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType;
+import com.extrawest.jsonserver.model.emun.ImplementedMessageType;
 import com.extrawest.jsonserver.repository.BddDataRepository;
 import com.extrawest.jsonserver.repository.ServerSessionRepository;
 import eu.chargetime.ocpp.model.Confirmation;
@@ -30,7 +30,7 @@ public class BddDataRepositoryImpl implements BddDataRepository {
     // <uniqueId, promise>
     private final Map<String, CompletableFuture<Confirmation>> completedPromises = new ConcurrentHashMap<>();
     // <chargePointId, type of requested messages>
-    private final Map<String, List<ImplementedReceivedMessageType>> requestedMessageTypes = new ConcurrentHashMap<>();
+    private final Map<String, List<ImplementedMessageType>> requestedMessageTypes = new ConcurrentHashMap<>();
     // <chargePointId, message>
     private final Map<String, List<Request>> requestedMessages = new ConcurrentHashMap<>();
     // <chargePointId>
@@ -88,20 +88,20 @@ public class BddDataRepositoryImpl implements BddDataRepository {
 
     @Override
     public void addRequestedMessageType(String chargePointId, TriggerMessageRequestType type) {
-        List<ImplementedReceivedMessageType> messageTypes = requestedMessageTypes.getOrDefault(chargePointId, new ArrayList<>());
-        messageTypes.add(ImplementedReceivedMessageType.fromValue(type.name()));
+        List<ImplementedMessageType> messageTypes = requestedMessageTypes.getOrDefault(chargePointId, new ArrayList<>());
+        messageTypes.add(ImplementedMessageType.fromValue(type.name()));
         requestedMessageTypes.put(chargePointId, messageTypes);
     }
 
     @Override
-    public void addRequestedMessageType(String chargePointId, ImplementedReceivedMessageType type) {
-        List<ImplementedReceivedMessageType> messageTypes = requestedMessageTypes.getOrDefault(chargePointId, new ArrayList<>());
+    public void addRequestedMessageType(String chargePointId, ImplementedMessageType type) {
+        List<ImplementedMessageType> messageTypes = requestedMessageTypes.getOrDefault(chargePointId, new ArrayList<>());
         messageTypes.add(type);
         requestedMessageTypes.put(chargePointId, messageTypes);
     }
 
     @Override
-    public Optional<List<ImplementedReceivedMessageType>> getRequestedMessageTypes(String chargePointId) {
+    public Optional<List<ImplementedMessageType>> getRequestedMessageTypes(String chargePointId) {
         return Optional.ofNullable(requestedMessageTypes.getOrDefault(chargePointId, null));
     }
 
@@ -118,8 +118,8 @@ public class BddDataRepositoryImpl implements BddDataRepository {
     }
 
     @Override
-    public void removeRequestedMessageType(String chargePointId, ImplementedReceivedMessageType requestedMessageType) {
-        List<ImplementedReceivedMessageType> messageTypes = requestedMessageTypes.get(chargePointId);
+    public void removeRequestedMessageType(String chargePointId, ImplementedMessageType requestedMessageType) {
+        List<ImplementedMessageType> messageTypes = requestedMessageTypes.get(chargePointId);
         messageTypes.remove(requestedMessageType);
         requestedMessageTypes.put(chargePointId, messageTypes);
     }
