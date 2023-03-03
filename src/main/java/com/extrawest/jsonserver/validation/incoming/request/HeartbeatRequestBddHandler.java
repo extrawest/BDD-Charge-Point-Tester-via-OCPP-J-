@@ -25,8 +25,9 @@ public class HeartbeatRequestBddHandler
     }
 
     @Override
-    public boolean validateFields(Map<String, String> params, HeartbeatRequest actualMessage) {
-        return super.validateRequestFields(params, actualMessage);
+    public void validateAndAssertFieldsWithParams(Map<String, String> params, HeartbeatRequest message) {
+        super.validateParamsViaLibModel(params);
+        super.assertParamsAndMessageFields(params, message);
     }
 
 }

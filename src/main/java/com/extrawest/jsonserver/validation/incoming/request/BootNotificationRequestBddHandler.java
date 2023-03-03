@@ -111,8 +111,9 @@ public class BootNotificationRequestBddHandler
     }
 
     @Override
-    public boolean validateFields(Map<String, String> params, BootNotificationRequest actualMessage) {
-        return super.validateRequestFields(params, actualMessage);
+    public void validateAndAssertFieldsWithParams(Map<String, String> params, BootNotificationRequest message) {
+        super.validateParamsViaLibModel(params);
+        super.assertParamsAndMessageFields(params, message);
     }
 
 }

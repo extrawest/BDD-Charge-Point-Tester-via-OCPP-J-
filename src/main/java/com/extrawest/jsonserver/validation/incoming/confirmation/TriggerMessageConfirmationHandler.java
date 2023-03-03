@@ -39,7 +39,9 @@ public class TriggerMessageConfirmationHandler
     }
 
     @Override
-    public boolean validateFields(Map<String, String> params, TriggerMessageConfirmation actualMessage) {
-        return super.validateRequestFields(params, actualMessage);
+    public void validateAndAssertFieldsWithParams(Map<String, String> params, TriggerMessageConfirmation message) {
+        super.validateParamsViaLibModel(params);
+        super.assertParamsAndMessageFields(params, message);
     }
+
 }
