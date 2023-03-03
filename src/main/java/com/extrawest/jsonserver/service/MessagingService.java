@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import com.extrawest.jsonserver.model.emun.ImplementedMessagesSentType;
 import com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType;
 import com.extrawest.jsonserver.model.ChargePoint;
 import com.extrawest.jsonserver.model.RequiredChargingData;
@@ -13,6 +14,8 @@ import eu.chargetime.ocpp.model.core.ResetType;
 import eu.chargetime.ocpp.model.remotetrigger.TriggerMessageRequestType;
 
 public interface MessagingService {
+    void sendRequest(String chargePointId, ImplementedMessagesSentType type, Map<String, String> params);
+
     void sendTriggerMessage(String chargePointId, TriggerMessageRequestType type);
 
     void sendResetMessage(String chargePointId, ResetType type);
