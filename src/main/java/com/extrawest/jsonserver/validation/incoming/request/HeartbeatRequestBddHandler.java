@@ -1,9 +1,9 @@
-package com.extrawest.jsonserver.validation.request;
+package com.extrawest.jsonserver.validation.incoming.request;
 
 import java.util.Collections;
 import java.util.Map;
-import com.extrawest.jsonserver.validation.RequestFactory;
-import com.extrawest.jsonserver.validation.ValidationAndAssertionRequestFieldsFactory;
+import com.extrawest.jsonserver.validation.incoming.IncomingMessageFactory;
+import com.extrawest.jsonserver.validation.incoming.IncomingMessageFieldsAssertionFactory;
 import eu.chargetime.ocpp.model.core.HeartbeatRequest;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -14,8 +14,8 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class HeartbeatRequestBddHandler
-        extends ValidationAndAssertionRequestFieldsFactory<HeartbeatRequest>
-        implements RequestFactory<HeartbeatRequest> {
+        extends IncomingMessageFieldsAssertionFactory<HeartbeatRequest>
+        implements IncomingMessageFactory<HeartbeatRequest> {
 
     @PostConstruct
     private void init() {
@@ -25,8 +25,8 @@ public class HeartbeatRequestBddHandler
     }
 
     @Override
-    public boolean validateFields(Map<String, String> params, HeartbeatRequest actualRequest) {
-        return super.validateRequestFields(params, actualRequest);
+    public boolean validateFields(Map<String, String> params, HeartbeatRequest actualMessage) {
+        return super.validateRequestFields(params, actualMessage);
     }
 
 }

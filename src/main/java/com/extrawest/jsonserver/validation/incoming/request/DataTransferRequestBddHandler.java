@@ -1,8 +1,8 @@
-package com.extrawest.jsonserver.validation.request;
+package com.extrawest.jsonserver.validation.incoming.request;
 
 import java.util.Map;
-import com.extrawest.jsonserver.validation.RequestFactory;
-import com.extrawest.jsonserver.validation.ValidationAndAssertionRequestFieldsFactory;
+import com.extrawest.jsonserver.validation.incoming.IncomingMessageFactory;
+import com.extrawest.jsonserver.validation.incoming.IncomingMessageFieldsAssertionFactory;
 import eu.chargetime.ocpp.model.core.DataTransferRequest;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -13,8 +13,8 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class DataTransferRequestBddHandler
-        extends ValidationAndAssertionRequestFieldsFactory<DataTransferRequest>
-        implements RequestFactory<DataTransferRequest> {
+        extends IncomingMessageFieldsAssertionFactory<DataTransferRequest>
+        implements IncomingMessageFactory<DataTransferRequest> {
     public static final String VENDOR_ID_REQUIRED = "vendorId";
     public static final String MESSAGE_ID = "messageId";
     public static final String DATA = "data";
@@ -53,8 +53,8 @@ public class DataTransferRequestBddHandler
     }
 
     @Override
-    public boolean validateFields(Map<String, String> params, DataTransferRequest actualRequest) {
-        return super.validateRequestFields(params, actualRequest);
+    public boolean validateFields(Map<String, String> params, DataTransferRequest actualMessage) {
+        return super.validateRequestFields(params, actualMessage);
     }
 
 }

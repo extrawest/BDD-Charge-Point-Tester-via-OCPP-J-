@@ -1,8 +1,8 @@
-package com.extrawest.jsonserver.validation.request;
+package com.extrawest.jsonserver.validation.incoming.request;
 
 import java.util.Map;
-import com.extrawest.jsonserver.validation.RequestFactory;
-import com.extrawest.jsonserver.validation.ValidationAndAssertionRequestFieldsFactory;
+import com.extrawest.jsonserver.validation.incoming.IncomingMessageFactory;
+import com.extrawest.jsonserver.validation.incoming.IncomingMessageFieldsAssertionFactory;
 import eu.chargetime.ocpp.model.core.BootNotificationRequest;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -13,8 +13,8 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class BootNotificationRequestBddHandler
-        extends ValidationAndAssertionRequestFieldsFactory<BootNotificationRequest>
-        implements RequestFactory<BootNotificationRequest> {
+        extends IncomingMessageFieldsAssertionFactory<BootNotificationRequest>
+        implements IncomingMessageFactory<BootNotificationRequest> {
     public static final String CHARGE_BOX_SERIAL_NUMBER = "chargeBoxSerialNumber";
     public static final String CHARGE_POINT_MODEL_REQUIRED = "chargePointModel";
     public static final String CHARGE_POINT_SERIAL_NUMBER = "chargePointSerialNumber";
@@ -111,8 +111,8 @@ public class BootNotificationRequestBddHandler
     }
 
     @Override
-    public boolean validateFields(Map<String, String> params, BootNotificationRequest actualRequest) {
-        return super.validateRequestFields(params, actualRequest);
+    public boolean validateFields(Map<String, String> params, BootNotificationRequest actualMessage) {
+        return super.validateRequestFields(params, actualMessage);
     }
 
 }

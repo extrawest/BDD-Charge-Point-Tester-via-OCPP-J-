@@ -1,4 +1,4 @@
-package com.extrawest.jsonserver.validation;
+package com.extrawest.jsonserver.validation.incoming;
 
 import static com.extrawest.jsonserver.model.emun.ApiErrorMessage.BUG_CREATING_INSTANCE;
 import static com.extrawest.jsonserver.model.emun.ApiErrorMessage.BUG_PARSING_MODEL;
@@ -14,6 +14,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -26,7 +27,6 @@ import com.extrawest.jsonserver.model.exception.ValidationException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.chargetime.ocpp.PropertyConstraintException;
-import eu.chargetime.ocpp.model.Request;
 import eu.chargetime.ocpp.model.Validatable;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +45,7 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public abstract class ValidationAndAssertionRequestFieldsFactory<T extends Validatable> {
+public abstract class IncomingMessageFieldsAssertionFactory<T extends Validatable> {
     @Autowired @Setter protected ObjectMapper mapper;
 
     @Value("${wildcard:any}")
@@ -57,8 +57,8 @@ public abstract class ValidationAndAssertionRequestFieldsFactory<T extends Valid
     protected Map<String, BiFunction<Map<String, String>, T, Boolean>> assertionFactory;
 
     protected boolean validateRequestFields(Map<String, String> params, T actualRequest) {
-        if (!(actualRequest instanceof Request)) {
-            throw new BddTestingException(String.format(WRONG_INSTANCE_OF.getValue(), Request.class.getName()));
+        if (isNull(actualRequest)) {
+            throw new BddTestingException(String.format(WRONG_INSTANCE_OF.getValue(), Validatable.class.getName()));
         }
         validateForRequiredFields(params);
         validateParamsViaLibModel(params);
@@ -122,6 +122,16 @@ public abstract class ValidationAndAssertionRequestFieldsFactory<T extends Valid
                 .filter(pair -> !pair.getValue().apply(expectedParams, actual))
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toList());
+    }
+
+    protected <E extends Enum<E>> E getValidatedEnumValueOrThrow(Class<E> clazz, String value, String fieldName) {
+        for (E en : EnumSet.allOf(clazz)) {
+            if (Objects.equals(en.name(), value)) {
+                return en;
+            }
+        }
+        throw new ValidationException(String.format(INVALID_REQUIRED_PARAM.getValue(),
+                fieldName, getParameterizeClassName()));
     }
 
     protected boolean compareStringsIncludeWildCard(Map<String, String> expectedParams,

@@ -1,9 +1,9 @@
-package com.extrawest.jsonserver.validation.request;
+package com.extrawest.jsonserver.validation.incoming.request;
 
 import java.util.Collections;
 import java.util.Map;
-import com.extrawest.jsonserver.validation.RequestFactory;
-import com.extrawest.jsonserver.validation.ValidationAndAssertionRequestFieldsFactory;
+import com.extrawest.jsonserver.validation.incoming.IncomingMessageFactory;
+import com.extrawest.jsonserver.validation.incoming.IncomingMessageFieldsAssertionFactory;
 import eu.chargetime.ocpp.model.core.AuthorizeRequest;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -14,8 +14,8 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class AuthorizeRequestBddHandler
-        extends ValidationAndAssertionRequestFieldsFactory<AuthorizeRequest>
-        implements RequestFactory<AuthorizeRequest> {
+        extends IncomingMessageFieldsAssertionFactory<AuthorizeRequest>
+        implements IncomingMessageFactory<AuthorizeRequest> {
     public static final String ID_TAG = "idTag";
 
     @PostConstruct
@@ -37,8 +37,8 @@ public class AuthorizeRequestBddHandler
     }
 
     @Override
-    public boolean validateFields(Map<String, String> params, AuthorizeRequest actualRequest) {
-        return super.validateRequestFields(params, actualRequest);
+    public boolean validateFields(Map<String, String> params, AuthorizeRequest actualMessage) {
+        return super.validateRequestFields(params, actualMessage);
     }
 
 }
