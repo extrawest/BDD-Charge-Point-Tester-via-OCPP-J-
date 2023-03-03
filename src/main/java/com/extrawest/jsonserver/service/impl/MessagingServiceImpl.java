@@ -8,6 +8,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import com.extrawest.jsonserver.service.MessagingService;
+import com.extrawest.jsonserver.validation.incoming.confirmation.ResetConfirmationHandler;
 import com.extrawest.jsonserver.validation.incoming.confirmation.TriggerMessageConfirmationHandler;
 import com.extrawest.jsonserver.validation.outcoming.confirmation.AuthorizeConfirmationBddHandlerValidation;
 import com.extrawest.jsonserver.validation.outcoming.confirmation.BootNotificationConfirmationBddHandlerValidation;
@@ -21,6 +22,7 @@ import com.extrawest.jsonserver.validation.incoming.request.DataTransferRequestB
 import com.extrawest.jsonserver.validation.incoming.request.HeartbeatRequestBddHandler;
 import com.extrawest.jsonserver.validation.incoming.request.MeterValuesRequestBddHandler;
 import com.extrawest.jsonserver.validation.incoming.request.StartTransactionRequestBddHandler;
+import com.extrawest.jsonserver.validation.outcoming.request.ResetRequestHandler;
 import com.extrawest.jsonserver.validation.outcoming.request.TriggerMessageRequestHandler;
 import com.extrawest.jsonserver.ws.handler.ServerCoreEventHandlerImpl;
 import eu.chargetime.ocpp.NotConnectedException;
@@ -44,6 +46,7 @@ import eu.chargetime.ocpp.model.core.HeartbeatConfirmation;
 import eu.chargetime.ocpp.model.core.HeartbeatRequest;
 import eu.chargetime.ocpp.model.core.MeterValuesConfirmation;
 import eu.chargetime.ocpp.model.core.MeterValuesRequest;
+import eu.chargetime.ocpp.model.core.ResetConfirmation;
 import eu.chargetime.ocpp.model.core.ResetRequest;
 import eu.chargetime.ocpp.model.core.StartTransactionConfirmation;
 import eu.chargetime.ocpp.model.core.StartTransactionRequest;
@@ -82,6 +85,8 @@ public class MessagingServiceImpl implements MessagingService {
     private final StartTransactionRequestBddHandler startTransactionRequestBddHandler;
     private final StartTransactionConfirmationBddHandlerValidation startTransactionConfirmationBddHandler;
 
+    private final ResetRequestHandler resetRequestHandler;
+    private final ResetConfirmationHandler resetConfirmationHandler;
     private final TriggerMessageRequestHandler triggerMessageRequestHandler;
     private final TriggerMessageConfirmationHandler triggerMessageConfirmationHandler;
 
@@ -98,7 +103,10 @@ public class MessagingServiceImpl implements MessagingService {
                 requestedMessageType = ImplementedMessageType.fromValue(message.getRequestedMessage().name());
                 request = message;
             }
-            case RESET -> request = new ResetRequest();
+            case RESET -> {
+                ResetRequest message = new ResetRequest();
+                request = resetRequestHandler.createValidatedMessage(params, message);
+            }
             default -> throw new BddTestingException("Request message type is unavailable");
         }
         sendRequest(sessionUUID, request);
@@ -287,6 +295,8 @@ public class MessagingServiceImpl implements MessagingService {
             Confirmation confirmation = completableFuture.get();
             if (confirmation instanceof TriggerMessageConfirmation message) {
                 triggerMessageConfirmationHandler.validateFields(parameters, message);
+            } else if (confirmation instanceof ResetConfirmation message) {
+                resetConfirmationHandler.validateFields(parameters, message);
             } else {
                 throw new BddTestingException("Type is not implemented. Confirmation: " + confirmation);
             }
