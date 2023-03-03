@@ -1,9 +1,9 @@
-package com.extrawest.jsonserver.validation.confirmation;
+package com.extrawest.jsonserver.validation.outcoming.confirmation;
 
 import java.util.Collections;
 import java.util.Map;
-import com.extrawest.jsonserver.validation.ConfirmationFactory;
-import com.extrawest.jsonserver.validation.ValidationAndAssertionConfirmationFieldsFactory;
+import com.extrawest.jsonserver.validation.outcoming.OutgoingMessageFactory;
+import com.extrawest.jsonserver.validation.outcoming.OutcomingMessageFieldsValidationFactory;
 import eu.chargetime.ocpp.model.core.AuthorizeConfirmation;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -15,9 +15,9 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class AuthorizeConfirmationBddHandler
-        extends ValidationAndAssertionConfirmationFieldsFactory<AuthorizeConfirmation>
-        implements ConfirmationFactory<AuthorizeConfirmation> {
+public class AuthorizeConfirmationBddHandlerValidation
+        extends OutcomingMessageFieldsValidationFactory<AuthorizeConfirmation>
+        implements OutgoingMessageFactory<AuthorizeConfirmation> {
     public static final String ID_TAG_INFO_REQUIRED = "idTagInfo";
     @Value("${authorize.confirmation.idTagInfo:{\"expiryDate\":\"2023-12-31T23:23:59.278930403Z\",\"parentIdTag\":\"idTag-chargePointId\",\"status\":\"Accepted\"}}")
     private String defaultIdTagInfo;
@@ -41,13 +41,13 @@ public class AuthorizeConfirmationBddHandler
 
     @Override
     public void validateFields(Map<String, String> params) {
-        super.validateConfirmationFields(params);
+        super.validateMessageFields(params);
     }
 
     @Override
-    public AuthorizeConfirmation createValidatedConfirmation(Map<String, String> params,
-                                                             AuthorizeConfirmation response) {
-        return super.createValidatedConfirmation(params, response);
+    public AuthorizeConfirmation createValidatedMessage(Map<String, String> params,
+                                                        AuthorizeConfirmation actualMessage) {
+        return super.createValidatedMessage(params, actualMessage);
     }
 
 }
