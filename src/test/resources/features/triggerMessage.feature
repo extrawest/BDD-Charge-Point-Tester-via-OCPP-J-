@@ -16,4 +16,7 @@ Feature:
       | imsi                   |  BDD-imsi                  |
       | meterSerialNumber      |  BDD-meter-serial          |
       | meterType              |  BDD-meter-type            |
-    And the Central System must send confirmation response
+    And the Central System must send confirmation response with given data
+      | currentTime | any |
+      | interval    | any |
+      | status      | any |
