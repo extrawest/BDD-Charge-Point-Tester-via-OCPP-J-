@@ -19,7 +19,7 @@ public interface MessagingService {
 
     ImplementedMessageType validateRequest(Map<String, String> parameters, Request request);
 
-    Confirmation sendConfirmationResponse(Map<String, String> parameters, Confirmation response);
+    Confirmation sendConfirmationResponse(Map<String, String> parameters, ImplementedMessageType sendingMessageType);
 
     void assertConfirmationMessage(Map<String, String> params, CompletableFuture<Confirmation> completableFuture);
 

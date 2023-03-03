@@ -38,25 +38,17 @@ import com.extrawest.jsonserver.repository.ServerSessionRepository;
 import com.extrawest.jsonserver.ws.JsonWsServer;
 import eu.chargetime.ocpp.model.Confirmation;
 import eu.chargetime.ocpp.model.Request;
-import eu.chargetime.ocpp.model.core.AuthorizeConfirmation;
 import eu.chargetime.ocpp.model.core.AuthorizeRequest;
-import eu.chargetime.ocpp.model.core.BootNotificationConfirmation;
 import eu.chargetime.ocpp.model.core.BootNotificationRequest;
-import eu.chargetime.ocpp.model.core.DataTransferConfirmation;
 import eu.chargetime.ocpp.model.core.DataTransferRequest;
-import eu.chargetime.ocpp.model.core.HeartbeatConfirmation;
 import eu.chargetime.ocpp.model.core.HeartbeatRequest;
-import eu.chargetime.ocpp.model.core.MeterValuesConfirmation;
 import eu.chargetime.ocpp.model.core.MeterValuesRequest;
 import eu.chargetime.ocpp.model.core.ResetConfirmation;
-import eu.chargetime.ocpp.model.core.ResetRequest;
-import eu.chargetime.ocpp.model.core.StartTransactionConfirmation;
 import eu.chargetime.ocpp.model.core.StartTransactionRequest;
 import eu.chargetime.ocpp.model.core.StatusNotificationRequest;
 import eu.chargetime.ocpp.model.firmware.DiagnosticsStatusNotificationRequest;
 import eu.chargetime.ocpp.model.firmware.FirmwareStatusNotificationRequest;
 import eu.chargetime.ocpp.model.firmware.UpdateFirmwareConfirmation;
-import eu.chargetime.ocpp.model.firmware.UpdateFirmwareRequest;
 import eu.chargetime.ocpp.model.remotetrigger.TriggerMessageConfirmation;
 import eu.chargetime.ocpp.model.remotetrigger.TriggerMessageRequest;
 import lombok.RequiredArgsConstructor;
@@ -103,20 +95,13 @@ public class MessagingServiceImpl implements MessagingService {
         ImplementedMessageType requestedMessageType = null;
         switch (type) {
             case TRIGGER_MESSAGE -> {
-                TriggerMessageRequest message = new TriggerMessageRequest();
-                message = triggerMessageRequestHandler.createValidatedMessage(params, message);
+                TriggerMessageRequest message = triggerMessageRequestHandler.createMessageWithValidatedParams(params);
                 bddDataRepository.addRequestedMessageType(chargePointId, message.getRequestedMessage());
                 requestedMessageType = ImplementedMessageType.fromValue(message.getRequestedMessage().name());
                 request = message;
             }
-            case RESET -> {
-                ResetRequest message = new ResetRequest();
-                request = resetRequestHandler.createValidatedMessage(params, message);
-            }
-            case UPDATE_FIRMWARE -> {
-                UpdateFirmwareRequest message = new UpdateFirmwareRequest();
-                request = updateFirmwareRequestFactory.createValidatedMessage(params, message);
-            }
+            case RESET -> request = resetRequestHandler.createMessageWithValidatedParams(params);
+            case UPDATE_FIRMWARE -> request = updateFirmwareRequestFactory.createMessageWithValidatedParams(params);
             default -> throw new BddTestingException("Request message type is unavailable");
         }
         sendRequest(sessionUUID, request);
@@ -244,24 +229,24 @@ public class MessagingServiceImpl implements MessagingService {
     @Override
     public ImplementedMessageType validateRequest(Map<String, String> parameters, Request request) {
         if (request instanceof BootNotificationRequest message) {
-            bootNotificationRequestBddHandler.validateFields(parameters, message);
+            bootNotificationRequestBddHandler.validateAndAssertFieldsWithParams(parameters, message);
             return ImplementedMessageType.BOOT_NOTIFICATION;
         } else if (request instanceof AuthorizeRequest message) {
             authorizeConfirmationBddHandler.setReceivedIdTag(message.getIdTag());
-            authorizeRequestBddHandler.validateFields(parameters, message);
+            authorizeRequestBddHandler.validateAndAssertFieldsWithParams(parameters, message);
             return ImplementedMessageType.AUTHORIZE;
         } else if (request instanceof DataTransferRequest message) {
-            dataTransferRequestBddHandler.validateFields(parameters, message);
+            dataTransferRequestBddHandler.validateAndAssertFieldsWithParams(parameters, message);
             return ImplementedMessageType.DATA_TRANSFER;
         } else if (request instanceof HeartbeatRequest message) {
-            heartbeatRequestBddHandler.validateFields(parameters, message);
+            heartbeatRequestBddHandler.validateAndAssertFieldsWithParams(parameters, message);
             return ImplementedMessageType.HEARTBEAT;
         } else if (request instanceof MeterValuesRequest message) {
-            meterValuesRequestBddHandler.validateFields(parameters, message);
+            meterValuesRequestBddHandler.validateAndAssertFieldsWithParams(parameters, message);
             return ImplementedMessageType.METER_VALUES;
         } else if (request instanceof StartTransactionRequest message) {
             startTransactionConfirmationBddHandler.setReceivedIdTag(message.getIdTag());
-            startTransactionRequestBddHandler.validateFields(parameters, message);
+            startTransactionRequestBddHandler.validateAndAssertFieldsWithParams(parameters, message);
             return ImplementedMessageType.START_TRANSACTION;
         } else {
              throw new BddTestingException("Type is not implemented. Request: " + request);
@@ -269,28 +254,30 @@ public class MessagingServiceImpl implements MessagingService {
     }
 
     @Override
-    public Confirmation sendConfirmationResponse(Map<String, String> parameters, Confirmation response) {
+    public Confirmation sendConfirmationResponse(Map<String, String> parameters, ImplementedMessageType sendingMessageType) {
         ServerCoreEventHandlerImpl handler = springBootContext.getBean(ServerCoreEventHandlerImpl.class);
         while (Objects.nonNull(handler.getResponse())) {
             waitHalfSecond();
         }
-        if (response instanceof BootNotificationConfirmation message) {
-            response = bootNotificationConfirmationBddHandler.createValidatedMessage(parameters, message);
-        } else if (response instanceof AuthorizeConfirmation message) {
-            response = authorizeConfirmationBddHandler.createValidatedMessage(parameters, message);
-        } else if (response instanceof DataTransferConfirmation message) {
-            response = dataTransferConfirmationBddHandler.createValidatedMessage(parameters, message);
-        } else if (response instanceof HeartbeatConfirmation message) {
-            response = heartbeatConfirmationBddHandler.createValidatedMessage(parameters, message);
-        } else if (response instanceof MeterValuesConfirmation message) {
-            response = meterValuesConfirmationBddHandler.createValidatedMessage(parameters, message);
-        } else if (response instanceof StartTransactionConfirmation message) {
-            response = startTransactionConfirmationBddHandler.createValidatedMessage(parameters, message);
-        } else {
-            throw new BddTestingException("This type of confirmation message is not implemented. ");
+        Confirmation response;
+        switch (sendingMessageType) {
+            case BOOT_NOTIFICATION -> response =
+                    bootNotificationConfirmationBddHandler.createMessageWithValidatedParams(parameters);
+            case AUTHORIZE ->  response =
+                    authorizeConfirmationBddHandler.createMessageWithValidatedParams(parameters);
+            case DATA_TRANSFER -> response =
+                    dataTransferConfirmationBddHandler.createMessageWithValidatedParams(parameters);
+            case HEARTBEAT -> response =
+                    heartbeatConfirmationBddHandler.createMessageWithValidatedParams(parameters);
+            case METER_VALUES -> response =
+                    meterValuesConfirmationBddHandler.createMessageWithValidatedParams(parameters);
+            case START_TRANSACTION -> response =
+                    startTransactionConfirmationBddHandler.createMessageWithValidatedParams(parameters);
+            default ->
+                    throw new BddTestingException("This type of confirmation message is not implemented. ");
         }
-        handler.setResponse(response);
 
+        handler.setResponse(response);
         while (Objects.nonNull(handler.getResponse())) {
             waitOneSecond();
         }
@@ -304,11 +291,11 @@ public class MessagingServiceImpl implements MessagingService {
         try {
             Confirmation confirmation = completableFuture.get();
             if (confirmation instanceof TriggerMessageConfirmation message) {
-                triggerMessageConfirmationHandler.validateFields(parameters, message);
+                triggerMessageConfirmationHandler.validateAndAssertFieldsWithParams(parameters, message);
             } else if (confirmation instanceof ResetConfirmation message) {
-                resetConfirmationHandler.validateFields(parameters, message);
+                resetConfirmationHandler.validateAndAssertFieldsWithParams(parameters, message);
             } else if (confirmation instanceof UpdateFirmwareConfirmation message) {
-                updateFirmwareConfirmationHandler.validateFields(parameters, message);
+                updateFirmwareConfirmationHandler.validateAndAssertFieldsWithParams(parameters, message);
             } else {
                 throw new BddTestingException("Type is not implemented. Confirmation: " + confirmation);
             }
