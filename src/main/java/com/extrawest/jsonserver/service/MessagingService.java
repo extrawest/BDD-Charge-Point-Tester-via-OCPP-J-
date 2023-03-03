@@ -17,7 +17,7 @@ public interface MessagingService {
 
     Optional<Request> waitForRequestedMessage(ChargePoint chargePoint, int waitingTimeSec, ImplementedMessageType type);
 
-    void validateRequest(Map<String, String> parameters, Request request);
+    ImplementedMessageType validateRequest(Map<String, String> parameters, Request request);
 
     Confirmation sendConfirmationResponse(Map<String, String> parameters, Confirmation response);
 

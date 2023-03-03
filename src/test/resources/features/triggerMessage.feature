@@ -16,3 +16,4 @@ Feature:
       | imsi                   |  BDD-imsi                  |
       | meterSerialNumber      |  BDD-meter-serial          |
       | meterType              |  BDD-meter-type            |
+    And the Central System must send confirmation response

@@ -224,21 +224,27 @@ public class MessagingServiceImpl implements MessagingService {
     }
 
     @Override
-    public void validateRequest(Map<String, String> parameters, Request request) {
+    public ImplementedMessageType validateRequest(Map<String, String> parameters, Request request) {
         if (request instanceof BootNotificationRequest message) {
             bootNotificationRequestBddHandler.validateFields(parameters, message);
+            return ImplementedMessageType.BOOT_NOTIFICATION;
         } else if (request instanceof AuthorizeRequest message) {
             authorizeConfirmationBddHandler.setReceivedIdTag(message.getIdTag());
             authorizeRequestBddHandler.validateFields(parameters, message);
+            return ImplementedMessageType.AUTHORIZE;
         } else if (request instanceof DataTransferRequest message) {
             dataTransferRequestBddHandler.validateFields(parameters, message);
+            return ImplementedMessageType.DATA_TRANSFER;
         } else if (request instanceof HeartbeatRequest message) {
             heartbeatRequestBddHandler.validateFields(parameters, message);
+            return ImplementedMessageType.HEARTBEAT;
         } else if (request instanceof MeterValuesRequest message) {
             meterValuesRequestBddHandler.validateFields(parameters, message);
+            return ImplementedMessageType.METER_VALUES;
         } else if (request instanceof StartTransactionRequest message) {
             startTransactionConfirmationBddHandler.setReceivedIdTag(message.getIdTag());
             startTransactionRequestBddHandler.validateFields(parameters, message);
+            return ImplementedMessageType.START_TRANSACTION;
         } else {
              throw new BddTestingException("Type is not implemented. Request: " + request);
         }
