@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType;
+import com.extrawest.jsonserver.model.emun.ImplementedMessageType;
 import eu.chargetime.ocpp.model.Confirmation;
 import eu.chargetime.ocpp.model.Request;
 import eu.chargetime.ocpp.model.remotetrigger.TriggerMessageRequestType;
@@ -28,15 +28,15 @@ public interface BddDataRepository {
 
     void addRequestedMessageType(String chargePointId, TriggerMessageRequestType type);
 
-    void addRequestedMessageType(String chargePointId, ImplementedReceivedMessageType type);
+    void addRequestedMessageType(String chargePointId, ImplementedMessageType type);
 
-    Optional<List<ImplementedReceivedMessageType>> getRequestedMessageTypes(String chargePointId);
+    Optional<List<ImplementedMessageType>> getRequestedMessageTypes(String chargePointId);
 
     void addRequestedMessage(String chargePointId, Request request);
 
     Optional<List<Request>> getRequestedMessage(String chargePointId);
 
-    void removeRequestedMessageType(String chargePointId, ImplementedReceivedMessageType requestedMessageType);
+    void removeRequestedMessageType(String chargePointId, ImplementedMessageType requestedMessageType);
 
     void removeRequestedMessage(String chargePointId, Request request);
 

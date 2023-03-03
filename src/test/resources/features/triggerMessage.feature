@@ -2,9 +2,10 @@ Feature:
   Scenario: The Central System sends message request to Charge Point
     Given the Central System is started
     Given the Charge Point is connected
-    When the Central System sends "TriggerMessage.req" request to the Charge Point and receives confirmation
+    When the Central System sends "TriggerMessage.req" request to the Charge Point
       | requestedMessage | BootNotification |
       | connectorId      | any              |
+    And the Central System receives confirmation
       | status           | any              |
     Then the Central System must receive requested message with given data
       | chargePointModel       |  BDD-model                 |

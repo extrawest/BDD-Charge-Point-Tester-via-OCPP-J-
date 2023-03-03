@@ -8,12 +8,10 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-import com.extrawest.jsonserver.model.emun.ImplementedMessagesSentType;
 import com.extrawest.jsonserver.service.StepsSupporterService;
-import com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType;
+import com.extrawest.jsonserver.model.emun.ImplementedMessageType;
 import com.extrawest.jsonserver.model.exception.BddTestingException;
 import com.extrawest.jsonserver.model.ChargePoint;
-import com.extrawest.jsonserver.model.RequiredChargingData;
 import com.extrawest.jsonserver.service.MessagingService;
 import com.extrawest.jsonserver.repository.BddDataRepository;
 import com.extrawest.jsonserver.repository.ServerSessionRepository;
@@ -25,12 +23,12 @@ import eu.chargetime.ocpp.model.core.DataTransferConfirmation;
 import eu.chargetime.ocpp.model.core.HeartbeatConfirmation;
 import eu.chargetime.ocpp.model.core.MeterValuesConfirmation;
 import eu.chargetime.ocpp.model.core.StartTransactionConfirmation;
-import eu.chargetime.ocpp.model.remotetrigger.TriggerMessageRequestType;
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
 import io.cucumber.java.BeforeStep;
 import io.cucumber.java.Scenario;
+import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -38,7 +36,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 
-import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.*;
 import static com.extrawest.jsonserver.util.TimeUtil.waitOneSecond;
 import static java.util.Objects.isNull;
 
@@ -58,14 +55,14 @@ public class MyStepsTest extends SpringIntegrationTest {
     private final ChargePoint chargePoint = new ChargePoint();
     private final int connectionWaitingTime = 300; // in seconds
     private final int messageWaitingTime = 120; // in seconds
-    private final RequiredChargingData requiredData = new RequiredChargingData();
 
     private int scenarioId;
     private String scenarioName;
     private int stepNumber;
 
     private UUID sessionIndex;
-    private ImplementedReceivedMessageType availableConfirmationMessageType;
+    private ImplementedMessageType waitingMessageType;
+    private ImplementedMessageType requestedMessageType;
 
     @Value("${wildcard:any}")
     private String wildCard;
@@ -152,30 +149,15 @@ public class MyStepsTest extends SpringIntegrationTest {
         this.sessionIndex = sessionIndex;
     }
 
-    @When("the Central System sends {string} request on {string} and receives confirmation")
-    public void csSendsTriggerMessageRequestAndGetsConfirmation(String messageType, String requestedMessageType) {
-        requiredData.setMessageType(requestedMessageType);
-        if (Objects.equals("TriggerMessage", messageType)) {
-            messagingService.sendTriggerMessage(
-                    chargePoint.getChargePointId(), TriggerMessageRequestType.valueOf(requestedMessageType));
-            log.info(String.format("Scenario №%s, STEP %s: Trigger message request sent. ",
-                    scenarioId, stepNumber));
-            handlingConfirmationResponse();
-        } else {
-            throw new BddTestingException(String.format("Scenario №%s, STEP %s: %s is not allowed in this step.",
-                    scenarioId, stepNumber, messageType));
-        }
-    }
-
-    @When("the Central System sends {string} request to the Charge Point and receives confirmation")
+    @Given("the Central System sends {string} request to the Charge Point")
     public void csSendsMessageRequestAndGetsConfirmation(String messageType, DataTable table) {
         Map<String, String> parameters = isNull(table) || table.isEmpty() ? Collections.emptyMap() : table.asMap();
         String requestType = messageType.replace(".req", "").replace(".conf", "");
-        if (ImplementedMessagesSentType.contains(requestType)) {
-            messagingService.sendRequest(chargePoint.getChargePointId(),
-                    ImplementedMessagesSentType.fromValue(requestType), parameters);
+        if (ImplementedMessageType.contains(requestType)) {
+            waitingMessageType = ImplementedMessageType.fromValue(requestType);
+            requestedMessageType = messagingService.sendRequest(chargePoint.getChargePointId(), waitingMessageType,
+                    parameters);
             log.info(String.format("Scenario №%s, STEP %s: %s request sent. ", scenarioId, stepNumber, messageType));
-            handlingConfirmationResponse();
         } else {
             throw new BddTestingException(
                     String.format("Scenario №%s, STEP %s: wrong message request type or %s is not implemented.",
@@ -183,47 +165,62 @@ public class MyStepsTest extends SpringIntegrationTest {
         }
     }
 
-    private void handlingConfirmationResponse() {
+    @And("the Central System receives confirmation")
+    public void theCentralSystemReceivesConfirmation(DataTable table) {
+        Map<String, String> parameters = isNull(table) || table.isEmpty() ? Collections.emptyMap() : table.asMap();
+        handlingConfirmationResponse(parameters);
+    }
+
+
+    private void handlingConfirmationResponse(Map<String, String> parameters) {
         log.info(String.format("Scenario №%s, STEP %s: Waiting for confirmation response...",
                 scenarioId, stepNumber));
         Optional<CompletableFuture<Confirmation>> future =
-                messagingService.waitForSuccessfulResponse(sessionIndex, messageWaitingTime);
+                messagingService.waitForSuccessfulResponse(sessionIndex, messageWaitingTime, parameters);
         if (future.isEmpty()) {
             throw new BddTestingException(
                     String.format("Scenario №%s, STEP %s: response to the trigger message is not valid.",
                             scenarioId, stepNumber));
         }
-        if (future.get().isDone()) {
+        CompletableFuture<Confirmation> completableFuture = future.get();
+        if (completableFuture.isDone()) {
+            messagingService.assertConfirmationMessage(parameters, completableFuture);
             log.info(String.format("Scenario №%s, STEP %s: handled. Response is valid. ",
                     scenarioId, stepNumber));
             return;
         }
-        if (future.get().isCompletedExceptionally()) {
+        if (completableFuture.isCompletedExceptionally()) {
             throw new BddTestingException(
                     String.format("Scenario №%s, STEP %s: handled. Response is not valid. ",
                             scenarioId, stepNumber));
         }
-        if (future.get().isCancelled()) {
+        if (completableFuture.isCancelled()) {
             throw new BddTestingException(
                     String.format("Scenario №%s, STEP %s: awaiting response was cancelled by CS.",
                             scenarioId, stepNumber));
         }
     }
 
+    @Then("the Central System must receive requested message")
+    public void csMustReceiveRequestedMessage() {
+        csMustReceiveRequestedMessageWithGivenData(DataTable.emptyDataTable());
+    }
+
     @Then("the Central System must receive requested message with given data")
-    public void csMustReceiveMessageRequestAndCompareData() {
+    public void csMustReceiveRequestedMessageWithGivenData(DataTable table) {
+        Map<String, String> parameters = isNull(table) || table.isEmpty() ? Collections.emptyMap() : table.asMap();
         log.info(String.format("Scenario №%s, STEP %s: Waiting for request up to %s...",
                 scenarioId, stepNumber, messageWaitingTime));
-        ImplementedReceivedMessageType type = valueOf(requiredData.getMessageType());
-        Optional<Request> request = messagingService.waitForRequestedMessage(chargePoint, messageWaitingTime, type);
+        Optional<Request> request = messagingService.waitForRequestedMessage(chargePoint, messageWaitingTime,
+                requestedMessageType);
         if (request.isEmpty()) {
             throw new BddTestingException(
                     String.format("Scenario №%s, STEP %s: requested %s message is not handled or invalid.",
-                            scenarioId, stepNumber, type));
+                            scenarioId, stepNumber, requestedMessageType));
         }
-        messagingService.validateReceivedMessageOrThrow(chargePoint, requiredData, request.get());
+        messagingService.validateRequest(parameters, request.get());
         log.info(String.format("Scenario №%s, STEP %s: handled. Requested %s message is valid: %s ",
-                scenarioId, stepNumber, type, request.get()));
+                scenarioId, stepNumber, requestedMessageType, request.get()));
     }
 
     @When("the Central System must receives {string}")
@@ -239,9 +236,9 @@ public class MyStepsTest extends SpringIntegrationTest {
     }
 
     private void theCSReceivesMessageWithGivenData(String messageType, Map<String, String> parameters) {
-        ImplementedReceivedMessageType type = ImplementedReceivedMessageType
+        ImplementedMessageType type = ImplementedMessageType
                 .fromValue(messageType.replace(".req", "").replace(".conf", ""));
-        availableConfirmationMessageType = type;
+        waitingMessageType = type;
         storage.addRequestedMessageType(chargePoint.getChargePointId(), type);
         Optional<Request> request = messagingService.waitForRequestedMessage(chargePoint, messageWaitingTime, type);
         if (request.isEmpty()) {
@@ -264,7 +261,7 @@ public class MyStepsTest extends SpringIntegrationTest {
     public void theCentralSystemMustSendsConfirmationResponseWithGivenData(DataTable table) {
         Map<String, String> parameters = isNull(table) || table.isEmpty() ? Collections.emptyMap() : table.asMap();
         Confirmation response;
-        switch (availableConfirmationMessageType) {
+        switch (waitingMessageType) {
             case BOOT_NOTIFICATION -> response = new BootNotificationConfirmation();
             case AUTHORIZE ->  response = new AuthorizeConfirmation();
             case DATA_TRANSFER -> response = new DataTransferConfirmation();
@@ -276,7 +273,7 @@ public class MyStepsTest extends SpringIntegrationTest {
         Confirmation confirmation = messagingService.sendConfirmationResponse(parameters, response);
 
         log.info(String.format("Scenario №%s, STEP %s: %s confirmation message sent: \n%s ",
-                scenarioId, stepNumber, availableConfirmationMessageType, confirmation));
+                scenarioId, stepNumber, waitingMessageType, confirmation));
     }
 
 }
