@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import com.extrawest.jsonserver.model.emun.ImplementedMessagesSentType;
 import com.extrawest.jsonserver.service.MessagingService;
 import com.extrawest.jsonserver.validation.outcoming.confirmation.AuthorizeConfirmationBddHandlerValidation;
 import com.extrawest.jsonserver.validation.outcoming.confirmation.BootNotificationConfirmationBddHandlerValidation;
@@ -20,6 +21,7 @@ import com.extrawest.jsonserver.validation.incoming.request.DataTransferRequestB
 import com.extrawest.jsonserver.validation.incoming.request.HeartbeatRequestBddHandler;
 import com.extrawest.jsonserver.validation.incoming.request.MeterValuesRequestBddHandler;
 import com.extrawest.jsonserver.validation.incoming.request.StartTransactionRequestBddHandler;
+import com.extrawest.jsonserver.validation.outcoming.request.TriggerMessageRequestHandler;
 import com.extrawest.jsonserver.ws.handler.ServerCoreEventHandlerImpl;
 import eu.chargetime.ocpp.NotConnectedException;
 import eu.chargetime.ocpp.OccurenceConstraintException;
@@ -84,6 +86,25 @@ public class MessagingServiceImpl implements MessagingService {
     private final MeterValuesConfirmationBddHandlerValidation meterValuesConfirmationBddHandler;
     private final StartTransactionRequestBddHandler startTransactionRequestBddHandler;
     private final StartTransactionConfirmationBddHandlerValidation startTransactionConfirmationBddHandler;
+
+    private final TriggerMessageRequestHandler triggerMessageRequestHandler;
+
+    @Override
+    public void sendRequest(String chargePointId, ImplementedMessagesSentType type, Map<String, String> params) {
+        UUID sessionUUID = sessionRepository.getSessionByChargerId(chargePointId);
+        Request request;
+        switch (type) {
+            case TRIGGER_MESSAGE -> {
+                TriggerMessageRequest message = new TriggerMessageRequest();
+                message = triggerMessageRequestHandler.createValidatedMessage(params, message);
+                bddDataRepository.addRequestedMessageType(chargePointId, message.getRequestedMessage());
+                request = message;
+            }
+            case RESET -> request = new ResetRequest();
+            default -> throw new BddTestingException("Message type is unavailable");
+        }
+        sendRequest(sessionUUID, request);
+    }
 
     @Override
     public void sendTriggerMessage(String chargePointId, TriggerMessageRequestType type) {
