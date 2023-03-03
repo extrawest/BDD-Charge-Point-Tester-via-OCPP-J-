@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+import com.extrawest.jsonserver.model.emun.ImplementedMessagesSentType;
 import com.extrawest.jsonserver.service.StepsSupporterService;
 import com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType;
 import com.extrawest.jsonserver.model.exception.BddTestingException;
@@ -23,7 +24,6 @@ import eu.chargetime.ocpp.model.core.BootNotificationConfirmation;
 import eu.chargetime.ocpp.model.core.DataTransferConfirmation;
 import eu.chargetime.ocpp.model.core.HeartbeatConfirmation;
 import eu.chargetime.ocpp.model.core.MeterValuesConfirmation;
-import eu.chargetime.ocpp.model.core.ResetType;
 import eu.chargetime.ocpp.model.core.StartTransactionConfirmation;
 import eu.chargetime.ocpp.model.remotetrigger.TriggerMessageRequestType;
 import io.cucumber.datatable.DataTable;
@@ -40,6 +40,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.*;
 import static com.extrawest.jsonserver.util.TimeUtil.waitOneSecond;
+import static java.util.Objects.isNull;
 
 /**
  * All time variables in seconds
@@ -106,7 +107,7 @@ public class MyStepsTest extends SpringIntegrationTest {
         LocalDateTime finishTime = LocalDateTime.now().plusSeconds(connectionWaitingTime);
         log.info(String.format("Scenario №%s, STEP %s: waiting for any connection up to %s seconds...",
                 scenarioId, stepNumber, connectionWaitingTime));
-        while (Objects.isNull(sessionIndex) && LocalDateTime.now().isBefore(finishTime)) {
+        while (isNull(sessionIndex) && LocalDateTime.now().isBefore(finishTime)) {
             try {
                 sessionIndex = sessionRepository.getSessionForWildCard();
                 String chargerPointId = sessionRepository.getChargerIdBySession(sessionIndex);
@@ -117,7 +118,7 @@ public class MyStepsTest extends SpringIntegrationTest {
                 waitOneSecond();
             }
         }
-        if (Objects.isNull(sessionIndex)) {
+        if (isNull(sessionIndex)) {
             throw new BddTestingException(String.format("Scenario №%s, STEP %s: %s didn't connect.",
                     scenarioId, stepNumber, chargePoint.getChargePointId()));
         }
@@ -134,7 +135,7 @@ public class MyStepsTest extends SpringIntegrationTest {
         LocalDateTime finishTime = LocalDateTime.now().plusSeconds(connectionWaitingTime);
         log.info(String.format("Scenario №%s, STEP %s: waiting for %s connection up to %s seconds...",
                 scenarioId, stepNumber, chargePointId, connectionWaitingTime));
-        while (Objects.isNull(sessionIndex) && LocalDateTime.now().isBefore(finishTime)) {
+        while (isNull(sessionIndex) && LocalDateTime.now().isBefore(finishTime)) {
             try {
                 sessionIndex = sessionRepository.getSessionByChargerId(chargePointId);
                 log.info(String.format("Scenario №%s, STEP %s: Charge point %s is connected!",
@@ -144,7 +145,7 @@ public class MyStepsTest extends SpringIntegrationTest {
                 stepsSupporterService.closeAllSessionsExceptGiven(chargePointId);
             }
         }
-        if (Objects.isNull(sessionIndex)) {
+        if (isNull(sessionIndex)) {
             throw new BddTestingException(String.format("Scenario №%s, STEP %s: %s didn't connect.",
                     scenarioId, stepNumber, chargePoint.getChargePointId()));
         }
@@ -161,17 +162,19 @@ public class MyStepsTest extends SpringIntegrationTest {
                     scenarioId, stepNumber));
             handlingConfirmationResponse();
         } else {
-            throw new BddTestingException(String.format("Scenario №%s, STEP %s: %s is not implemented.",
+            throw new BddTestingException(String.format("Scenario №%s, STEP %s: %s is not allowed in this step.",
                     scenarioId, stepNumber, messageType));
         }
     }
 
-    @When("the Central System sends {string} to Charge Point and receives confirmation")
-    public void csSendsMessageRequestAndGetsConfirmation(String messageType) {
-        if (Objects.equals("Reset.req", messageType)) {
-            messagingService.sendResetMessage(chargePoint.getChargePointId(), ResetType.Soft);
-            log.info(String.format("Scenario №%s, STEP %s: %s request sent. ",
-                    scenarioId, stepNumber, messageType));
+    @When("the Central System sends {string} request to the Charge Point and receives confirmation")
+    public void csSendsMessageRequestAndGetsConfirmation(String messageType, DataTable table) {
+        Map<String, String> parameters = isNull(table) || table.isEmpty() ? Collections.emptyMap() : table.asMap();
+        String requestType = messageType.replace(".req", "").replace(".conf", "");
+        if (ImplementedMessagesSentType.contains(requestType)) {
+            messagingService.sendRequest(chargePoint.getChargePointId(),
+                    ImplementedMessagesSentType.fromValue(requestType), parameters);
+            log.info(String.format("Scenario №%s, STEP %s: %s request sent. ", scenarioId, stepNumber, messageType));
             handlingConfirmationResponse();
         } else {
             throw new BddTestingException(
@@ -231,7 +234,7 @@ public class MyStepsTest extends SpringIntegrationTest {
 
     @When("the Central System must receives {string} with given data")
     public void theCentralSystemMustReceivesMessageWithGivenData(String messageType, DataTable table) {
-        Map<String, String> parameters = table.asMap();
+        Map<String, String> parameters = isNull(table) || table.isEmpty() ? Collections.emptyMap() : table.asMap();
         theCSReceivesMessageWithGivenData(messageType, parameters);
     }
 
@@ -259,7 +262,7 @@ public class MyStepsTest extends SpringIntegrationTest {
 
     @Then("the Central System must sends confirmation response with given data")
     public void theCentralSystemMustSendsConfirmationResponseWithGivenData(DataTable table) {
-        Map<String, String> parameters = table.isEmpty() ? Collections.emptyMap() : table.asMap();
+        Map<String, String> parameters = isNull(table) || table.isEmpty() ? Collections.emptyMap() : table.asMap();
         Confirmation response;
         switch (availableConfirmationMessageType) {
             case BOOT_NOTIFICATION -> response = new BootNotificationConfirmation();
