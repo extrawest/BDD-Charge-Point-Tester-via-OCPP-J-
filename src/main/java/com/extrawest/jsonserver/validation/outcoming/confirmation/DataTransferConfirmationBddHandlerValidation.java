@@ -44,14 +44,10 @@ public class DataTransferConfirmationBddHandlerValidation
     }
 
     @Override
-    public void validateFields(Map<String, String> params) {
-        super.validateMessageFields(params);
-    }
-
-    @Override
-    public DataTransferConfirmation createValidatedMessage(Map<String, String> params,
-                                                           DataTransferConfirmation actualMessage) {
-        return super.createValidatedMessage(params, actualMessage);
+    public DataTransferConfirmation createMessageWithValidatedParams(Map<String, String> params) {
+        DataTransferConfirmation request = super.createMessageWithValidatedParamsViaLibModel(params);
+        log.debug(getParameterizeClassName() + ": " + request);
+        return request;
     }
 
 }

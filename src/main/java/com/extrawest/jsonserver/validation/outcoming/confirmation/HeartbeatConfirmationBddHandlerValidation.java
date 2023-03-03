@@ -39,14 +39,10 @@ public class HeartbeatConfirmationBddHandlerValidation
     }
 
     @Override
-    public void validateFields(Map<String, String> params) {
-        super.validateMessageFields(params);
-    }
-
-    @Override
-    public HeartbeatConfirmation createValidatedMessage(Map<String, String> params,
-                                                        HeartbeatConfirmation actualMessage) {
-        return super.createValidatedMessage(params, actualMessage);
+    public HeartbeatConfirmation createMessageWithValidatedParams(Map<String, String> params) {
+        HeartbeatConfirmation request = super.createMessageWithValidatedParamsViaLibModel(params);
+        log.debug(getParameterizeClassName() + ": " + request);
+        return request;
     }
 
 }

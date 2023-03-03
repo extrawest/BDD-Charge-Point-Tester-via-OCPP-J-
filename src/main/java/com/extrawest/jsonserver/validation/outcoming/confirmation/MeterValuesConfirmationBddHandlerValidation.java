@@ -27,14 +27,10 @@ public class MeterValuesConfirmationBddHandlerValidation
     }
 
     @Override
-    public void validateFields(Map<String, String> params) {
-        super.validateMessageFields(params);
-    }
-
-    @Override
-    public MeterValuesConfirmation createValidatedMessage(Map<String, String> params,
-                                                          MeterValuesConfirmation actualMessage) {
-        return super.createValidatedMessage(params, actualMessage);
+    public MeterValuesConfirmation createMessageWithValidatedParams(Map<String, String> params) {
+        MeterValuesConfirmation request = super.createMessageWithValidatedParamsViaLibModel(params);
+        log.debug(getParameterizeClassName() + ": " + request);
+        return request;
     }
 
 }

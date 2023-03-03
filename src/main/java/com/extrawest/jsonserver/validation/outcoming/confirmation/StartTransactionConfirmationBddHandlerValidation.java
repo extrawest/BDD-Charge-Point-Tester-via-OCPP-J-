@@ -44,14 +44,10 @@ public class StartTransactionConfirmationBddHandlerValidation
     }
 
     @Override
-    public void validateFields(Map<String, String> params) {
-        super.validateMessageFields(params);
-    }
-
-    @Override
-    public StartTransactionConfirmation createValidatedMessage(Map<String, String> params,
-                                                               StartTransactionConfirmation actualMessage) {
-        return super.createValidatedMessage(params, actualMessage);
+    public StartTransactionConfirmation createMessageWithValidatedParams(Map<String, String> params) {
+        StartTransactionConfirmation request = super.createMessageWithValidatedParamsViaLibModel(params);
+        log.debug(getParameterizeClassName() + ": " + request);
+        return request;
     }
 
 }

@@ -55,14 +55,10 @@ public class UpdateFirmwareRequestFactory extends OutcomingMessageFieldsValidati
     }
 
     @Override
-    public void validateFields(Map<String, String> params) {
-        super.validateMessageFields(params);
-    }
-
-    @Override
-    public UpdateFirmwareRequest createValidatedMessage(Map<String, String> params,
-                                                        UpdateFirmwareRequest actualMessage) {
-        return super.createValidatedMessage(params, actualMessage);
+    public UpdateFirmwareRequest createMessageWithValidatedParams(Map<String, String> params) {
+        UpdateFirmwareRequest request = super.createMessageWithValidatedParamsViaLibModel(params);
+        log.debug(getParameterizeClassName() + ": " + request);
+        return request;
     }
 
 }
