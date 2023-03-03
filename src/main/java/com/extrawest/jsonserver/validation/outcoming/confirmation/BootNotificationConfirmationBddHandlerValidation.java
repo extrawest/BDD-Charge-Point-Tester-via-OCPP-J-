@@ -51,14 +51,10 @@ public class BootNotificationConfirmationBddHandlerValidation
     }
 
     @Override
-    public void validateFields(Map<String, String> params) {
-        super.validateMessageFields(params);
-    }
-
-    @Override
-    public BootNotificationConfirmation createValidatedMessage(Map<String, String> params,
-                                                               BootNotificationConfirmation actualMessage) {
-        return super.createValidatedMessage(params, actualMessage);
+    public BootNotificationConfirmation createMessageWithValidatedParams(Map<String, String> params) {
+        BootNotificationConfirmation request = super.createMessageWithValidatedParamsViaLibModel(params);
+        log.debug(getParameterizeClassName() + ": " + request);
+        return request;
     }
 
 }

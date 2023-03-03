@@ -37,13 +37,10 @@ public class ResetRequestHandler extends OutcomingMessageFieldsValidationFactory
     }
 
     @Override
-    public void validateFields(Map<String, String> params) {
-        super.validateMessageFields(params);
-    }
-
-    @Override
-    public ResetRequest createValidatedMessage(Map<String, String> params, ResetRequest actualMessage) {
-        return super.createValidatedMessage(params, actualMessage);
+    public ResetRequest createMessageWithValidatedParams(Map<String, String> params) {
+        ResetRequest request = super.createMessageWithValidatedParamsViaLibModel(params);
+        log.debug(getParameterizeClassName() + ": " + request);
+        return request;
     }
 
 }

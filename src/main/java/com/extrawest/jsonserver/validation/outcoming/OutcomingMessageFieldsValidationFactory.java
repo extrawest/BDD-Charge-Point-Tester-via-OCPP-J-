@@ -4,7 +4,6 @@ import static com.extrawest.jsonserver.model.emun.ApiErrorMessage.BUG_CREATING_I
 import static com.extrawest.jsonserver.model.emun.ApiErrorMessage.INVALID_FIELD_VALUE;
 import static com.extrawest.jsonserver.model.emun.ApiErrorMessage.INVALID_REQUIRED_PARAM;
 import static com.extrawest.jsonserver.model.emun.ApiErrorMessage.REDUNDANT_EXPECTED_PARAM;
-import static com.extrawest.jsonserver.model.emun.ApiErrorMessage.WRONG_INSTANCE_OF;
 import static java.util.Objects.isNull;
 
 import java.lang.reflect.InvocationTargetException;
@@ -50,34 +49,13 @@ public abstract class OutcomingMessageFieldsValidationFactory<T extends Validata
     protected Map<String, BiConsumer<T, String>> requiredFieldsSetup;
     protected Map<String, BiConsumer<T, String>> optionalFieldsSetup;
 
-    protected void validateMessageFields(Map<String, String> params) {
-        validateForRequiredFields(params);
-    }
-
-    protected T createValidatedMessage(Map<String, String> params, T response) {
-        if (isNull(response)) {
-            throw new BddTestingException(String.format(WRONG_INSTANCE_OF.getValue(), Validatable.class.getName()));
-        }
-        validateForRequiredFields(params);
-        return validateParamsViaLibModel(params);
-    }
-
-    private void validateForRequiredFields(Map<String, String> params) {
-        String messageType = getParameterizeClassName();
-        requiredFieldsSetup.keySet().forEach(field -> {
-            if (!params.containsKey(field) || isNull(params.get(field))) {
-                throw new ValidationException(
-                        String.format(INVALID_REQUIRED_PARAM.getValue(), field, messageType));
-            }
-        });
-    }
-
     /**
      *
      * @param params - map with parameters for validation.
      * Validating parameters - Using SETTER methods(witch include validation) of parametrized model
      */
-    private T validateParamsViaLibModel(Map<String, String> params) {
+    protected T createMessageWithValidatedParamsViaLibModel(Map<String, String> params) {
+        validateMessageForRequiredFields(params);
         String messageType = getParameterizeClassName();
         String currentFieldName = "";
         T message;
@@ -104,6 +82,16 @@ public abstract class OutcomingMessageFieldsValidationFactory<T extends Validata
 
         }
         return message;
+    }
+
+    private void validateMessageForRequiredFields(Map<String, String> params) {
+        String messageType = getParameterizeClassName();
+        requiredFieldsSetup.keySet().forEach(field -> {
+            if (!params.containsKey(field) || isNull(params.get(field))) {
+                throw new ValidationException(
+                        String.format(INVALID_REQUIRED_PARAM.getValue(), field, messageType));
+            }
+        });
     }
 
     protected ZonedDateTime getValidatedZonedDateTimeOrCurrentTimeIfEmptyOrThrow(String paramValue,

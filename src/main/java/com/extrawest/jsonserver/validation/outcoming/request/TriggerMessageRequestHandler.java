@@ -44,14 +44,10 @@ public class TriggerMessageRequestHandler extends OutcomingMessageFieldsValidati
     }
 
     @Override
-    public void validateFields(Map<String, String> params) {
-        super.validateMessageFields(params);
-    }
-
-    @Override
-    public TriggerMessageRequest createValidatedMessage(Map<String, String> params,
-                                                        TriggerMessageRequest actualMessage) {
-        return super.createValidatedMessage(params, actualMessage);
+    public TriggerMessageRequest createMessageWithValidatedParams(Map<String, String> params) {
+        TriggerMessageRequest request = super.createMessageWithValidatedParamsViaLibModel(params);
+        log.debug(getParameterizeClassName() + ": " + request);
+        return request;
     }
 
 }

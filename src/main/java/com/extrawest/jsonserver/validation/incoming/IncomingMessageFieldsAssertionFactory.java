@@ -6,7 +6,6 @@ import static com.extrawest.jsonserver.model.emun.ApiErrorMessage.INVALID_FIELD_
 import static com.extrawest.jsonserver.model.emun.ApiErrorMessage.INVALID_REQUIRED_PARAM;
 import static com.extrawest.jsonserver.model.emun.ApiErrorMessage.NON_MATCH_FIELDS;
 import static com.extrawest.jsonserver.model.emun.ApiErrorMessage.REDUNDANT_EXPECTED_PARAM;
-import static com.extrawest.jsonserver.model.emun.ApiErrorMessage.WRONG_INSTANCE_OF;
 import static java.util.Objects.isNull;
 
 import java.lang.reflect.InvocationTargetException;
@@ -56,14 +55,8 @@ public abstract class IncomingMessageFieldsAssertionFactory<T extends Validatabl
     protected Map<String, BiConsumer<T, String>> optionalFieldsSetup;
     protected Map<String, BiFunction<Map<String, String>, T, Boolean>> assertionFactory;
 
-    protected boolean validateRequestFields(Map<String, String> params, T actualRequest) {
-        if (isNull(actualRequest)) {
-            throw new BddTestingException(String.format(WRONG_INSTANCE_OF.getValue(), Validatable.class.getName()));
-        }
-        validateForRequiredFields(params);
-        validateParamsViaLibModel(params);
-
-        List<String> nonMatchFields = nonMatchValues(params, actualRequest);
+    protected boolean assertParamsAndMessageFields(Map<String, String> params, T actualMessage) {
+        List<String> nonMatchFields = nonMatchValues(params, actualMessage);
 
         if (!nonMatchFields.isEmpty()) {
             log.warn("Non match fields: " + nonMatchFields);
@@ -73,23 +66,15 @@ public abstract class IncomingMessageFieldsAssertionFactory<T extends Validatabl
         return true;
     }
 
-    private void validateForRequiredFields(Map<String, String> params) {
-        String messageType = getParameterizeClassName();
-        requiredFieldsSetup.keySet().forEach(field -> {
-            if (!params.containsKey(field) || isNull(params.get(field))) {
-                throw new ValidationException(
-                        String.format(INVALID_REQUIRED_PARAM.getValue(), field, messageType));
-            }
-        });
-    }
-
     /**
      *
      * @param params - map with parameters for validation.
      * Validating parameters - Using SETTER methods(witch include validation) of parametrized model
      */
-    private T validateParamsViaLibModel(Map<String, String> params) {
+    protected T validateParamsViaLibModel(Map<String, String> params) {
         String messageType = getParameterizeClassName();
+        validateForRequiredFields(params, messageType);
+
         String currentFieldName = "";
         T message;
         try {
@@ -115,6 +100,15 @@ public abstract class IncomingMessageFieldsAssertionFactory<T extends Validatabl
 
         }
         return message;
+    }
+
+    private void validateForRequiredFields(Map<String, String> params, String messageType) {
+        requiredFieldsSetup.keySet().forEach(field -> {
+            if (!params.containsKey(field) || isNull(params.get(field))) {
+                throw new ValidationException(
+                        String.format(INVALID_REQUIRED_PARAM.getValue(), field, messageType));
+            }
+        });
     }
 
     private List<String> nonMatchValues(Map<String, String> expectedParams, T actual) {

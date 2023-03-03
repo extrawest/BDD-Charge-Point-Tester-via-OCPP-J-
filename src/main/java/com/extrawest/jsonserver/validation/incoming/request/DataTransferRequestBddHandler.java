@@ -53,8 +53,9 @@ public class DataTransferRequestBddHandler
     }
 
     @Override
-    public boolean validateFields(Map<String, String> params, DataTransferRequest actualMessage) {
-        return super.validateRequestFields(params, actualMessage);
+    public void validateAndAssertFieldsWithParams(Map<String, String> params, DataTransferRequest message) {
+        super.validateParamsViaLibModel(params);
+        super.assertParamsAndMessageFields(params, message);
     }
 
 }

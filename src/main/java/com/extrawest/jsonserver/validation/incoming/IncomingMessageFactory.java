@@ -5,6 +5,6 @@ import eu.chargetime.ocpp.model.Validatable;
 
 public interface IncomingMessageFactory<T extends Validatable> {
 
-    boolean validateFields(Map<String, String> params, T actualMessage);
+    void validateAndAssertFieldsWithParams(Map<String, String> params, T message);
 
 }

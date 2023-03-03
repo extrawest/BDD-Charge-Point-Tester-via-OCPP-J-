@@ -36,8 +36,9 @@ public class ResetConfirmationHandler extends IncomingMessageFieldsAssertionFact
     }
 
     @Override
-    public boolean validateFields(Map<String, String> params, ResetConfirmation actualMessage) {
-        return super.validateRequestFields(params, actualMessage);
+    public void validateAndAssertFieldsWithParams(Map<String, String> params, ResetConfirmation message) {
+        super.validateParamsViaLibModel(params);
+        super.assertParamsAndMessageFields(params, message);
     }
 
 }

@@ -40,14 +40,10 @@ public class AuthorizeConfirmationBddHandlerValidation
     }
 
     @Override
-    public void validateFields(Map<String, String> params) {
-        super.validateMessageFields(params);
-    }
-
-    @Override
-    public AuthorizeConfirmation createValidatedMessage(Map<String, String> params,
-                                                        AuthorizeConfirmation actualMessage) {
-        return super.createValidatedMessage(params, actualMessage);
+    public AuthorizeConfirmation createMessageWithValidatedParams(Map<String, String> params) {
+        AuthorizeConfirmation request = super.createMessageWithValidatedParamsViaLibModel(params);
+        log.debug(getParameterizeClassName() + ": " + request);
+        return request;
     }
 
 }

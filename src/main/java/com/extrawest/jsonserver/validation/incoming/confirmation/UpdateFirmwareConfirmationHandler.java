@@ -25,8 +25,9 @@ public class UpdateFirmwareConfirmationHandler
     }
 
     @Override
-    public boolean validateFields(Map<String, String> params, UpdateFirmwareConfirmation actualMessage) {
-        return super.validateRequestFields(params, actualMessage);
+    public void validateAndAssertFieldsWithParams(Map<String, String> params, UpdateFirmwareConfirmation message) {
+        super.validateParamsViaLibModel(params);
+        super.assertParamsAndMessageFields(params, message);
     }
 
 }
