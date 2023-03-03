@@ -8,18 +8,18 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import com.extrawest.jsonserver.service.MessagingService;
-import com.extrawest.jsonserver.validation.confirmation.AuthorizeConfirmationBddHandler;
-import com.extrawest.jsonserver.validation.confirmation.BootNotificationConfirmationBddHandler;
-import com.extrawest.jsonserver.validation.confirmation.DataTransferConfirmationBddHandler;
-import com.extrawest.jsonserver.validation.confirmation.HeartbeatConfirmationBddHandler;
-import com.extrawest.jsonserver.validation.confirmation.MeterValuesConfirmationBddHandler;
-import com.extrawest.jsonserver.validation.confirmation.StartTransactionConfirmationBddHandler;
-import com.extrawest.jsonserver.validation.request.AuthorizeRequestBddHandler;
-import com.extrawest.jsonserver.validation.request.BootNotificationRequestBddHandler;
-import com.extrawest.jsonserver.validation.request.DataTransferRequestBddHandler;
-import com.extrawest.jsonserver.validation.request.HeartbeatRequestBddHandler;
-import com.extrawest.jsonserver.validation.request.MeterValuesRequestBddHandler;
-import com.extrawest.jsonserver.validation.request.StartTransactionRequestBddHandler;
+import com.extrawest.jsonserver.validation.outcoming.confirmation.AuthorizeConfirmationBddHandlerValidation;
+import com.extrawest.jsonserver.validation.outcoming.confirmation.BootNotificationConfirmationBddHandlerValidation;
+import com.extrawest.jsonserver.validation.outcoming.confirmation.DataTransferConfirmationBddHandlerValidation;
+import com.extrawest.jsonserver.validation.outcoming.confirmation.HeartbeatConfirmationBddHandlerValidation;
+import com.extrawest.jsonserver.validation.outcoming.confirmation.MeterValuesConfirmationBddHandlerValidation;
+import com.extrawest.jsonserver.validation.outcoming.confirmation.StartTransactionConfirmationBddHandlerValidation;
+import com.extrawest.jsonserver.validation.incoming.request.AuthorizeRequestBddHandler;
+import com.extrawest.jsonserver.validation.incoming.request.BootNotificationRequestBddHandler;
+import com.extrawest.jsonserver.validation.incoming.request.DataTransferRequestBddHandler;
+import com.extrawest.jsonserver.validation.incoming.request.HeartbeatRequestBddHandler;
+import com.extrawest.jsonserver.validation.incoming.request.MeterValuesRequestBddHandler;
+import com.extrawest.jsonserver.validation.incoming.request.StartTransactionRequestBddHandler;
 import com.extrawest.jsonserver.ws.handler.ServerCoreEventHandlerImpl;
 import eu.chargetime.ocpp.NotConnectedException;
 import eu.chargetime.ocpp.OccurenceConstraintException;
@@ -73,17 +73,17 @@ public class MessagingServiceImpl implements MessagingService {
     private final ServerSessionRepository sessionRepository;
 
     private final AuthorizeRequestBddHandler authorizeRequestBddHandler;
-    private final AuthorizeConfirmationBddHandler authorizeConfirmationBddHandler;
+    private final AuthorizeConfirmationBddHandlerValidation authorizeConfirmationBddHandler;
     private final BootNotificationRequestBddHandler bootNotificationRequestBddHandler;
-    private final BootNotificationConfirmationBddHandler bootNotificationConfirmationBddHandler;
+    private final BootNotificationConfirmationBddHandlerValidation bootNotificationConfirmationBddHandler;
     private final DataTransferRequestBddHandler dataTransferRequestBddHandler;
-    private final DataTransferConfirmationBddHandler dataTransferConfirmationBddHandler;
+    private final DataTransferConfirmationBddHandlerValidation dataTransferConfirmationBddHandler;
     private final HeartbeatRequestBddHandler heartbeatRequestBddHandler;
-    private final HeartbeatConfirmationBddHandler heartbeatConfirmationBddHandler;
+    private final HeartbeatConfirmationBddHandlerValidation heartbeatConfirmationBddHandler;
     private final MeterValuesRequestBddHandler meterValuesRequestBddHandler;
-    private final MeterValuesConfirmationBddHandler meterValuesConfirmationBddHandler;
+    private final MeterValuesConfirmationBddHandlerValidation meterValuesConfirmationBddHandler;
     private final StartTransactionRequestBddHandler startTransactionRequestBddHandler;
-    private final StartTransactionConfirmationBddHandler startTransactionConfirmationBddHandler;
+    private final StartTransactionConfirmationBddHandlerValidation startTransactionConfirmationBddHandler;
 
     @Override
     public void sendTriggerMessage(String chargePointId, TriggerMessageRequestType type) {
@@ -107,6 +107,10 @@ public class MessagingServiceImpl implements MessagingService {
         }
         UUID sessionUUID = sessionRepository.getSessionByChargerId(chargePointId);
         Request request = new ResetRequest(type);
+        sendRequest(sessionUUID, request);
+    }
+
+    private void sendRequest(UUID sessionUUID, Request request) {
         try {
             server.send(sessionUUID, request);
         } catch (OccurenceConstraintException | UnsupportedFeatureException | NotConnectedException e) {
@@ -262,17 +266,17 @@ public class MessagingServiceImpl implements MessagingService {
             waitHalfSecond();
         }
         if (response instanceof BootNotificationConfirmation message) {
-            response = bootNotificationConfirmationBddHandler.createValidatedConfirmation(parameters, message);
+            response = bootNotificationConfirmationBddHandler.createValidatedMessage(parameters, message);
         } else if (response instanceof AuthorizeConfirmation message) {
-            response = authorizeConfirmationBddHandler.createValidatedConfirmation(parameters, message);
+            response = authorizeConfirmationBddHandler.createValidatedMessage(parameters, message);
         } else if (response instanceof DataTransferConfirmation message) {
-            response = dataTransferConfirmationBddHandler.createValidatedConfirmation(parameters, message);
+            response = dataTransferConfirmationBddHandler.createValidatedMessage(parameters, message);
         } else if (response instanceof HeartbeatConfirmation message) {
-            response = heartbeatConfirmationBddHandler.createValidatedConfirmation(parameters, message);
+            response = heartbeatConfirmationBddHandler.createValidatedMessage(parameters, message);
         } else if (response instanceof MeterValuesConfirmation message) {
-            response = meterValuesConfirmationBddHandler.createValidatedConfirmation(parameters, message);
+            response = meterValuesConfirmationBddHandler.createValidatedMessage(parameters, message);
         } else if (response instanceof StartTransactionConfirmation message) {
-            response = startTransactionConfirmationBddHandler.createValidatedConfirmation(parameters, message);
+            response = startTransactionConfirmationBddHandler.createValidatedMessage(parameters, message);
         } else {
             throw new BddTestingException("This type of confirmation message is not implemented. ");
         }

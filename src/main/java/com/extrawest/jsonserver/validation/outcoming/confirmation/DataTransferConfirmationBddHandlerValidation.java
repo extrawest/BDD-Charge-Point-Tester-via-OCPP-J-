@@ -1,8 +1,8 @@
-package com.extrawest.jsonserver.validation.confirmation;
+package com.extrawest.jsonserver.validation.outcoming.confirmation;
 
 import java.util.Map;
-import com.extrawest.jsonserver.validation.ConfirmationFactory;
-import com.extrawest.jsonserver.validation.ValidationAndAssertionConfirmationFieldsFactory;
+import com.extrawest.jsonserver.validation.outcoming.OutgoingMessageFactory;
+import com.extrawest.jsonserver.validation.outcoming.OutcomingMessageFieldsValidationFactory;
 import eu.chargetime.ocpp.model.core.DataTransferConfirmation;
 import eu.chargetime.ocpp.model.core.DataTransferStatus;
 import jakarta.annotation.PostConstruct;
@@ -14,9 +14,9 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class DataTransferConfirmationBddHandler
-        extends ValidationAndAssertionConfirmationFieldsFactory<DataTransferConfirmation>
-        implements ConfirmationFactory<DataTransferConfirmation> {
+public class DataTransferConfirmationBddHandlerValidation
+        extends OutcomingMessageFieldsValidationFactory<DataTransferConfirmation>
+        implements OutgoingMessageFactory<DataTransferConfirmation> {
     public static final String STATUS_REQUIRED = "status";
     public static final String DATA = "data";
     @Value("${bootNotification.confirmation.status:Accepted}")
@@ -45,13 +45,13 @@ public class DataTransferConfirmationBddHandler
 
     @Override
     public void validateFields(Map<String, String> params) {
-        super.validateConfirmationFields(params);
+        super.validateMessageFields(params);
     }
 
     @Override
-    public DataTransferConfirmation createValidatedConfirmation(Map<String, String> params,
-                                                                    DataTransferConfirmation response) {
-        return super.createValidatedConfirmation(params, response);
+    public DataTransferConfirmation createValidatedMessage(Map<String, String> params,
+                                                           DataTransferConfirmation actualMessage) {
+        return super.createValidatedMessage(params, actualMessage);
     }
 
 }

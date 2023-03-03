@@ -1,9 +1,9 @@
-package com.extrawest.jsonserver.validation.confirmation;
+package com.extrawest.jsonserver.validation.outcoming.confirmation;
 
 import java.util.Collections;
 import java.util.Map;
-import com.extrawest.jsonserver.validation.ConfirmationFactory;
-import com.extrawest.jsonserver.validation.ValidationAndAssertionConfirmationFieldsFactory;
+import com.extrawest.jsonserver.validation.outcoming.OutgoingMessageFactory;
+import com.extrawest.jsonserver.validation.outcoming.OutcomingMessageFieldsValidationFactory;
 import eu.chargetime.ocpp.model.core.HeartbeatConfirmation;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -14,9 +14,9 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class HeartbeatConfirmationBddHandler
-        extends ValidationAndAssertionConfirmationFieldsFactory<HeartbeatConfirmation>
-        implements ConfirmationFactory<HeartbeatConfirmation> {
+public class HeartbeatConfirmationBddHandlerValidation
+        extends OutcomingMessageFieldsValidationFactory<HeartbeatConfirmation>
+        implements OutgoingMessageFactory<HeartbeatConfirmation> {
     public static final String CURRENT_TIME_REQUIRED = "currentTime";
     @Value("${heartbeat.confirmation.currentTime:}")
     private String defaultCurrentTime;
@@ -40,13 +40,13 @@ public class HeartbeatConfirmationBddHandler
 
     @Override
     public void validateFields(Map<String, String> params) {
-        super.validateConfirmationFields(params);
+        super.validateMessageFields(params);
     }
 
     @Override
-    public HeartbeatConfirmation createValidatedConfirmation(Map<String, String> params,
-                                                             HeartbeatConfirmation response) {
-        return super.createValidatedConfirmation(params, response);
+    public HeartbeatConfirmation createValidatedMessage(Map<String, String> params,
+                                                        HeartbeatConfirmation actualMessage) {
+        return super.createValidatedMessage(params, actualMessage);
     }
 
 }

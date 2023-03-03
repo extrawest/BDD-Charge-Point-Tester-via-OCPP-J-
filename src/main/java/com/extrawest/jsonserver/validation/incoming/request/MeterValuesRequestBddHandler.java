@@ -1,8 +1,8 @@
-package com.extrawest.jsonserver.validation.request;
+package com.extrawest.jsonserver.validation.incoming.request;
 
 import java.util.Map;
-import com.extrawest.jsonserver.validation.RequestFactory;
-import com.extrawest.jsonserver.validation.ValidationAndAssertionRequestFieldsFactory;
+import com.extrawest.jsonserver.validation.incoming.IncomingMessageFactory;
+import com.extrawest.jsonserver.validation.incoming.IncomingMessageFieldsAssertionFactory;
 import eu.chargetime.ocpp.model.core.MeterValue;
 import eu.chargetime.ocpp.model.core.MeterValuesRequest;
 import jakarta.annotation.PostConstruct;
@@ -14,8 +14,8 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class MeterValuesRequestBddHandler
-        extends ValidationAndAssertionRequestFieldsFactory<MeterValuesRequest>
-        implements RequestFactory<MeterValuesRequest> {
+        extends IncomingMessageFieldsAssertionFactory<MeterValuesRequest>
+        implements IncomingMessageFactory<MeterValuesRequest> {
     public static final String CONNECTOR_ID_REQUIRED = "connectorId";
     public static final String METER_VALUES_REQUIRED = "meterValue";
     public static final String TRANSACTION_ID = "transactionId";
@@ -58,8 +58,8 @@ public class MeterValuesRequestBddHandler
     }
 
     @Override
-    public boolean validateFields(Map<String, String> params, MeterValuesRequest actualRequest) {
-        return super.validateRequestFields(params, actualRequest);
+    public boolean validateFields(Map<String, String> params, MeterValuesRequest actualMessage) {
+        return super.validateRequestFields(params, actualMessage);
     }
 
 }

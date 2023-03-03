@@ -1,9 +1,9 @@
-package com.extrawest.jsonserver.validation.request;
+package com.extrawest.jsonserver.validation.incoming.request;
 
 import java.time.ZonedDateTime;
 import java.util.Map;
-import com.extrawest.jsonserver.validation.RequestFactory;
-import com.extrawest.jsonserver.validation.ValidationAndAssertionRequestFieldsFactory;
+import com.extrawest.jsonserver.validation.incoming.IncomingMessageFactory;
+import com.extrawest.jsonserver.validation.incoming.IncomingMessageFieldsAssertionFactory;
 import eu.chargetime.ocpp.model.core.StartTransactionRequest;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -14,8 +14,8 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class StartTransactionRequestBddHandler
-        extends ValidationAndAssertionRequestFieldsFactory<StartTransactionRequest>
-        implements RequestFactory<StartTransactionRequest> {
+        extends IncomingMessageFieldsAssertionFactory<StartTransactionRequest>
+        implements IncomingMessageFactory<StartTransactionRequest> {
     public static final String CONNECTOR_ID_REQUIRED = "connectorId";
     public static final String ID_TAG_REQUIRED = "idTag";
     public static final String METER_START_REQUIRED = "meterStart";
@@ -70,8 +70,8 @@ public class StartTransactionRequestBddHandler
     }
 
     @Override
-    public boolean validateFields(Map<String, String> params, StartTransactionRequest actualRequest) {
-        return super.validateRequestFields(params, actualRequest);
+    public boolean validateFields(Map<String, String> params, StartTransactionRequest actualMessage) {
+        return super.validateRequestFields(params, actualMessage);
     }
 
 }

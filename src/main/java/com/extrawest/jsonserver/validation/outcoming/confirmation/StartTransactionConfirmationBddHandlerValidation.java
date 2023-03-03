@@ -1,9 +1,9 @@
-package com.extrawest.jsonserver.validation.confirmation;
+package com.extrawest.jsonserver.validation.outcoming.confirmation;
 
 import java.util.Collections;
 import java.util.Map;
-import com.extrawest.jsonserver.validation.ConfirmationFactory;
-import com.extrawest.jsonserver.validation.ValidationAndAssertionConfirmationFieldsFactory;
+import com.extrawest.jsonserver.validation.outcoming.OutgoingMessageFactory;
+import com.extrawest.jsonserver.validation.outcoming.OutcomingMessageFieldsValidationFactory;
 import eu.chargetime.ocpp.model.core.StartTransactionConfirmation;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -15,9 +15,9 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class StartTransactionConfirmationBddHandler
-        extends ValidationAndAssertionConfirmationFieldsFactory<StartTransactionConfirmation>
-        implements ConfirmationFactory<StartTransactionConfirmation> {
+public class StartTransactionConfirmationBddHandlerValidation
+        extends OutcomingMessageFieldsValidationFactory<StartTransactionConfirmation>
+        implements OutgoingMessageFactory<StartTransactionConfirmation> {
     public static final String ID_TAG_INFO_REQUIRED = "idTagInfo";
     public static final String TRANSACTION_ID_REQUIRED = "transactionId";
     @Value("${startTransaction.confirmation.idTagInfo:}")
@@ -45,13 +45,13 @@ public class StartTransactionConfirmationBddHandler
 
     @Override
     public void validateFields(Map<String, String> params) {
-        super.validateConfirmationFields(params);
+        super.validateMessageFields(params);
     }
 
     @Override
-    public StartTransactionConfirmation createValidatedConfirmation(Map<String, String> params,
-                                                                StartTransactionConfirmation response) {
-        return super.createValidatedConfirmation(params, response);
+    public StartTransactionConfirmation createValidatedMessage(Map<String, String> params,
+                                                               StartTransactionConfirmation actualMessage) {
+        return super.createValidatedMessage(params, actualMessage);
     }
 
 }

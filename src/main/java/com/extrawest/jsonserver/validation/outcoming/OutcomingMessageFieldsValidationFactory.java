@@ -1,4 +1,4 @@
-package com.extrawest.jsonserver.validation;
+package com.extrawest.jsonserver.validation.outcoming;
 
 import static com.extrawest.jsonserver.model.emun.ApiErrorMessage.BUG_CREATING_INSTANCE;
 import static com.extrawest.jsonserver.model.emun.ApiErrorMessage.INVALID_FIELD_VALUE;
@@ -20,7 +20,6 @@ import com.extrawest.jsonserver.model.exception.ValidationException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.chargetime.ocpp.PropertyConstraintException;
-import eu.chargetime.ocpp.model.Confirmation;
 import eu.chargetime.ocpp.model.Validatable;
 import eu.chargetime.ocpp.model.core.AuthorizationStatus;
 import eu.chargetime.ocpp.model.core.IdTagInfo;
@@ -32,7 +31,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * defaultValues<FIELD_NAME, DEFAULT_VALUE> - required only if the parametrized class is an inheritor of
- *                  Confirmation.class. Must contain default values for every field of parametrized model.
+ *                  Validatable.class. Must contain default values for every field of parametrized model.
  * requiredFieldsSetup<FIELD_NAME, BiConsumer> - must contain BiConsumer to set up field value from given string value.
  *                  Mandatory for all required fields of parametrized model.
  * optionalFieldsSetup<FIELD_NAME, BiConsumer> - must contain BiConsumer to set up field value from given string value.
@@ -41,7 +40,7 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public abstract class ValidationAndAssertionConfirmationFieldsFactory<T extends Validatable> {
+public abstract class OutcomingMessageFieldsValidationFactory<T extends Validatable> {
     @Autowired @Setter protected ObjectMapper mapper;
 
     @Value("${wildcard:any}")
@@ -51,13 +50,13 @@ public abstract class ValidationAndAssertionConfirmationFieldsFactory<T extends 
     protected Map<String, BiConsumer<T, String>> requiredFieldsSetup;
     protected Map<String, BiConsumer<T, String>> optionalFieldsSetup;
 
-    protected void validateConfirmationFields(Map<String, String> params) {
+    protected void validateMessageFields(Map<String, String> params) {
         validateForRequiredFields(params);
     }
 
-    protected T createValidatedConfirmation(Map<String, String> params, T response) {
-        if (!(response instanceof Confirmation)) {
-            throw new BddTestingException(String.format(WRONG_INSTANCE_OF.getValue(), Confirmation.class.getName()));
+    protected T createValidatedMessage(Map<String, String> params, T response) {
+        if (isNull(response)) {
+            throw new BddTestingException(String.format(WRONG_INSTANCE_OF.getValue(), Validatable.class.getName()));
         }
         validateForRequiredFields(params);
         return validateParamsViaLibModel(params);

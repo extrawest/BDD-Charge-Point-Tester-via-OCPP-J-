@@ -1,9 +1,9 @@
-package com.extrawest.jsonserver.validation.confirmation;
+package com.extrawest.jsonserver.validation.outcoming.confirmation;
 
 import java.util.Collections;
 import java.util.Map;
-import com.extrawest.jsonserver.validation.ConfirmationFactory;
-import com.extrawest.jsonserver.validation.ValidationAndAssertionConfirmationFieldsFactory;
+import com.extrawest.jsonserver.validation.outcoming.OutgoingMessageFactory;
+import com.extrawest.jsonserver.validation.outcoming.OutcomingMessageFieldsValidationFactory;
 import eu.chargetime.ocpp.model.core.BootNotificationConfirmation;
 import eu.chargetime.ocpp.model.core.RegistrationStatus;
 import jakarta.annotation.PostConstruct;
@@ -15,9 +15,9 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class BootNotificationConfirmationBddHandler
-        extends ValidationAndAssertionConfirmationFieldsFactory<BootNotificationConfirmation>
-        implements ConfirmationFactory<BootNotificationConfirmation> {
+public class BootNotificationConfirmationBddHandlerValidation
+        extends OutcomingMessageFieldsValidationFactory<BootNotificationConfirmation>
+        implements OutgoingMessageFactory<BootNotificationConfirmation> {
     public static final String CURRENT_TIME_REQUIRED = "currentTime";
     public static final String INTERVAL_REQUIRED = "interval";
     public static final String STATUS_REQUIRED = "status";
@@ -52,13 +52,13 @@ public class BootNotificationConfirmationBddHandler
 
     @Override
     public void validateFields(Map<String, String> params) {
-        super.validateConfirmationFields(params);
+        super.validateMessageFields(params);
     }
 
     @Override
-    public BootNotificationConfirmation createValidatedConfirmation(Map<String, String> params,
-                                                                    BootNotificationConfirmation response) {
-        return super.createValidatedConfirmation(params, response);
+    public BootNotificationConfirmation createValidatedMessage(Map<String, String> params,
+                                                               BootNotificationConfirmation actualMessage) {
+        return super.createValidatedMessage(params, actualMessage);
     }
 
 }
