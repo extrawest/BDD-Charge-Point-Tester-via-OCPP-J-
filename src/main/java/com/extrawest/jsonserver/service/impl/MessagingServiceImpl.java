@@ -10,6 +10,7 @@ import java.util.concurrent.ExecutionException;
 import com.extrawest.jsonserver.service.MessagingService;
 import com.extrawest.jsonserver.validation.incoming.confirmation.ResetConfirmationHandler;
 import com.extrawest.jsonserver.validation.incoming.confirmation.TriggerMessageConfirmationHandler;
+import com.extrawest.jsonserver.validation.incoming.confirmation.UpdateFirmwareConfirmationHandler;
 import com.extrawest.jsonserver.validation.outcoming.confirmation.AuthorizeConfirmationBddHandlerValidation;
 import com.extrawest.jsonserver.validation.outcoming.confirmation.BootNotificationConfirmationBddHandlerValidation;
 import com.extrawest.jsonserver.validation.outcoming.confirmation.DataTransferConfirmationBddHandlerValidation;
@@ -24,6 +25,7 @@ import com.extrawest.jsonserver.validation.incoming.request.MeterValuesRequestBd
 import com.extrawest.jsonserver.validation.incoming.request.StartTransactionRequestBddHandler;
 import com.extrawest.jsonserver.validation.outcoming.request.ResetRequestHandler;
 import com.extrawest.jsonserver.validation.outcoming.request.TriggerMessageRequestHandler;
+import com.extrawest.jsonserver.validation.outcoming.request.UpdateFirmwareRequestFactory;
 import com.extrawest.jsonserver.ws.handler.ServerCoreEventHandlerImpl;
 import eu.chargetime.ocpp.NotConnectedException;
 import eu.chargetime.ocpp.OccurenceConstraintException;
@@ -53,6 +55,8 @@ import eu.chargetime.ocpp.model.core.StartTransactionRequest;
 import eu.chargetime.ocpp.model.core.StatusNotificationRequest;
 import eu.chargetime.ocpp.model.firmware.DiagnosticsStatusNotificationRequest;
 import eu.chargetime.ocpp.model.firmware.FirmwareStatusNotificationRequest;
+import eu.chargetime.ocpp.model.firmware.UpdateFirmwareConfirmation;
+import eu.chargetime.ocpp.model.firmware.UpdateFirmwareRequest;
 import eu.chargetime.ocpp.model.remotetrigger.TriggerMessageConfirmation;
 import eu.chargetime.ocpp.model.remotetrigger.TriggerMessageRequest;
 import lombok.RequiredArgsConstructor;
@@ -89,6 +93,8 @@ public class MessagingServiceImpl implements MessagingService {
     private final ResetConfirmationHandler resetConfirmationHandler;
     private final TriggerMessageRequestHandler triggerMessageRequestHandler;
     private final TriggerMessageConfirmationHandler triggerMessageConfirmationHandler;
+    private final UpdateFirmwareRequestFactory updateFirmwareRequestFactory;
+    private final UpdateFirmwareConfirmationHandler updateFirmwareConfirmationHandler;
 
     @Override
     public ImplementedMessageType sendRequest(String chargePointId, ImplementedMessageType type, Map<String, String> params) {
@@ -106,6 +112,10 @@ public class MessagingServiceImpl implements MessagingService {
             case RESET -> {
                 ResetRequest message = new ResetRequest();
                 request = resetRequestHandler.createValidatedMessage(params, message);
+            }
+            case UPDATE_FIRMWARE -> {
+                UpdateFirmwareRequest message = new UpdateFirmwareRequest();
+                request = updateFirmwareRequestFactory.createValidatedMessage(params, message);
             }
             default -> throw new BddTestingException("Request message type is unavailable");
         }
@@ -297,6 +307,8 @@ public class MessagingServiceImpl implements MessagingService {
                 triggerMessageConfirmationHandler.validateFields(parameters, message);
             } else if (confirmation instanceof ResetConfirmation message) {
                 resetConfirmationHandler.validateFields(parameters, message);
+            } else if (confirmation instanceof UpdateFirmwareConfirmation message) {
+                updateFirmwareConfirmationHandler.validateFields(parameters, message);
             } else {
                 throw new BddTestingException("Type is not implemented. Confirmation: " + confirmation);
             }
