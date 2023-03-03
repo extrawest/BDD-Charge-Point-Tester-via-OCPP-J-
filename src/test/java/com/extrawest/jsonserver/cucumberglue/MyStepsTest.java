@@ -63,6 +63,7 @@ public class MyStepsTest extends SpringIntegrationTest {
     private UUID sessionIndex;
     private ImplementedMessageType waitingMessageType;
     private ImplementedMessageType requestedMessageType;
+    private ImplementedMessageType sendingMessageType;
 
     @Value("${wildcard:any}")
     private String wildCard;
@@ -218,7 +219,7 @@ public class MyStepsTest extends SpringIntegrationTest {
                     String.format("Scenario №%s, STEP %s: requested %s message is not handled or invalid.",
                             scenarioId, stepNumber, requestedMessageType));
         }
-        messagingService.validateRequest(parameters, request.get());
+        sendingMessageType = messagingService.validateRequest(parameters, request.get());
         log.info(String.format("Scenario №%s, STEP %s: handled. Requested %s message is valid: %s ",
                 scenarioId, stepNumber, requestedMessageType, request.get()));
     }
@@ -239,6 +240,7 @@ public class MyStepsTest extends SpringIntegrationTest {
         ImplementedMessageType type = ImplementedMessageType
                 .fromValue(messageType.replace(".req", "").replace(".conf", ""));
         waitingMessageType = type;
+        sendingMessageType = type;
         storage.addRequestedMessageType(chargePoint.getChargePointId(), type);
         Optional<Request> request = messagingService.waitForRequestedMessage(chargePoint, messageWaitingTime, type);
         if (request.isEmpty()) {
@@ -251,17 +253,17 @@ public class MyStepsTest extends SpringIntegrationTest {
                 scenarioId, stepNumber, type, request.get()));
     }
 
-    @Then("the Central System must sends confirmation response")
-    public void theCentralSystemMustSendsConfirmationResponseWithGivenData() {
+    @Then("the Central System must send confirmation response")
+    public void theCentralSystemMustSendConfirmationResponseWithGivenData() {
         DataTable table = DataTable.emptyDataTable();
-        theCentralSystemMustSendsConfirmationResponseWithGivenData(table);
+        theCentralSystemMustSendConfirmationResponseWithGivenData(table);
     }
 
-    @Then("the Central System must sends confirmation response with given data")
-    public void theCentralSystemMustSendsConfirmationResponseWithGivenData(DataTable table) {
+    @Then("the Central System must send confirmation response with given data")
+    public void theCentralSystemMustSendConfirmationResponseWithGivenData(DataTable table) {
         Map<String, String> parameters = isNull(table) || table.isEmpty() ? Collections.emptyMap() : table.asMap();
         Confirmation response;
-        switch (waitingMessageType) {
+        switch (sendingMessageType) {
             case BOOT_NOTIFICATION -> response = new BootNotificationConfirmation();
             case AUTHORIZE ->  response = new AuthorizeConfirmation();
             case DATA_TRANSFER -> response = new DataTransferConfirmation();
@@ -273,7 +275,7 @@ public class MyStepsTest extends SpringIntegrationTest {
         Confirmation confirmation = messagingService.sendConfirmationResponse(parameters, response);
 
         log.info(String.format("Scenario №%s, STEP %s: %s confirmation message sent: \n%s ",
-                scenarioId, stepNumber, waitingMessageType, confirmation));
+                scenarioId, stepNumber, sendingMessageType, confirmation));
     }
 
 }
