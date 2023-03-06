@@ -42,16 +42,7 @@ import com.extrawest.jsonserver.repository.ServerSessionRepository;
 import com.extrawest.jsonserver.ws.JsonWsServer;
 import eu.chargetime.ocpp.model.Confirmation;
 import eu.chargetime.ocpp.model.Request;
-import eu.chargetime.ocpp.model.core.AuthorizeRequest;
-import eu.chargetime.ocpp.model.core.BootNotificationRequest;
-import eu.chargetime.ocpp.model.core.DataTransferRequest;
-import eu.chargetime.ocpp.model.core.HeartbeatRequest;
-import eu.chargetime.ocpp.model.core.MeterValuesRequest;
-import eu.chargetime.ocpp.model.core.ResetConfirmation;
-import eu.chargetime.ocpp.model.core.StartTransactionRequest;
-import eu.chargetime.ocpp.model.core.StatusNotificationRequest;
-import eu.chargetime.ocpp.model.core.StopTransactionRequest;
-import eu.chargetime.ocpp.model.core.UnlockConnectorConfirmation;
+import eu.chargetime.ocpp.model.core.*;
 import eu.chargetime.ocpp.model.firmware.DiagnosticsStatusNotificationRequest;
 import eu.chargetime.ocpp.model.firmware.FirmwareStatusNotificationRequest;
 import eu.chargetime.ocpp.model.firmware.UpdateFirmwareConfirmation;
@@ -99,6 +90,8 @@ public class MessagingServiceImpl implements MessagingService {
 
     private final CancelReservationRequestBddHandler cancelReservationRequestBddHandler;
     private final CancelReservationConfirmationBddHandler cancelReservationConfirmationBddHandler;
+    private final ChangeAvailabilityRequestBddHandler changeAvailabilityRequestBddHandler;
+    private final ChangeAvailabilityConfirmationBddHandler changeAvailabilityConfirmationBddHandler;
     private final ResetRequestBddHandler resetRequestBddHandler;
     private final ResetConfirmationBddHandler resetConfirmationBddHandler;
     private final TriggerMessageRequestBddHandler triggerMessageRequestBddHandler;
@@ -124,6 +117,7 @@ public class MessagingServiceImpl implements MessagingService {
             }
             case RESET -> request = resetRequestBddHandler.createMessageWithValidatedParams(params);
             case CANCEL_RESERVATION -> request = cancelReservationRequestBddHandler.createMessageWithValidatedParams(params);
+            case CHANGE_AVAILABILITY -> request = changeAvailabilityRequestBddHandler.createMessageWithValidatedParams(params);
             case UNLOCK_CONNECTOR -> request = unlockConnectorRequestBddHandler
                     .createMessageWithValidatedParams(params);
             case UPDATE_FIRMWARE -> request = updateFirmwareRequestBddFactory.createMessageWithValidatedParams(params);
@@ -361,6 +355,8 @@ public class MessagingServiceImpl implements MessagingService {
                 unlockConnectorConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
             } else if (confirmation instanceof CancelReservationConfirmation message) {
                 cancelReservationConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
+            } else if (confirmation instanceof ChangeAvailabilityConfirmation message) {
+                changeAvailabilityConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
             } else {
                 throw new BddTestingException("Type is not implemented. Confirmation: " + confirmation);
             }
