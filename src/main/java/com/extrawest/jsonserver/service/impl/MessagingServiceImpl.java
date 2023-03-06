@@ -46,6 +46,7 @@ import eu.chargetime.ocpp.model.core.*;
 import eu.chargetime.ocpp.model.firmware.DiagnosticsStatusNotificationRequest;
 import eu.chargetime.ocpp.model.firmware.FirmwareStatusNotificationRequest;
 import eu.chargetime.ocpp.model.firmware.UpdateFirmwareConfirmation;
+import eu.chargetime.ocpp.model.localauthlist.SendLocalListConfirmation;
 import eu.chargetime.ocpp.model.remotetrigger.TriggerMessageConfirmation;
 import eu.chargetime.ocpp.model.remotetrigger.TriggerMessageRequest;
 import eu.chargetime.ocpp.model.reservation.CancelReservationConfirmation;
@@ -95,10 +96,12 @@ public class MessagingServiceImpl implements MessagingService {
     private final ChangeAvailabilityConfirmationBddHandler changeAvailabilityConfirmationBddHandler;
     private final ChangeConfigurationRequestBddHandler changeConfigurationRequestBddHandler;
     private final ChangeConfigurationConfirmationBddHandler changeConfigurationConfirmationBddHandler;
-    private final SetChargingProfileRequestBddHandler setChargingProfileRequestBddHandler;
-    private final SetChargingProfileConfirmationBddHandler setChargingProfileConfirmationBddHandler;
     private final ResetRequestBddHandler resetRequestBddHandler;
     private final ResetConfirmationBddHandler resetConfirmationBddHandler;
+    private final SendLocalListRequestBddHandler sendLocalListRequestBddHandler;
+    private final SendLocalListConfirmationBddHandler sendLocalListConfirmationBddHandler;
+    private final SetChargingProfileRequestBddHandler setChargingProfileRequestBddHandler;
+    private final SetChargingProfileConfirmationBddHandler setChargingProfileConfirmationBddHandler;
     private final TriggerMessageRequestBddHandler triggerMessageRequestBddHandler;
     private final TriggerMessageConfirmationBddHandler triggerMessageConfirmationBddHandler;
     private final UnlockConnectorRequestBddHandler unlockConnectorRequestBddHandler;
@@ -113,6 +116,16 @@ public class MessagingServiceImpl implements MessagingService {
         Request request;
         ImplementedMessageType requestedMessageType = null;
         switch (type) {
+            case CANCEL_RESERVATION -> request = cancelReservationRequestBddHandler
+                    .createMessageWithValidatedParams(params);
+            case CHANGE_AVAILABILITY -> request = changeAvailabilityRequestBddHandler
+                    .createMessageWithValidatedParams(params);
+            case CHANGE_CONFIGURATION -> request = changeConfigurationRequestBddHandler
+                    .createMessageWithValidatedParams(params);
+            case RESET -> request = resetRequestBddHandler
+                    .createMessageWithValidatedParams(params);
+            case SEND_LOCAL_LIST -> request = sendLocalListRequestBddHandler
+                    .createMessageWithValidatedParams(params);
             case SET_CHARGING_PROFILE -> request = setChargingProfileRequestBddHandler
                     .createMessageWithValidatedParams(params);
             case TRIGGER_MESSAGE -> {
@@ -122,13 +135,6 @@ public class MessagingServiceImpl implements MessagingService {
                 requestedMessageType = ImplementedMessageType.fromValue(message.getRequestedMessage().name());
                 request = message;
             }
-            case RESET -> request = resetRequestBddHandler.createMessageWithValidatedParams(params);
-            case CANCEL_RESERVATION -> request = cancelReservationRequestBddHandler
-                    .createMessageWithValidatedParams(params);
-            case CHANGE_AVAILABILITY -> request = changeAvailabilityRequestBddHandler
-                    .createMessageWithValidatedParams(params);
-            case CHANGE_CONFIGURATION -> request = changeConfigurationRequestBddHandler
-                    .createMessageWithValidatedParams(params);
             case UNLOCK_CONNECTOR -> request = unlockConnectorRequestBddHandler
                     .createMessageWithValidatedParams(params);
             case UPDATE_FIRMWARE -> request = updateFirmwareRequestBddFactory.createMessageWithValidatedParams(params);
@@ -356,22 +362,24 @@ public class MessagingServiceImpl implements MessagingService {
                                           CompletableFuture<Confirmation> completableFuture) {
         try {
             Confirmation confirmation = completableFuture.get();
-            if (confirmation instanceof SetChargingProfileConfirmation message) {
-                setChargingProfileConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
-            } else if (confirmation instanceof TriggerMessageConfirmation message) {
-                triggerMessageConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
-            } else if (confirmation instanceof ResetConfirmation message) {
-                resetConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
-            } else if (confirmation instanceof UpdateFirmwareConfirmation message) {
-                updateFirmwareConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
-            } else if (confirmation instanceof UnlockConnectorConfirmation message) {
-                unlockConnectorConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
-            } else if (confirmation instanceof CancelReservationConfirmation message) {
+            if (confirmation instanceof CancelReservationConfirmation message) {
                 cancelReservationConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
             } else if (confirmation instanceof ChangeAvailabilityConfirmation message) {
                 changeAvailabilityConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
             } else if (confirmation instanceof ChangeConfigurationConfirmation message) {
                 changeConfigurationConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
+            } else if (confirmation instanceof ResetConfirmation message) {
+                resetConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
+            } else if (confirmation instanceof SendLocalListConfirmation message) {
+                sendLocalListConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
+            } else if (confirmation instanceof SetChargingProfileConfirmation message) {
+                setChargingProfileConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
+            } else if (confirmation instanceof TriggerMessageConfirmation message) {
+                triggerMessageConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
+            } else if (confirmation instanceof UpdateFirmwareConfirmation message) {
+                updateFirmwareConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
+            } else if (confirmation instanceof UnlockConnectorConfirmation message) {
+                unlockConnectorConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
             } else {
                 throw new BddTestingException("Type is not implemented. Confirmation: " + confirmation);
             }
