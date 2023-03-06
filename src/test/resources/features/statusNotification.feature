@@ -3,7 +3,7 @@ Feature:
   Scenario: The Central System receiving 'StatusNotification.req' message from Charge Point
     Given the Central System is started on "localhost"
     Given the Charge Point is connected
-    When the Central System must receives "StatusNotification.req" with given data
+    When the Central System must receive "StatusNotification.req" with given data
       | connectorId     |  any  |
       | errorCode       |  any  |
       | info            |  any  |
@@ -11,4 +11,4 @@ Feature:
       | timestamp       |  any  |
       | vendorId        |  any  |
       | vendorErrorCode |  any  |
-    Then the Central System must sends confirmation response
+    Then the Central System must send confirmation response
