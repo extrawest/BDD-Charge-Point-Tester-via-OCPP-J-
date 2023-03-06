@@ -11,6 +11,8 @@ import com.extrawest.jsonserver.service.MessagingService;
 import com.extrawest.jsonserver.validation.incoming.confirmation.ResetConfirmationHandler;
 import com.extrawest.jsonserver.validation.incoming.confirmation.TriggerMessageConfirmationHandler;
 import com.extrawest.jsonserver.validation.incoming.confirmation.UpdateFirmwareConfirmationHandler;
+import com.extrawest.jsonserver.validation.incoming.request.StatusNotificationRequestBddHandler;
+import com.extrawest.jsonserver.validation.incoming.request.StopTransactionRequestBddHandler;
 import com.extrawest.jsonserver.validation.outcoming.confirmation.AuthorizeConfirmationBddHandlerValidation;
 import com.extrawest.jsonserver.validation.outcoming.confirmation.BootNotificationConfirmationBddHandlerValidation;
 import com.extrawest.jsonserver.validation.outcoming.confirmation.DataTransferConfirmationBddHandlerValidation;
@@ -23,6 +25,8 @@ import com.extrawest.jsonserver.validation.incoming.request.DataTransferRequestB
 import com.extrawest.jsonserver.validation.incoming.request.HeartbeatRequestBddHandler;
 import com.extrawest.jsonserver.validation.incoming.request.MeterValuesRequestBddHandler;
 import com.extrawest.jsonserver.validation.incoming.request.StartTransactionRequestBddHandler;
+import com.extrawest.jsonserver.validation.outcoming.confirmation.StatusNotificationConfirmationBddHandler;
+import com.extrawest.jsonserver.validation.outcoming.confirmation.StopTransactionConfirmationBddHandler;
 import com.extrawest.jsonserver.validation.outcoming.request.ResetRequestHandler;
 import com.extrawest.jsonserver.validation.outcoming.request.TriggerMessageRequestHandler;
 import com.extrawest.jsonserver.validation.outcoming.request.UpdateFirmwareRequestFactory;
@@ -46,6 +50,7 @@ import eu.chargetime.ocpp.model.core.MeterValuesRequest;
 import eu.chargetime.ocpp.model.core.ResetConfirmation;
 import eu.chargetime.ocpp.model.core.StartTransactionRequest;
 import eu.chargetime.ocpp.model.core.StatusNotificationRequest;
+import eu.chargetime.ocpp.model.core.StopTransactionRequest;
 import eu.chargetime.ocpp.model.firmware.DiagnosticsStatusNotificationRequest;
 import eu.chargetime.ocpp.model.firmware.FirmwareStatusNotificationRequest;
 import eu.chargetime.ocpp.model.firmware.UpdateFirmwareConfirmation;
@@ -80,6 +85,10 @@ public class MessagingServiceImpl implements MessagingService {
     private final MeterValuesConfirmationBddHandlerValidation meterValuesConfirmationBddHandler;
     private final StartTransactionRequestBddHandler startTransactionRequestBddHandler;
     private final StartTransactionConfirmationBddHandlerValidation startTransactionConfirmationBddHandler;
+    private final StatusNotificationRequestBddHandler statusNotificationRequestBddHandler;
+    private final StatusNotificationConfirmationBddHandler statusNotificationConfirmationBddHandler;
+    private final StopTransactionRequestBddHandler stopTransactionRequestBddHandler;
+    private final StopTransactionConfirmationBddHandler stopTransactionConfirmationBddHandler;
 
     private final ResetRequestHandler resetRequestHandler;
     private final ResetConfirmationHandler resetConfirmationHandler;
@@ -174,8 +183,19 @@ public class MessagingServiceImpl implements MessagingService {
         }
         for (Request request : requests) {
             switch (messageType) {
+                case AUTHORIZE:
+                    if (request instanceof AuthorizeRequest) {
+                        bddDataRepository.removeRequestedMessage(chargePointId, request);
+                        return Optional.of(request);
+                    }
                 case BOOT_NOTIFICATION:
                     if (request instanceof BootNotificationRequest) {
+                        bddDataRepository.removeRequestedMessage(chargePointId, request);
+                        return Optional.of(request);
+                    }
+                    break;
+                case DATA_TRANSFER:
+                    if (request instanceof DataTransferRequest) {
                         bddDataRepository.removeRequestedMessage(chargePointId, request);
                         return Optional.of(request);
                     }
@@ -192,8 +212,20 @@ public class MessagingServiceImpl implements MessagingService {
                         return Optional.of(request);
                     }
                     break;
+                case START_TRANSACTION:
+                    if (request instanceof StartTransactionRequest) {
+                        bddDataRepository.removeRequestedMessage(chargePointId, request);
+                        return Optional.of(request);
+                    }
+                    break;
                 case STATUS_NOTIFICATION:
                     if (request instanceof StatusNotificationRequest) {
+                        bddDataRepository.removeRequestedMessage(chargePointId, request);
+                        return Optional.of(request);
+                    }
+                    break;
+                case STOP_TRANSACTION:
+                    if (request instanceof StopTransactionRequest) {
                         bddDataRepository.removeRequestedMessage(chargePointId, request);
                         return Optional.of(request);
                     }
@@ -206,17 +238,6 @@ public class MessagingServiceImpl implements MessagingService {
                     break;
                 case DIAGNOSTICS_STATUS_NOTIFICATION:
                     if (request instanceof DiagnosticsStatusNotificationRequest) {
-                        bddDataRepository.removeRequestedMessage(chargePointId, request);
-                        return Optional.of(request);
-                    }
-                    break;
-                case AUTHORIZE:
-                    if (request instanceof AuthorizeRequest) {
-                        bddDataRepository.removeRequestedMessage(chargePointId, request);
-                        return Optional.of(request);
-                    }
-                case DATA_TRANSFER:
-                    if (request instanceof DataTransferRequest) {
                         bddDataRepository.removeRequestedMessage(chargePointId, request);
                         return Optional.of(request);
                     }
@@ -248,6 +269,13 @@ public class MessagingServiceImpl implements MessagingService {
             startTransactionConfirmationBddHandler.setReceivedIdTag(message.getIdTag());
             startTransactionRequestBddHandler.validateAndAssertFieldsWithParams(parameters, message);
             return ImplementedMessageType.START_TRANSACTION;
+        } else if (request instanceof StatusNotificationRequest message) {
+            statusNotificationRequestBddHandler.validateAndAssertFieldsWithParams(parameters, message);
+            return ImplementedMessageType.STATUS_NOTIFICATION;
+        } else if (request instanceof StopTransactionRequest message) {
+            stopTransactionConfirmationBddHandler.setReceivedIdTag(message.getIdTag());
+            stopTransactionRequestBddHandler.validateAndAssertFieldsWithParams(parameters, message);
+            return ImplementedMessageType.STOP_TRANSACTION;
         } else {
              throw new BddTestingException("Type is not implemented. Request: " + request);
         }
@@ -273,6 +301,10 @@ public class MessagingServiceImpl implements MessagingService {
                     meterValuesConfirmationBddHandler.createMessageWithValidatedParams(parameters);
             case START_TRANSACTION -> response =
                     startTransactionConfirmationBddHandler.createMessageWithValidatedParams(parameters);
+            case STATUS_NOTIFICATION -> response =
+                    statusNotificationConfirmationBddHandler.createMessageWithValidatedParams(parameters);
+            case STOP_TRANSACTION -> response =
+                    stopTransactionConfirmationBddHandler.createMessageWithValidatedParams(parameters);
             default ->
                     throw new BddTestingException("This type of confirmation message is not implemented. ");
         }
