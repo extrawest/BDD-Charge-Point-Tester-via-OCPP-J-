@@ -12,12 +12,14 @@ import com.extrawest.jsonserver.validation.incoming.confirmation.ResetConfirmati
 import com.extrawest.jsonserver.validation.incoming.confirmation.TriggerMessageConfirmationHandler;
 import com.extrawest.jsonserver.validation.incoming.confirmation.UpdateFirmwareConfirmationHandler;
 import com.extrawest.jsonserver.validation.incoming.request.DiagnosticsStatusNotificationRequestBddHandler;
+import com.extrawest.jsonserver.validation.incoming.request.FirmwareStatusNotificationRequestBddHandler;
 import com.extrawest.jsonserver.validation.incoming.request.StatusNotificationRequestBddHandler;
 import com.extrawest.jsonserver.validation.incoming.request.StopTransactionRequestBddHandler;
 import com.extrawest.jsonserver.validation.outcoming.confirmation.AuthorizeConfirmationBddHandlerValidation;
 import com.extrawest.jsonserver.validation.outcoming.confirmation.BootNotificationConfirmationBddHandlerValidation;
 import com.extrawest.jsonserver.validation.outcoming.confirmation.DataTransferConfirmationBddHandlerValidation;
 import com.extrawest.jsonserver.validation.outcoming.confirmation.DiagnosticsStatusNotificationConfirmationBddHandlerValidation;
+import com.extrawest.jsonserver.validation.outcoming.confirmation.FirmwareStatusNotificationConfirmationBddHandlerValidation;
 import com.extrawest.jsonserver.validation.outcoming.confirmation.HeartbeatConfirmationBddHandlerValidation;
 import com.extrawest.jsonserver.validation.outcoming.confirmation.MeterValuesConfirmationBddHandlerValidation;
 import com.extrawest.jsonserver.validation.outcoming.confirmation.StartTransactionConfirmationBddHandlerValidation;
@@ -82,7 +84,11 @@ public class MessagingServiceImpl implements MessagingService {
     private final DataTransferRequestBddHandler dataTransferRequestBddHandler;
     private final DataTransferConfirmationBddHandlerValidation dataTransferConfirmationBddHandler;
     private final DiagnosticsStatusNotificationRequestBddHandler diagnosticsStatusNotificationRequestBddHandler;
-    private final DiagnosticsStatusNotificationConfirmationBddHandlerValidation diagnosticsStatusNotificationConfirmationBddHandlerValidation;
+    private final DiagnosticsStatusNotificationConfirmationBddHandlerValidation
+            diagnosticsStatusNotificationConfirmationBddHandlerValidation;
+    private final FirmwareStatusNotificationRequestBddHandler firmwareStatusNotificationRequestBddHandler;
+    private final FirmwareStatusNotificationConfirmationBddHandlerValidation
+            firmwareStatusNotificationConfirmationBddHandlerValidation;
     private final HeartbeatRequestBddHandler heartbeatRequestBddHandler;
     private final HeartbeatConfirmationBddHandlerValidation heartbeatConfirmationBddHandler;
     private final MeterValuesRequestBddHandler meterValuesRequestBddHandler;
@@ -102,7 +108,8 @@ public class MessagingServiceImpl implements MessagingService {
     private final UpdateFirmwareConfirmationHandler updateFirmwareConfirmationHandler;
 
     @Override
-    public ImplementedMessageType sendRequest(String chargePointId, ImplementedMessageType type, Map<String, String> params) {
+    public ImplementedMessageType sendRequest(String chargePointId, ImplementedMessageType type,
+                                              Map<String, String> params) {
         UUID sessionUUID = sessionRepository.getSessionByChargerId(chargePointId);
         Request request;
         ImplementedMessageType requestedMessageType = null;
@@ -210,6 +217,12 @@ public class MessagingServiceImpl implements MessagingService {
                         return Optional.of(request);
                     }
                     break;
+                case FIRMWARE_STATUS_NOTIFICATION:
+                    if (request instanceof FirmwareStatusNotificationRequest) {
+                        bddDataRepository.removeRequestedMessage(chargePointId, request);
+                        return Optional.of(request);
+                    }
+                    break;
                 case HEARTBEAT:
                     if (request instanceof HeartbeatRequest) {
                         bddDataRepository.removeRequestedMessage(chargePointId, request);
@@ -240,12 +253,6 @@ public class MessagingServiceImpl implements MessagingService {
                         return Optional.of(request);
                     }
                     break;
-                case FIRMWARE_STATUS_NOTIFICATION:
-                    if (request instanceof FirmwareStatusNotificationRequest) {
-                        bddDataRepository.removeRequestedMessage(chargePointId, request);
-                        return Optional.of(request);
-                    }
-                    break;
             }
         }
         return Optional.empty();
@@ -265,6 +272,9 @@ public class MessagingServiceImpl implements MessagingService {
             return ImplementedMessageType.DATA_TRANSFER;
         } else if (request instanceof DiagnosticsStatusNotificationRequest message) {
             diagnosticsStatusNotificationRequestBddHandler.validateAndAssertFieldsWithParams(parameters, message);
+            return ImplementedMessageType.DIAGNOSTICS_STATUS_NOTIFICATION;
+        } else if (request instanceof FirmwareStatusNotificationRequest message) {
+            firmwareStatusNotificationRequestBddHandler.validateAndAssertFieldsWithParams(parameters, message);
             return ImplementedMessageType.DIAGNOSTICS_STATUS_NOTIFICATION;
         } else if (request instanceof HeartbeatRequest message) {
             heartbeatRequestBddHandler.validateAndAssertFieldsWithParams(parameters, message);
@@ -289,7 +299,8 @@ public class MessagingServiceImpl implements MessagingService {
     }
 
     @Override
-    public Confirmation sendConfirmationResponse(Map<String, String> parameters, ImplementedMessageType sendingMessageType) {
+    public Confirmation sendConfirmationResponse(Map<String, String> parameters,
+                                                 ImplementedMessageType sendingMessageType) {
         ServerCoreEventHandlerImpl handler = springBootContext.getBean(ServerCoreEventHandlerImpl.class);
         while (Objects.nonNull(handler.getResponse())) {
             waitHalfSecond();
@@ -303,7 +314,11 @@ public class MessagingServiceImpl implements MessagingService {
             case DATA_TRANSFER -> response =
                     dataTransferConfirmationBddHandler.createMessageWithValidatedParams(parameters);
             case DIAGNOSTICS_STATUS_NOTIFICATION -> response =
-                    diagnosticsStatusNotificationConfirmationBddHandlerValidation.createMessageWithValidatedParams(parameters);
+                    diagnosticsStatusNotificationConfirmationBddHandlerValidation
+                            .createMessageWithValidatedParams(parameters);
+            case FIRMWARE_STATUS_NOTIFICATION -> response =
+                    firmwareStatusNotificationConfirmationBddHandlerValidation
+                            .createMessageWithValidatedParams(parameters);
             case HEARTBEAT -> response =
                     heartbeatConfirmationBddHandler.createMessageWithValidatedParams(parameters);
             case METER_VALUES -> response =
