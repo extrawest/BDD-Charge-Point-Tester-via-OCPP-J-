@@ -8,10 +8,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import com.extrawest.jsonserver.service.MessagingService;
-import com.extrawest.jsonserver.validation.incoming.confirmation.ResetConfirmationBddHandler;
-import com.extrawest.jsonserver.validation.incoming.confirmation.TriggerMessageConfirmationBddHandler;
-import com.extrawest.jsonserver.validation.incoming.confirmation.UnlockConnectorConfirmationBddHandler;
-import com.extrawest.jsonserver.validation.incoming.confirmation.UpdateFirmwareConfirmationBddHandler;
+import com.extrawest.jsonserver.validation.incoming.confirmation.*;
 import com.extrawest.jsonserver.validation.incoming.request.DiagnosticsStatusNotificationRequestBddHandler;
 import com.extrawest.jsonserver.validation.incoming.request.FirmwareStatusNotificationRequestBddHandler;
 import com.extrawest.jsonserver.validation.incoming.request.StatusNotificationRequestBddHandler;
@@ -32,10 +29,7 @@ import com.extrawest.jsonserver.validation.incoming.request.MeterValuesRequestBd
 import com.extrawest.jsonserver.validation.incoming.request.StartTransactionRequestBddHandler;
 import com.extrawest.jsonserver.validation.outcoming.confirmation.StatusNotificationConfirmationBddHandler;
 import com.extrawest.jsonserver.validation.outcoming.confirmation.StopTransactionConfirmationBddHandler;
-import com.extrawest.jsonserver.validation.outcoming.request.ResetRequestBddHandler;
-import com.extrawest.jsonserver.validation.outcoming.request.TriggerMessageRequestBddHandler;
-import com.extrawest.jsonserver.validation.outcoming.request.UnlockConnectorRequestBddHandler;
-import com.extrawest.jsonserver.validation.outcoming.request.UpdateFirmwareRequestBddFactory;
+import com.extrawest.jsonserver.validation.outcoming.request.*;
 import com.extrawest.jsonserver.ws.handler.ServerCoreEventHandlerImpl;
 import eu.chargetime.ocpp.NotConnectedException;
 import eu.chargetime.ocpp.OccurenceConstraintException;
@@ -63,6 +57,7 @@ import eu.chargetime.ocpp.model.firmware.FirmwareStatusNotificationRequest;
 import eu.chargetime.ocpp.model.firmware.UpdateFirmwareConfirmation;
 import eu.chargetime.ocpp.model.remotetrigger.TriggerMessageConfirmation;
 import eu.chargetime.ocpp.model.remotetrigger.TriggerMessageRequest;
+import eu.chargetime.ocpp.model.reservation.CancelReservationConfirmation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
@@ -102,6 +97,8 @@ public class MessagingServiceImpl implements MessagingService {
     private final StopTransactionRequestBddHandler stopTransactionRequestBddHandler;
     private final StopTransactionConfirmationBddHandler stopTransactionConfirmationBddHandler;
 
+    private final CancelReservationRequestBddHandler cancelReservationRequestBddHandler;
+    private final CancelReservationConfirmationBddHandler cancelReservationConfirmationBddHandler;
     private final ResetRequestBddHandler resetRequestBddHandler;
     private final ResetConfirmationBddHandler resetConfirmationBddHandler;
     private final TriggerMessageRequestBddHandler triggerMessageRequestBddHandler;
@@ -126,6 +123,7 @@ public class MessagingServiceImpl implements MessagingService {
                 request = message;
             }
             case RESET -> request = resetRequestBddHandler.createMessageWithValidatedParams(params);
+            case CANCEL_RESERVATION -> request = cancelReservationRequestBddHandler.createMessageWithValidatedParams(params);
             case UNLOCK_CONNECTOR -> request = unlockConnectorRequestBddHandler
                     .createMessageWithValidatedParams(params);
             case UPDATE_FIRMWARE -> request = updateFirmwareRequestBddFactory.createMessageWithValidatedParams(params);
@@ -361,6 +359,8 @@ public class MessagingServiceImpl implements MessagingService {
                 updateFirmwareConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
             } else if (confirmation instanceof UnlockConnectorConfirmation message) {
                 unlockConnectorConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
+            } else if (confirmation instanceof CancelReservationConfirmation message) {
+                cancelReservationConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
             } else {
                 throw new BddTestingException("Type is not implemented. Confirmation: " + confirmation);
             }
