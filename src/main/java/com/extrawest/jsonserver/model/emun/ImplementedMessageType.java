@@ -24,6 +24,7 @@ public enum ImplementedMessageType {
     START_TRANSACTION("StartTransaction"),
     STATUS_NOTIFICATION("StatusNotification"),
     STOP_TRANSACTION("StopTransaction"),
+    CANCEL_RESERVATION("CancelReservation"),
     RESET("Reset"),
     TRIGGER_MESSAGE("TriggerMessage"),
     UNLOCK_CONNECTOR("UnlockConnector"),
