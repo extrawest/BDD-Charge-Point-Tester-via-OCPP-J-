@@ -10,6 +10,7 @@ import java.util.concurrent.ExecutionException;
 import com.extrawest.jsonserver.service.MessagingService;
 import com.extrawest.jsonserver.validation.incoming.confirmation.ResetConfirmationBddHandler;
 import com.extrawest.jsonserver.validation.incoming.confirmation.TriggerMessageConfirmationBddHandler;
+import com.extrawest.jsonserver.validation.incoming.confirmation.UnlockConnectorConfirmationBddHandler;
 import com.extrawest.jsonserver.validation.incoming.confirmation.UpdateFirmwareConfirmationBddHandler;
 import com.extrawest.jsonserver.validation.incoming.request.DiagnosticsStatusNotificationRequestBddHandler;
 import com.extrawest.jsonserver.validation.incoming.request.FirmwareStatusNotificationRequestBddHandler;
@@ -33,6 +34,7 @@ import com.extrawest.jsonserver.validation.outcoming.confirmation.StatusNotifica
 import com.extrawest.jsonserver.validation.outcoming.confirmation.StopTransactionConfirmationBddHandler;
 import com.extrawest.jsonserver.validation.outcoming.request.ResetRequestBddHandler;
 import com.extrawest.jsonserver.validation.outcoming.request.TriggerMessageRequestBddHandler;
+import com.extrawest.jsonserver.validation.outcoming.request.UnlockConnectorRequestBddHandler;
 import com.extrawest.jsonserver.validation.outcoming.request.UpdateFirmwareRequestBddFactory;
 import com.extrawest.jsonserver.ws.handler.ServerCoreEventHandlerImpl;
 import eu.chargetime.ocpp.NotConnectedException;
@@ -55,6 +57,7 @@ import eu.chargetime.ocpp.model.core.ResetConfirmation;
 import eu.chargetime.ocpp.model.core.StartTransactionRequest;
 import eu.chargetime.ocpp.model.core.StatusNotificationRequest;
 import eu.chargetime.ocpp.model.core.StopTransactionRequest;
+import eu.chargetime.ocpp.model.core.UnlockConnectorConfirmation;
 import eu.chargetime.ocpp.model.firmware.DiagnosticsStatusNotificationRequest;
 import eu.chargetime.ocpp.model.firmware.FirmwareStatusNotificationRequest;
 import eu.chargetime.ocpp.model.firmware.UpdateFirmwareConfirmation;
@@ -103,6 +106,8 @@ public class MessagingServiceImpl implements MessagingService {
     private final ResetConfirmationBddHandler resetConfirmationBddHandler;
     private final TriggerMessageRequestBddHandler triggerMessageRequestBddHandler;
     private final TriggerMessageConfirmationBddHandler triggerMessageConfirmationBddHandler;
+    private final UnlockConnectorRequestBddHandler unlockConnectorRequestBddHandler;
+    private final UnlockConnectorConfirmationBddHandler unlockConnectorConfirmationBddHandler;
     private final UpdateFirmwareRequestBddFactory updateFirmwareRequestBddFactory;
     private final UpdateFirmwareConfirmationBddHandler updateFirmwareConfirmationBddHandler;
 
@@ -114,12 +119,15 @@ public class MessagingServiceImpl implements MessagingService {
         ImplementedMessageType requestedMessageType = null;
         switch (type) {
             case TRIGGER_MESSAGE -> {
-                TriggerMessageRequest message = triggerMessageRequestBddHandler.createMessageWithValidatedParams(params);
+                TriggerMessageRequest message = triggerMessageRequestBddHandler
+                        .createMessageWithValidatedParams(params);
                 bddDataRepository.addRequestedMessageType(chargePointId, message.getRequestedMessage());
                 requestedMessageType = ImplementedMessageType.fromValue(message.getRequestedMessage().name());
                 request = message;
             }
             case RESET -> request = resetRequestBddHandler.createMessageWithValidatedParams(params);
+            case UNLOCK_CONNECTOR -> request = unlockConnectorRequestBddHandler
+                    .createMessageWithValidatedParams(params);
             case UPDATE_FIRMWARE -> request = updateFirmwareRequestBddFactory.createMessageWithValidatedParams(params);
             default -> throw new BddTestingException("Request message type is unavailable");
         }
@@ -351,6 +359,8 @@ public class MessagingServiceImpl implements MessagingService {
                 resetConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
             } else if (confirmation instanceof UpdateFirmwareConfirmation message) {
                 updateFirmwareConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
+            } else if (confirmation instanceof UnlockConnectorConfirmation message) {
+                unlockConnectorConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
             } else {
                 throw new BddTestingException("Type is not implemented. Confirmation: " + confirmation);
             }
