@@ -8,21 +8,21 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import com.extrawest.jsonserver.service.MessagingService;
-import com.extrawest.jsonserver.validation.incoming.confirmation.ResetConfirmationHandler;
-import com.extrawest.jsonserver.validation.incoming.confirmation.TriggerMessageConfirmationHandler;
-import com.extrawest.jsonserver.validation.incoming.confirmation.UpdateFirmwareConfirmationHandler;
+import com.extrawest.jsonserver.validation.incoming.confirmation.ResetConfirmationBddHandler;
+import com.extrawest.jsonserver.validation.incoming.confirmation.TriggerMessageConfirmationBddHandler;
+import com.extrawest.jsonserver.validation.incoming.confirmation.UpdateFirmwareConfirmationBddHandler;
 import com.extrawest.jsonserver.validation.incoming.request.DiagnosticsStatusNotificationRequestBddHandler;
 import com.extrawest.jsonserver.validation.incoming.request.FirmwareStatusNotificationRequestBddHandler;
 import com.extrawest.jsonserver.validation.incoming.request.StatusNotificationRequestBddHandler;
 import com.extrawest.jsonserver.validation.incoming.request.StopTransactionRequestBddHandler;
-import com.extrawest.jsonserver.validation.outcoming.confirmation.AuthorizeConfirmationBddHandlerValidation;
-import com.extrawest.jsonserver.validation.outcoming.confirmation.BootNotificationConfirmationBddHandlerValidation;
-import com.extrawest.jsonserver.validation.outcoming.confirmation.DataTransferConfirmationBddHandlerValidation;
-import com.extrawest.jsonserver.validation.outcoming.confirmation.DiagnosticsStatusNotificationConfirmationBddHandlerValidation;
-import com.extrawest.jsonserver.validation.outcoming.confirmation.FirmwareStatusNotificationConfirmationBddHandlerValidation;
-import com.extrawest.jsonserver.validation.outcoming.confirmation.HeartbeatConfirmationBddHandlerValidation;
-import com.extrawest.jsonserver.validation.outcoming.confirmation.MeterValuesConfirmationBddHandlerValidation;
-import com.extrawest.jsonserver.validation.outcoming.confirmation.StartTransactionConfirmationBddHandlerValidation;
+import com.extrawest.jsonserver.validation.outcoming.confirmation.AuthorizeConfirmationBddHandler;
+import com.extrawest.jsonserver.validation.outcoming.confirmation.BootNotificationConfirmationBddHandler;
+import com.extrawest.jsonserver.validation.outcoming.confirmation.DataTransferConfirmationBddHandler;
+import com.extrawest.jsonserver.validation.outcoming.confirmation.DiagnosticsStatusNotificationConfirmationBddHandler;
+import com.extrawest.jsonserver.validation.outcoming.confirmation.FirmwareStatusNotificationConfirmationBddHandler;
+import com.extrawest.jsonserver.validation.outcoming.confirmation.HeartbeatConfirmationBddHandler;
+import com.extrawest.jsonserver.validation.outcoming.confirmation.MeterValuesConfirmationBddHandler;
+import com.extrawest.jsonserver.validation.outcoming.confirmation.StartTransactionConfirmationBddHandler;
 import com.extrawest.jsonserver.validation.incoming.request.AuthorizeRequestBddHandler;
 import com.extrawest.jsonserver.validation.incoming.request.BootNotificationRequestBddHandler;
 import com.extrawest.jsonserver.validation.incoming.request.DataTransferRequestBddHandler;
@@ -31,9 +31,9 @@ import com.extrawest.jsonserver.validation.incoming.request.MeterValuesRequestBd
 import com.extrawest.jsonserver.validation.incoming.request.StartTransactionRequestBddHandler;
 import com.extrawest.jsonserver.validation.outcoming.confirmation.StatusNotificationConfirmationBddHandler;
 import com.extrawest.jsonserver.validation.outcoming.confirmation.StopTransactionConfirmationBddHandler;
-import com.extrawest.jsonserver.validation.outcoming.request.ResetRequestHandler;
-import com.extrawest.jsonserver.validation.outcoming.request.TriggerMessageRequestHandler;
-import com.extrawest.jsonserver.validation.outcoming.request.UpdateFirmwareRequestFactory;
+import com.extrawest.jsonserver.validation.outcoming.request.ResetRequestBddHandler;
+import com.extrawest.jsonserver.validation.outcoming.request.TriggerMessageRequestBddHandler;
+import com.extrawest.jsonserver.validation.outcoming.request.UpdateFirmwareRequestBddFactory;
 import com.extrawest.jsonserver.ws.handler.ServerCoreEventHandlerImpl;
 import eu.chargetime.ocpp.NotConnectedException;
 import eu.chargetime.ocpp.OccurenceConstraintException;
@@ -78,34 +78,33 @@ public class MessagingServiceImpl implements MessagingService {
     private final ServerSessionRepository sessionRepository;
 
     private final AuthorizeRequestBddHandler authorizeRequestBddHandler;
-    private final AuthorizeConfirmationBddHandlerValidation authorizeConfirmationBddHandler;
+    private final AuthorizeConfirmationBddHandler authorizeConfirmationBddHandler;
     private final BootNotificationRequestBddHandler bootNotificationRequestBddHandler;
-    private final BootNotificationConfirmationBddHandlerValidation bootNotificationConfirmationBddHandler;
+    private final BootNotificationConfirmationBddHandler bootNotificationConfirmationBddHandler;
     private final DataTransferRequestBddHandler dataTransferRequestBddHandler;
-    private final DataTransferConfirmationBddHandlerValidation dataTransferConfirmationBddHandler;
+    private final DataTransferConfirmationBddHandler dataTransferConfirmationBddHandler;
     private final DiagnosticsStatusNotificationRequestBddHandler diagnosticsStatusNotificationRequestBddHandler;
-    private final DiagnosticsStatusNotificationConfirmationBddHandlerValidation
-            diagnosticsStatusNotificationConfirmationBddHandlerValidation;
+    private final DiagnosticsStatusNotificationConfirmationBddHandler
+            diagnosticsStatusNotificationConfirmationBddHandler;
     private final FirmwareStatusNotificationRequestBddHandler firmwareStatusNotificationRequestBddHandler;
-    private final FirmwareStatusNotificationConfirmationBddHandlerValidation
-            firmwareStatusNotificationConfirmationBddHandlerValidation;
+    private final FirmwareStatusNotificationConfirmationBddHandler firmwareStatusNotificationConfirmationBddHandler;
     private final HeartbeatRequestBddHandler heartbeatRequestBddHandler;
-    private final HeartbeatConfirmationBddHandlerValidation heartbeatConfirmationBddHandler;
+    private final HeartbeatConfirmationBddHandler heartbeatConfirmationBddHandler;
     private final MeterValuesRequestBddHandler meterValuesRequestBddHandler;
-    private final MeterValuesConfirmationBddHandlerValidation meterValuesConfirmationBddHandler;
+    private final MeterValuesConfirmationBddHandler meterValuesConfirmationBddHandler;
     private final StartTransactionRequestBddHandler startTransactionRequestBddHandler;
-    private final StartTransactionConfirmationBddHandlerValidation startTransactionConfirmationBddHandler;
+    private final StartTransactionConfirmationBddHandler startTransactionConfirmationBddHandler;
     private final StatusNotificationRequestBddHandler statusNotificationRequestBddHandler;
     private final StatusNotificationConfirmationBddHandler statusNotificationConfirmationBddHandler;
     private final StopTransactionRequestBddHandler stopTransactionRequestBddHandler;
     private final StopTransactionConfirmationBddHandler stopTransactionConfirmationBddHandler;
 
-    private final ResetRequestHandler resetRequestHandler;
-    private final ResetConfirmationHandler resetConfirmationHandler;
-    private final TriggerMessageRequestHandler triggerMessageRequestHandler;
-    private final TriggerMessageConfirmationHandler triggerMessageConfirmationHandler;
-    private final UpdateFirmwareRequestFactory updateFirmwareRequestFactory;
-    private final UpdateFirmwareConfirmationHandler updateFirmwareConfirmationHandler;
+    private final ResetRequestBddHandler resetRequestBddHandler;
+    private final ResetConfirmationBddHandler resetConfirmationBddHandler;
+    private final TriggerMessageRequestBddHandler triggerMessageRequestBddHandler;
+    private final TriggerMessageConfirmationBddHandler triggerMessageConfirmationBddHandler;
+    private final UpdateFirmwareRequestBddFactory updateFirmwareRequestBddFactory;
+    private final UpdateFirmwareConfirmationBddHandler updateFirmwareConfirmationBddHandler;
 
     @Override
     public ImplementedMessageType sendRequest(String chargePointId, ImplementedMessageType type,
@@ -115,13 +114,13 @@ public class MessagingServiceImpl implements MessagingService {
         ImplementedMessageType requestedMessageType = null;
         switch (type) {
             case TRIGGER_MESSAGE -> {
-                TriggerMessageRequest message = triggerMessageRequestHandler.createMessageWithValidatedParams(params);
+                TriggerMessageRequest message = triggerMessageRequestBddHandler.createMessageWithValidatedParams(params);
                 bddDataRepository.addRequestedMessageType(chargePointId, message.getRequestedMessage());
                 requestedMessageType = ImplementedMessageType.fromValue(message.getRequestedMessage().name());
                 request = message;
             }
-            case RESET -> request = resetRequestHandler.createMessageWithValidatedParams(params);
-            case UPDATE_FIRMWARE -> request = updateFirmwareRequestFactory.createMessageWithValidatedParams(params);
+            case RESET -> request = resetRequestBddHandler.createMessageWithValidatedParams(params);
+            case UPDATE_FIRMWARE -> request = updateFirmwareRequestBddFactory.createMessageWithValidatedParams(params);
             default -> throw new BddTestingException("Request message type is unavailable");
         }
         sendRequest(sessionUUID, request);
@@ -314,10 +313,10 @@ public class MessagingServiceImpl implements MessagingService {
             case DATA_TRANSFER -> response =
                     dataTransferConfirmationBddHandler.createMessageWithValidatedParams(parameters);
             case DIAGNOSTICS_STATUS_NOTIFICATION -> response =
-                    diagnosticsStatusNotificationConfirmationBddHandlerValidation
+                    diagnosticsStatusNotificationConfirmationBddHandler
                             .createMessageWithValidatedParams(parameters);
             case FIRMWARE_STATUS_NOTIFICATION -> response =
-                    firmwareStatusNotificationConfirmationBddHandlerValidation
+                    firmwareStatusNotificationConfirmationBddHandler
                             .createMessageWithValidatedParams(parameters);
             case HEARTBEAT -> response =
                     heartbeatConfirmationBddHandler.createMessageWithValidatedParams(parameters);
@@ -347,11 +346,11 @@ public class MessagingServiceImpl implements MessagingService {
         try {
             Confirmation confirmation = completableFuture.get();
             if (confirmation instanceof TriggerMessageConfirmation message) {
-                triggerMessageConfirmationHandler.validateAndAssertFieldsWithParams(parameters, message);
+                triggerMessageConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
             } else if (confirmation instanceof ResetConfirmation message) {
-                resetConfirmationHandler.validateAndAssertFieldsWithParams(parameters, message);
+                resetConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
             } else if (confirmation instanceof UpdateFirmwareConfirmation message) {
-                updateFirmwareConfirmationHandler.validateAndAssertFieldsWithParams(parameters, message);
+                updateFirmwareConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
             } else {
                 throw new BddTestingException("Type is not implemented. Confirmation: " + confirmation);
             }

@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class BootNotificationConfirmationBddHandlerValidation
+public class BootNotificationConfirmationBddHandler
         extends OutcomingMessageFieldsValidationFactory<BootNotificationConfirmation>
         implements OutgoingMessageFactory<BootNotificationConfirmation> {
     public static final String CURRENT_TIME_REQUIRED = "currentTime";
