@@ -21,6 +21,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.chargetime.ocpp.PropertyConstraintException;
 import eu.chargetime.ocpp.model.Validatable;
 import eu.chargetime.ocpp.model.core.AuthorizationStatus;
+import eu.chargetime.ocpp.model.core.ChargingProfile;
+import eu.chargetime.ocpp.model.core.ChargingProfileKindType;
+import eu.chargetime.ocpp.model.core.ChargingProfilePurposeType;
+import eu.chargetime.ocpp.model.core.ChargingRateUnitType;
+import eu.chargetime.ocpp.model.core.ChargingSchedule;
+import eu.chargetime.ocpp.model.core.ChargingSchedulePeriod;
 import eu.chargetime.ocpp.model.core.IdTagInfo;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -120,7 +126,8 @@ public abstract class OutcomingMessageFieldsValidationFactory<T extends Validata
         }
     }
 
-    protected IdTagInfo getValidatedIdTagInfo(String paramValue, String defaultValue, String fieldName, String receivedIdTag) {
+    protected IdTagInfo getValidatedIdTagInfo(String paramValue, String defaultValue, String fieldName,
+                                              String receivedIdTag) {
         if (Objects.equals(paramValue, wildCard)) {
             if (isNull(defaultValue) || defaultValue.isBlank()) {
                 IdTagInfo idTagInfo = new IdTagInfo(AuthorizationStatus.Accepted);
@@ -131,6 +138,28 @@ public abstract class OutcomingMessageFieldsValidationFactory<T extends Validata
             return parseModelFromJson(defaultValue, fieldName, IdTagInfo.class);
         }
         return parseModelFromJson(paramValue, fieldName, IdTagInfo.class);
+    }
+
+    protected ChargingProfile getValidatedChargingProfile(String paramValue, String defaultValue, String fieldName) {
+        if (Objects.equals(paramValue, wildCard)) {
+            if (isNull(defaultValue) || defaultValue.isBlank()) {
+                ChargingProfile profile = new ChargingProfile();
+                profile.setChargingProfileId(101);
+                profile.setStackLevel(0);
+                profile.setChargingProfilePurpose(ChargingProfilePurposeType.TxDefaultProfile);
+                profile.setChargingProfileKind(ChargingProfileKindType.Absolute);
+                ChargingSchedule schedule = new ChargingSchedule();
+                schedule.setChargingRateUnit(ChargingRateUnitType.W);
+                schedule.setChargingSchedulePeriod(
+                        new ChargingSchedulePeriod[]{
+                                new ChargingSchedulePeriod(10, 11.00),
+                                new ChargingSchedulePeriod(20, 11.00)
+                        });
+                return profile;
+            }
+            return parseModelFromJson(defaultValue, fieldName, ChargingProfile.class);
+        }
+        return parseModelFromJson(paramValue, fieldName, ChargingProfile.class);
     }
 
     protected String getValidatedStringValueOrThrow(String paramValue, String defaultValue) {
