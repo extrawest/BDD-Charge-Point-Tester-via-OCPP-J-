@@ -26,6 +26,7 @@ public enum ImplementedMessageType {
     STOP_TRANSACTION("StopTransaction"),
     RESET("Reset"),
     TRIGGER_MESSAGE("TriggerMessage"),
+    UNLOCK_CONNECTOR("UnlockConnector"),
     UPDATE_FIRMWARE("UpdateFirmware");
 
 
