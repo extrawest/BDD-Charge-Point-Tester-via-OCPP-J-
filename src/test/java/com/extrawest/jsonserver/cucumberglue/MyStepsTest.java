@@ -145,8 +145,17 @@ public class MyStepsTest extends SpringIntegrationTest {
     }
 
     @Given("the Central System sends {string} request to the Charge Point")
-    public void csSendsMessageRequestAndGetsConfirmation(String messageType, DataTable table) {
+    public void csSendsMessageRequest(String messageType) {
+        csSendsMessageRequestWithData(messageType, Map.of(wildCard, wildCard));
+    }
+
+    @Given("the Central System sends {string} request to the Charge Point with given data")
+    public void csSendsMessageRequest(String messageType, DataTable table) {
         Map<String, String> parameters = isNull(table) || table.isEmpty() ? Collections.emptyMap() : table.asMap();
+        csSendsMessageRequestWithData(messageType, parameters);
+    }
+
+    private void csSendsMessageRequestWithData(String messageType, Map<String, String> parameters) {
         String requestType = messageType.replace(".req", "").replace(".conf", "");
         if (ImplementedMessageType.contains(requestType)) {
             waitingMessageType = ImplementedMessageType.fromValue(requestType);
@@ -161,13 +170,17 @@ public class MyStepsTest extends SpringIntegrationTest {
     }
 
     @And("the Central System receives confirmation")
-    public void theCentralSystemReceivesConfirmation(DataTable table) {
-        Map<String, String> parameters = isNull(table) || table.isEmpty() ? Collections.emptyMap() : table.asMap();
-        handlingConfirmationResponse(parameters);
+    public void theCentralSystemReceivesConfirmationWithAnyData() {
+        handlingConfirmationResponseWithData(Map.of(wildCard, wildCard));
     }
 
+    @And("the Central System receives confirmation with given data")
+    public void theCentralSystemReceivesConfirmationWithGivenData(DataTable table) {
+        Map<String, String> parameters = isNull(table) || table.isEmpty() ? Collections.emptyMap() : table.asMap();
+        handlingConfirmationResponseWithData(parameters);
+    }
 
-    private void handlingConfirmationResponse(Map<String, String> parameters) {
+    private void handlingConfirmationResponseWithData(Map<String, String> parameters) {
         log.info(String.format("Scenario №%s, STEP %s: Waiting for confirmation response...",
                 scenarioId, stepNumber));
         Optional<CompletableFuture<Confirmation>> future =
@@ -197,17 +210,17 @@ public class MyStepsTest extends SpringIntegrationTest {
     }
 
     @Then("the Central System must receive requested message")
-    public void csMustReceiveRequestedMessage() {
-        csMustReceiveRequestedMessageWithGivenData(Map.of(wildCard, wildCard));
+    public void csMustReceiveRequestedMessageAnyData() {
+        csMustReceiveRequestedMessageWithData(Map.of(wildCard, wildCard));
     }
 
     @Then("the Central System must receive requested message with given data")
     public void csMustReceiveRequestedMessageWithGivenData(DataTable table) {
         Map<String, String> parameters = isNull(table) || table.isEmpty() ? Collections.emptyMap() : table.asMap();
-        csMustReceiveRequestedMessageWithGivenData(parameters);
+        csMustReceiveRequestedMessageWithData(parameters);
     }
 
-    private void csMustReceiveRequestedMessageWithGivenData(Map<String, String> parameters) {
+    private void csMustReceiveRequestedMessageWithData(Map<String, String> parameters) {
         log.info(String.format("Scenario №%s, STEP %s: Waiting for request up to %s...",
                 scenarioId, stepNumber, messageWaitingTime));
         Optional<Request> request = messagingService.waitForRequestedMessage(chargePoint, messageWaitingTime,
@@ -223,18 +236,18 @@ public class MyStepsTest extends SpringIntegrationTest {
     }
 
     @When("the Central System must receive {string}")
-    public void theCentralSystemMustReceivesMessageWithGivenData(String messageType) {
+    public void theCentralSystemMustReceivesMessageWithAnyData(String messageType) {
         Map<String, String> parameters = Map.of(wildCard, wildCard);
-        theCSReceivesMessageWithGivenData(messageType, parameters);
+        theCSReceivesMessageWithData(messageType, parameters);
     }
 
     @When("the Central System must receive {string} with given data")
     public void theCentralSystemMustReceivesMessageWithGivenData(String messageType, DataTable table) {
         Map<String, String> parameters = isNull(table) || table.isEmpty() ? Collections.emptyMap() : table.asMap();
-        theCSReceivesMessageWithGivenData(messageType, parameters);
+        theCSReceivesMessageWithData(messageType, parameters);
     }
 
-    private void theCSReceivesMessageWithGivenData(String messageType, Map<String, String> parameters) {
+    private void theCSReceivesMessageWithData(String messageType, Map<String, String> parameters) {
         ImplementedMessageType type = ImplementedMessageType
                 .fromValue(messageType.replace(".req", "").replace(".conf", ""));
         waitingMessageType = type;
@@ -252,15 +265,18 @@ public class MyStepsTest extends SpringIntegrationTest {
     }
 
     @Then("the Central System must send confirmation response")
-    public void theCentralSystemMustSendConfirmationResponseWithGivenData() {
-        DataTable table = DataTable.emptyDataTable();
-        theCentralSystemMustSendConfirmationResponseWithGivenData(table);
+    public void theCentralSystemMustSendConfirmationResponseWithAnyData() {
+        theCentralSystemMustSendConfirmationResponseWithData(Map.of(wildCard, wildCard));
     }
 
     @Then("the Central System must send confirmation response with given data")
     public void theCentralSystemMustSendConfirmationResponseWithGivenData(DataTable table) {
         Map<String, String> parameters = isNull(table) || table.isEmpty() ? Collections.emptyMap() : table.asMap();
 
+        theCentralSystemMustSendConfirmationResponseWithData(parameters);
+    }
+
+    private void theCentralSystemMustSendConfirmationResponseWithData(Map<String, String> parameters) {
         Confirmation confirmation = messagingService.sendConfirmationResponse(parameters, sendingMessageType);
 
         log.info(String.format("Scenario №%s, STEP %s: %s confirmation message sent: \n%s ",
