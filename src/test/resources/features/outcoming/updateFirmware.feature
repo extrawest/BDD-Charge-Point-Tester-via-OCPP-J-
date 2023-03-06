@@ -7,4 +7,4 @@ Feature:
       | retrieveDate  | any |
       | retries       | any |
       | retryInterval | any |
-    And the Central System receives confirmation with given data
+    And the Central System receives confirmation
