@@ -76,8 +76,13 @@ public class BddDataRepositoryImpl implements BddDataRepository {
     public Optional<CompletableFuture<Confirmation>> getCompleted(UUID sessionIndex) {
         waitOneSecond();
         String chargePointId = serverSessionRepository.getChargerIdBySession(sessionIndex);
+        if (Objects.isNull(chargePointId)) {
+            return Optional.empty();
+        }
         String uniqueId = uniqueIdByChargePointId.getOrDefault(chargePointId, null);
-        return Optional.ofNullable(completedPromises.getOrDefault(uniqueId, null));
+        if (Objects.isNull(uniqueId)) {
+            return Optional.empty();
+        }        return Optional.ofNullable(completedPromises.getOrDefault(uniqueId, null));
     }
 
     @Override
