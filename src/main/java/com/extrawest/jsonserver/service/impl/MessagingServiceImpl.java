@@ -49,6 +49,7 @@ import eu.chargetime.ocpp.model.firmware.UpdateFirmwareConfirmation;
 import eu.chargetime.ocpp.model.remotetrigger.TriggerMessageConfirmation;
 import eu.chargetime.ocpp.model.remotetrigger.TriggerMessageRequest;
 import eu.chargetime.ocpp.model.reservation.CancelReservationConfirmation;
+import eu.chargetime.ocpp.model.smartcharging.SetChargingProfileConfirmation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
@@ -94,6 +95,8 @@ public class MessagingServiceImpl implements MessagingService {
     private final ChangeAvailabilityConfirmationBddHandler changeAvailabilityConfirmationBddHandler;
     private final ChangeConfigurationRequestBddHandler changeConfigurationRequestBddHandler;
     private final ChangeConfigurationConfirmationBddHandler changeConfigurationConfirmationBddHandler;
+    private final SetChargingProfileRequestBddHandler setChargingProfileRequestBddHandler;
+    private final SetChargingProfileConfirmationBddHandler setChargingProfileConfirmationBddHandler;
     private final ResetRequestBddHandler resetRequestBddHandler;
     private final ResetConfirmationBddHandler resetConfirmationBddHandler;
     private final TriggerMessageRequestBddHandler triggerMessageRequestBddHandler;
@@ -110,6 +113,8 @@ public class MessagingServiceImpl implements MessagingService {
         Request request;
         ImplementedMessageType requestedMessageType = null;
         switch (type) {
+            case SET_CHARGING_PROFILE -> request = setChargingProfileRequestBddHandler
+                    .createMessageWithValidatedParams(params);
             case TRIGGER_MESSAGE -> {
                 TriggerMessageRequest message = triggerMessageRequestBddHandler
                         .createMessageWithValidatedParams(params);
@@ -118,9 +123,12 @@ public class MessagingServiceImpl implements MessagingService {
                 request = message;
             }
             case RESET -> request = resetRequestBddHandler.createMessageWithValidatedParams(params);
-            case CANCEL_RESERVATION -> request = cancelReservationRequestBddHandler.createMessageWithValidatedParams(params);
-            case CHANGE_AVAILABILITY -> request = changeAvailabilityRequestBddHandler.createMessageWithValidatedParams(params);
-            case CHANGE_CONFIGURATION -> request = changeConfigurationRequestBddHandler.createMessageWithValidatedParams(params);
+            case CANCEL_RESERVATION -> request = cancelReservationRequestBddHandler
+                    .createMessageWithValidatedParams(params);
+            case CHANGE_AVAILABILITY -> request = changeAvailabilityRequestBddHandler
+                    .createMessageWithValidatedParams(params);
+            case CHANGE_CONFIGURATION -> request = changeConfigurationRequestBddHandler
+                    .createMessageWithValidatedParams(params);
             case UNLOCK_CONNECTOR -> request = unlockConnectorRequestBddHandler
                     .createMessageWithValidatedParams(params);
             case UPDATE_FIRMWARE -> request = updateFirmwareRequestBddFactory.createMessageWithValidatedParams(params);
@@ -348,7 +356,9 @@ public class MessagingServiceImpl implements MessagingService {
                                           CompletableFuture<Confirmation> completableFuture) {
         try {
             Confirmation confirmation = completableFuture.get();
-            if (confirmation instanceof TriggerMessageConfirmation message) {
+            if (confirmation instanceof SetChargingProfileConfirmation message) {
+                setChargingProfileConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
+            } else if (confirmation instanceof TriggerMessageConfirmation message) {
                 triggerMessageConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
             } else if (confirmation instanceof ResetConfirmation message) {
                 resetConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
