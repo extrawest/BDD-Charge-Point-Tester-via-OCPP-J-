@@ -24,7 +24,7 @@ public class ChangeAvailabilityRequestBddHandler extends OutcomingMessageFieldsV
 
     @Value("${triggerMessage.request.connectorId:1}")
     private String defaultConnectorId;
-    @Value("${triggerMessage.request.requestedMessage:Soft}")
+    @Value("${triggerMessage.request.requestedMessage:Operative}")
     private String defaultType;
 
     @PostConstruct

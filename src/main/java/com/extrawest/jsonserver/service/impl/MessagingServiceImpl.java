@@ -92,6 +92,8 @@ public class MessagingServiceImpl implements MessagingService {
     private final CancelReservationConfirmationBddHandler cancelReservationConfirmationBddHandler;
     private final ChangeAvailabilityRequestBddHandler changeAvailabilityRequestBddHandler;
     private final ChangeAvailabilityConfirmationBddHandler changeAvailabilityConfirmationBddHandler;
+    private final ChangeConfigurationRequestBddHandler changeConfigurationRequestBddHandler;
+    private final ChangeConfigurationConfirmationBddHandler changeConfigurationConfirmationBddHandler;
     private final ResetRequestBddHandler resetRequestBddHandler;
     private final ResetConfirmationBddHandler resetConfirmationBddHandler;
     private final TriggerMessageRequestBddHandler triggerMessageRequestBddHandler;
@@ -118,6 +120,7 @@ public class MessagingServiceImpl implements MessagingService {
             case RESET -> request = resetRequestBddHandler.createMessageWithValidatedParams(params);
             case CANCEL_RESERVATION -> request = cancelReservationRequestBddHandler.createMessageWithValidatedParams(params);
             case CHANGE_AVAILABILITY -> request = changeAvailabilityRequestBddHandler.createMessageWithValidatedParams(params);
+            case CHANGE_CONFIGURATION -> request = changeConfigurationRequestBddHandler.createMessageWithValidatedParams(params);
             case UNLOCK_CONNECTOR -> request = unlockConnectorRequestBddHandler
                     .createMessageWithValidatedParams(params);
             case UPDATE_FIRMWARE -> request = updateFirmwareRequestBddFactory.createMessageWithValidatedParams(params);
@@ -357,6 +360,8 @@ public class MessagingServiceImpl implements MessagingService {
                 cancelReservationConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
             } else if (confirmation instanceof ChangeAvailabilityConfirmation message) {
                 changeAvailabilityConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
+            } else if (confirmation instanceof ChangeConfigurationConfirmation message) {
+                changeConfigurationConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
             } else {
                 throw new BddTestingException("Type is not implemented. Confirmation: " + confirmation);
             }
