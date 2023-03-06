@@ -95,6 +95,8 @@ public class MessagingServiceImpl implements MessagingService {
     private final ChangeAvailabilityConfirmationBddHandler changeAvailabilityConfirmationBddHandler;
     private final ChangeConfigurationRequestBddHandler changeConfigurationRequestBddHandler;
     private final ChangeConfigurationConfirmationBddHandler changeConfigurationConfirmationBddHandler;
+    private final ClearCacheRequestBddHandler clearCacheRequestBddHandler;
+    private final ClearCacheConfirmationBddHandler clearCacheConfirmationBddHandler;
     private final SetChargingProfileRequestBddHandler setChargingProfileRequestBddHandler;
     private final SetChargingProfileConfirmationBddHandler setChargingProfileConfirmationBddHandler;
     private final ResetRequestBddHandler resetRequestBddHandler;
@@ -128,6 +130,8 @@ public class MessagingServiceImpl implements MessagingService {
             case CHANGE_AVAILABILITY -> request = changeAvailabilityRequestBddHandler
                     .createMessageWithValidatedParams(params);
             case CHANGE_CONFIGURATION -> request = changeConfigurationRequestBddHandler
+                    .createMessageWithValidatedParams(params);
+            case CLEAR_CACHE -> request = clearCacheRequestBddHandler
                     .createMessageWithValidatedParams(params);
             case UNLOCK_CONNECTOR -> request = unlockConnectorRequestBddHandler
                     .createMessageWithValidatedParams(params);
@@ -372,6 +376,8 @@ public class MessagingServiceImpl implements MessagingService {
                 changeAvailabilityConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
             } else if (confirmation instanceof ChangeConfigurationConfirmation message) {
                 changeConfigurationConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
+            }else if (confirmation instanceof ClearCacheConfirmation message) {
+                clearCacheConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
             } else {
                 throw new BddTestingException("Type is not implemented. Confirmation: " + confirmation);
             }
