@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.ZonedDateTime;
 import java.util.Map;
+import java.util.Objects;
 
 @Slf4j
 @Component
@@ -88,6 +89,9 @@ public class StopTransactionRequestBddHandler
 
     @Override
     public void validateAndAssertFieldsWithParams(Map<String, String> params, StopTransactionRequest message) {
+        if (Objects.equals(params.size(), 1) && params.containsKey(wildCard)) {
+            return;
+        }
         super.validateParamsViaLibModel(params);
         super.assertParamsAndMessageFields(params, message);
     }

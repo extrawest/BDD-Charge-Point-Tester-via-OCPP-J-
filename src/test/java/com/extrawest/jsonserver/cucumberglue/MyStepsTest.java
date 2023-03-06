@@ -198,12 +198,16 @@ public class MyStepsTest extends SpringIntegrationTest {
 
     @Then("the Central System must receive requested message")
     public void csMustReceiveRequestedMessage() {
-        csMustReceiveRequestedMessageWithGivenData(DataTable.emptyDataTable());
+        csMustReceiveRequestedMessageWithGivenData(Map.of(wildCard, wildCard));
     }
 
     @Then("the Central System must receive requested message with given data")
     public void csMustReceiveRequestedMessageWithGivenData(DataTable table) {
         Map<String, String> parameters = isNull(table) || table.isEmpty() ? Collections.emptyMap() : table.asMap();
+        csMustReceiveRequestedMessageWithGivenData(parameters);
+    }
+
+    private void csMustReceiveRequestedMessageWithGivenData(Map<String, String> parameters) {
         log.info(String.format("Scenario №%s, STEP %s: Waiting for request up to %s...",
                 scenarioId, stepNumber, messageWaitingTime));
         Optional<Request> request = messagingService.waitForRequestedMessage(chargePoint, messageWaitingTime,
@@ -220,7 +224,7 @@ public class MyStepsTest extends SpringIntegrationTest {
 
     @When("the Central System must receive {string}")
     public void theCentralSystemMustReceivesMessageWithGivenData(String messageType) {
-        Map<String, String> parameters = Collections.emptyMap();
+        Map<String, String> parameters = Map.of(wildCard, wildCard);
         theCSReceivesMessageWithGivenData(messageType, parameters);
     }
 

@@ -1,6 +1,7 @@
 package com.extrawest.jsonserver.validation.incoming.request;
 
 import java.util.Map;
+import java.util.Objects;
 import com.extrawest.jsonserver.validation.incoming.IncomingMessageFactory;
 import com.extrawest.jsonserver.validation.incoming.IncomingMessageFieldsAssertionFactory;
 import eu.chargetime.ocpp.model.core.MeterValue;
@@ -59,6 +60,9 @@ public class MeterValuesRequestBddHandler
 
     @Override
     public void validateAndAssertFieldsWithParams(Map<String, String> params, MeterValuesRequest message) {
+        if (Objects.equals(params.size(), 1) && params.containsKey(wildCard)) {
+            return;
+        }
         super.validateParamsViaLibModel(params);
         super.assertParamsAndMessageFields(params, message);
     }
