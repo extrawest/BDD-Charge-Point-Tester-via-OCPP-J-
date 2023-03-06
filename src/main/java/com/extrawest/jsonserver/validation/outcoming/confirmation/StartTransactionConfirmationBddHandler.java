@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class StartTransactionConfirmationBddHandlerValidation
+public class StartTransactionConfirmationBddHandler
         extends OutcomingMessageFieldsValidationFactory<StartTransactionConfirmation>
         implements OutgoingMessageFactory<StartTransactionConfirmation> {
     public static final String ID_TAG_INFO_REQUIRED = "idTagInfo";

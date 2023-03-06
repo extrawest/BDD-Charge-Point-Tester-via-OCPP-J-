@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class DiagnosticsStatusNotificationConfirmationBddHandlerValidation
+public class DiagnosticsStatusNotificationConfirmationBddHandler
         extends OutcomingMessageFieldsValidationFactory<DiagnosticsStatusNotificationConfirmation>
         implements OutgoingMessageFactory<DiagnosticsStatusNotificationConfirmation> {
 

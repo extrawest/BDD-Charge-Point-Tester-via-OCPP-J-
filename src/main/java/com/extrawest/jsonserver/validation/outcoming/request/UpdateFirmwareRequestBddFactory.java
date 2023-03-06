@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class UpdateFirmwareRequestFactory extends OutcomingMessageFieldsValidationFactory<UpdateFirmwareRequest>
+public class UpdateFirmwareRequestBddFactory extends OutcomingMessageFieldsValidationFactory<UpdateFirmwareRequest>
         implements OutgoingMessageFactory<UpdateFirmwareRequest> {
     public static final String LOCATION_REQUIRED = "location";
     public static final String RETRIEVE_DATE_REQUIRED = "retrieveDate";

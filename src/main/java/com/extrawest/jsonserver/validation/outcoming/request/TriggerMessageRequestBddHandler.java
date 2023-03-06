@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class TriggerMessageRequestHandler extends OutcomingMessageFieldsValidationFactory<TriggerMessageRequest>
+public class TriggerMessageRequestBddHandler extends OutcomingMessageFieldsValidationFactory<TriggerMessageRequest>
         implements OutgoingMessageFactory<TriggerMessageRequest> {
     public static final String REQUESTED_MESSAGE_REQUIRED = "requestedMessage";
     public static final String CONNECTOR_ID = "connectorId";

@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class MeterValuesConfirmationBddHandlerValidation
+public class MeterValuesConfirmationBddHandler
         extends OutcomingMessageFieldsValidationFactory<MeterValuesConfirmation>
         implements OutgoingMessageFactory<MeterValuesConfirmation> {
 

@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class HeartbeatConfirmationBddHandlerValidation
+public class HeartbeatConfirmationBddHandler
         extends OutcomingMessageFieldsValidationFactory<HeartbeatConfirmation>
         implements OutgoingMessageFactory<HeartbeatConfirmation> {
     public static final String CURRENT_TIME_REQUIRED = "currentTime";
