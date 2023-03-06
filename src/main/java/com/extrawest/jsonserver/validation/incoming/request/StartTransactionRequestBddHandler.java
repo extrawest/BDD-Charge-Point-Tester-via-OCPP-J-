@@ -2,6 +2,7 @@ package com.extrawest.jsonserver.validation.incoming.request;
 
 import java.time.ZonedDateTime;
 import java.util.Map;
+import java.util.Objects;
 import com.extrawest.jsonserver.validation.incoming.IncomingMessageFactory;
 import com.extrawest.jsonserver.validation.incoming.IncomingMessageFieldsAssertionFactory;
 import eu.chargetime.ocpp.model.core.StartTransactionRequest;
@@ -71,6 +72,9 @@ public class StartTransactionRequestBddHandler
 
     @Override
     public void validateAndAssertFieldsWithParams(Map<String, String> params, StartTransactionRequest message) {
+        if (Objects.equals(params.size(), 1) && params.containsKey(wildCard)) {
+            return;
+        }
         super.validateParamsViaLibModel(params);
         super.assertParamsAndMessageFields(params, message);
     }

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
 
 @Slf4j
 @Component
@@ -38,6 +39,9 @@ public class ChangeConfigurationConfirmationBddHandler extends IncomingMessageFi
 
     @Override
     public void validateAndAssertFieldsWithParams(Map<String, String> params, ChangeConfigurationConfirmation message) {
+        if (Objects.equals(params.size(), 1) && params.containsKey(wildCard)) {
+            return;
+        }
         super.validateParamsViaLibModel(params);
         super.assertParamsAndMessageFields(params, message);
     }
