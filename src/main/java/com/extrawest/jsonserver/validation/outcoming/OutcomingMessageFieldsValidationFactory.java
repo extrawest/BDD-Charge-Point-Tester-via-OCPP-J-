@@ -28,6 +28,7 @@ import eu.chargetime.ocpp.model.core.ChargingRateUnitType;
 import eu.chargetime.ocpp.model.core.ChargingSchedule;
 import eu.chargetime.ocpp.model.core.ChargingSchedulePeriod;
 import eu.chargetime.ocpp.model.core.IdTagInfo;
+import eu.chargetime.ocpp.model.localauthlist.AuthorizationData;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -172,6 +173,18 @@ public abstract class OutcomingMessageFieldsValidationFactory<T extends Validata
             return parseModelFromJson(defaultValue, fieldName, ChargingProfile.class);
         }
         return parseModelFromJson(paramValue, fieldName, ChargingProfile.class);
+    }
+
+    protected AuthorizationData[] getValidatedLocalAuthorizationList(String paramValue, String defaultValue,
+                                                                     String fieldName) {
+        if (Objects.equals(paramValue, wildCard)) {
+            if (isNull(defaultValue) || defaultValue.isBlank()) {
+                    AuthorizationData data = new AuthorizationData("DefaultBddTestIdaTag");
+                return new AuthorizationData[]{data};
+            }
+            return new AuthorizationData[]{parseModelFromJson(defaultValue, fieldName, AuthorizationData.class)};
+        }
+        return new AuthorizationData[]{parseModelFromJson(paramValue, fieldName, AuthorizationData.class)};
     }
 
     protected String getValidatedStringValueOrThrow(String paramValue, String defaultValue) {
