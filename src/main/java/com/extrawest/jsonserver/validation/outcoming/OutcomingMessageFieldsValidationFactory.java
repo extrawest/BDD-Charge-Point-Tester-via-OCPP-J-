@@ -61,7 +61,6 @@ public abstract class OutcomingMessageFieldsValidationFactory<T extends Validata
      * Validating parameters - Using SETTER methods(witch include validation) of parametrized model
      */
     protected T createMessageWithValidatedParamsViaLibModel(Map<String, String> params) {
-        validateMessageForRequiredFields(params);
         String messageType = getParameterizeClassName();
         String currentFieldName = "";
         T message;
@@ -70,6 +69,12 @@ public abstract class OutcomingMessageFieldsValidationFactory<T extends Validata
         } catch (InstantiationException | NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             throw new BddTestingException(String.format(BUG_CREATING_INSTANCE.getValue(), messageType));
         }
+
+        if (Objects.equals(params.size(), 1) && params.containsKey(wildCard)) {
+            return createMessageWithDefaultRequiredParams(message);
+        }
+        validateMessageForRequiredFields(params);
+
         try {
             for (Map.Entry<String, String> pair : params.entrySet()) {
                 currentFieldName = pair.getKey();
@@ -86,6 +91,13 @@ public abstract class OutcomingMessageFieldsValidationFactory<T extends Validata
             throw new ValidationException(
                     String.format(INVALID_FIELD_VALUE.getValue(), messageType, currentFieldName, cause.getMessage()));
 
+        }
+        return message;
+    }
+
+    private T createMessageWithDefaultRequiredParams(T message) {
+        for (Map.Entry<String, BiConsumer<T, String>> field : requiredFieldsSetup.entrySet()) {
+            field.getValue().accept(message, wildCard);
         }
         return message;
     }
