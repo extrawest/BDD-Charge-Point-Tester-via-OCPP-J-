@@ -29,6 +29,7 @@ public enum ImplementedMessageType {
     CHANGE_CONFIGURATION("ChangeConfiguration"),
     SET_CHARGING_PROFILE("SetChargingProfile"),
     RESET("Reset"),
+    SEND_LOCAL_LIST("SendLocalList"),
     TRIGGER_MESSAGE("TriggerMessage"),
     UNLOCK_CONNECTOR("UnlockConnector"),
     UPDATE_FIRMWARE("UpdateFirmware");
