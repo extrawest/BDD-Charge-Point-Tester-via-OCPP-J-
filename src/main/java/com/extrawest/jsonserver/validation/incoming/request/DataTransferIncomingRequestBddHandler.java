@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class DataTransferRequestBddHandler
+public class DataTransferIncomingRequestBddHandler
         extends IncomingMessageFieldsAssertionFactory<DataTransferRequest>
         implements IncomingMessageFactory<DataTransferRequest> {
     public static final String VENDOR_ID_REQUIRED = "vendorId";

@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class DataTransferConfirmationBddHandler
+public class DataTransferOutcomingConfirmationBddHandler
         extends OutcomingMessageFieldsValidationFactory<DataTransferConfirmation>
         implements OutgoingMessageFactory<DataTransferConfirmation> {
     public static final String STATUS_REQUIRED = "status";
