@@ -58,9 +58,9 @@ To use this application, you can modify the Cucumber scenarios in the 'src/test/
 
 ## Running Tests
 #### Mandatory sequence of steps:
-- Starting the Central System(CS)
-- Waiting for a Charge Point(CP) connection
-- Operation test
+- [Starting the Central System(CS)](#Starting-the-CS)
+- [Waiting for a Charge Point(CP) connection](#Waiting-for-connection)
+- [Operation test](#operation-test)
 
 
 ###### All text in steps is case-sensitive.
@@ -85,7 +85,7 @@ To use this application, you can modify the Cucumber scenarios in the 'src/test/
     Given the Charge Point "ChargePointId" is connected 
 ```
 
-### Message testing
+### Operation test
 ###### According to the OCPP documentation, operations are divided into two parts: 
 - operations initiated by CP 
 - operations initiated by CS 
@@ -103,7 +103,7 @@ initiated by CS:
 ```
 ######  The sending messages will be created with the [default values](#default-values):
 
-### Message's parameters
+#### Message's parameters
 ###### According to OCPP documentation messages can have required and optional parameters.
 
 ###### The next steps combination is used to test operation, with specified parameters:
@@ -162,4 +162,4 @@ Scenario: The Central System receiving 'BootNotification.req' message from Charg
 ```
 
 ### Default values
-All messages have the default values for every field. These values can be set in application.properties file. If field value is a complicated type(IdTagInfo for example) then you can specify it via JSON string.  
+###### All messages have the default values for every field. These values can be set in application.properties file. If field value is a complicated type(IdTagInfo for example) then you can specify it via JSON string.  
