@@ -28,6 +28,7 @@ public enum ImplementedMessageType {
     CHANGE_AVAILABILITY("ChangeAvailability"),
     CHANGE_CONFIGURATION("ChangeConfiguration"),
     CLEAR_CACHE("ClearCache"),
+    CLEAR_CHARGING_PROFILE("ClearChargingProfile"),
     SET_CHARGING_PROFILE("SetChargingProfile"),
     RESET("Reset"),
     SEND_LOCAL_LIST("SendLocalList"),
