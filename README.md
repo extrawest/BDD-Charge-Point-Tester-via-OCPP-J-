@@ -26,20 +26,46 @@ The simulator provides a set of predefined OCPP messages that can be sent and re
 - Java 17 or higher
 - Maven 3.6 or higher
 ## Features
-- Boot Notification
+Operations Initiated by Charge Point:
 - Authorize
+- Boot Notification
 - Data Transfer
-- Heart Beat
+- Diagnostics Status Notification
+- Firmware Status Notification
+- Heartbeat
+- Meter Values
+- Start Transaction
+- Status Notification
+- Stop Transaction
+
+Operations Initiated by Central System:
+- Cancel Reservation
+- Change Availability
+- Change Configuration
+- Clear Cache
+- Reset
+- Send Local List
+- Set Charging Profile
+- Trigger Message
+- Unlock Connector
+- Update Firmware
 ## Usage
 
-To use this application, you can modify the Cucumber scenarios in the 'src/test/resources/features' directory to fit your testing needs. You can also add new scenarios and steps in the 'src/test/java' directory.
+To use this application, you can modify the Cucumber scenarios in the 'src/test/resources/features' directory to fit your testing needs. You can also add new steps in the 'src/test/java/com/extrawest/jsonserver/cucumberglue' directory.
 
 
 
 
 ## Running Tests
+#### Mandatory sequence of steps:
+- Starting the Central System(CS)
+- Waiting for a Charge Point(CP) connection
+- Operation test
 
-### Starting Central System
+
+###### All text in steps is case-sensitive.
+
+### Starting the CS
 
 ###### You can run CS by next steps:
 ```gherkin
@@ -49,53 +75,71 @@ To use this application, you can modify the Cucumber scenarios in the 'src/test/
 ###### In the first case CS will start on 'localhost'.
 ###### In the second - CS will start on specified IP.
 
-#### Waiting for connection
+### Waiting for connection
 
-###### CS can wait connection with any CP(the first case) or with only specified CP(the second case)
+###### CS can wait connection with any CP(the first case) or with only specified CP(the second case). 
+
 
 ```gherkin
     Given the Charge Point is connected
     Given the Charge Point "ChargePointId" is connected 
 ```
 
-#### Message testing
-According to OCPP documentation every sent request must receive confirmation response.
-The next steps combination using for testing this flow.
+### Message testing
+###### According to the OCPP documentation, operations are divided into two parts: 
+- operations initiated by CP 
+- operations initiated by CS 
+###### Also every sent request must receive confirmation response.
+###### The next steps combination is used to test operation, regardless of what data will be received or sent:
+initiated by CP:
 ```gherkin 
-    When the Central System must receives "ClearCache.req"
-    Then the Central System must sends confirmation response
+    When the Central System must receive "ClearCache.req"
+    Then the Central System must send confirmation response
 ```
-
-#### Message's parameters
-According to OCPP documentation messages can have required and optional parameters.
-All required parameters MUST be specified. The optional parameters can be set or not.
+initiated by CS:
 ```gherkin 
-    When the Central System must receives "BootNotification.req" with given data
+    When the Central System sends "Reset.req" request to the Charge Point
+    Then the Central System receives confirmation
+```
+######  The sending messages will be created with the [default values](#default-values):
+
+### Message's parameters
+###### According to OCPP documentation messages can have required and optional parameters.
+
+###### The next steps combination is used to test operation, with specified parameters:
+initiated by CP:
+```gherkin
+    When the Central System must receive "BootNotification.req" with given data
       | chargePointModel  | CurrentModel  |
       | chargePointVendor | CurrentVendor |
-    Then the Central System must sends confirmation response with given data
+    Then the Central System must send confirmation response with given data
       | currentTime | any |
       | interval    | 60 |
       | status      | Accepted |
+``````
+initiated by CS:
+```gherkin 
+    When the Central System sends "Reset.req" request to the Charge Point with given data
+      | type   | Hard |
+    Then the Central System receives confirmation with given data
+      | status | any  |
 ```
-If parameters specified for sent message then message will be created with these values
+###### All required fields must be specified, optional fields - optional.
 
 #### Validation
-All specified parameters will be validated according documentation.
-
+###### A receiving message and the specified parameters will be validated according to OCPP documentation.
 #### Assertion
-All received values in message will be asserted with specified parameters.
+###### If parameters are specified then all received data in message will be asserted to these parameters.
 
 #### Wildcard
-Parameters can be specified as wildcard(by default 'any').
-
-For received messages this means that current field must have any value(can't be equals to Null).
-
-For sending messages - current field will be set from default values. Default values can be set in application.properties file.
-
+###### Parameters can be specified as wildcard(by default 'any').
 ```gherkin
       | currentTime | any |
 ```
+###### For the receiving message this means that current field must have any value(can't be Null).
+###### For the sending message - current field value will be set to [default value](#default-values).
+
+
 
 #### Scenario example:
 ```gherkin
@@ -117,3 +161,5 @@ Scenario: The Central System receiving 'BootNotification.req' message from Charg
     | status | Accepted |
 ```
 
+### Default values
+All messages have the default values for every field. These values can be set in application.properties file. If field value is a complicated type(IdTagInfo for example) then you can specify it via JSON string.  
