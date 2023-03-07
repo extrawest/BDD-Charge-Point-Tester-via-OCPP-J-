@@ -98,8 +98,6 @@ public class MessagingServiceImpl implements MessagingService {
     private final ChangeConfigurationConfirmationBddHandler changeConfigurationConfirmationBddHandler;
     private final ClearCacheRequestBddHandler clearCacheRequestBddHandler;
     private final ClearCacheConfirmationBddHandler clearCacheConfirmationBddHandler;
-    private final SetChargingProfileRequestBddHandler setChargingProfileRequestBddHandler;
-    private final SetChargingProfileConfirmationBddHandler setChargingProfileConfirmationBddHandler;
     private final ResetRequestBddHandler resetRequestBddHandler;
     private final ResetConfirmationBddHandler resetConfirmationBddHandler;
     private final SendLocalListRequestBddHandler sendLocalListRequestBddHandler;
