@@ -96,6 +96,10 @@ public class MessagingServiceImpl implements MessagingService {
     private final ChangeAvailabilityConfirmationBddHandler changeAvailabilityConfirmationBddHandler;
     private final ChangeConfigurationRequestBddHandler changeConfigurationRequestBddHandler;
     private final ChangeConfigurationConfirmationBddHandler changeConfigurationConfirmationBddHandler;
+    private final ClearCacheRequestBddHandler clearCacheRequestBddHandler;
+    private final ClearCacheConfirmationBddHandler clearCacheConfirmationBddHandler;
+    private final SetChargingProfileRequestBddHandler setChargingProfileRequestBddHandler;
+    private final SetChargingProfileConfirmationBddHandler setChargingProfileConfirmationBddHandler;
     private final ResetRequestBddHandler resetRequestBddHandler;
     private final ResetConfirmationBddHandler resetConfirmationBddHandler;
     private final SendLocalListRequestBddHandler sendLocalListRequestBddHandler;
@@ -121,6 +125,8 @@ public class MessagingServiceImpl implements MessagingService {
             case CHANGE_AVAILABILITY -> request = changeAvailabilityRequestBddHandler
                     .createMessageWithValidatedParams(params);
             case CHANGE_CONFIGURATION -> request = changeConfigurationRequestBddHandler
+                    .createMessageWithValidatedParams(params);
+            case CLEAR_CACHE -> request = clearCacheRequestBddHandler
                     .createMessageWithValidatedParams(params);
             case RESET -> request = resetRequestBddHandler
                     .createMessageWithValidatedParams(params);
@@ -368,6 +374,8 @@ public class MessagingServiceImpl implements MessagingService {
                 changeAvailabilityConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
             } else if (confirmation instanceof ChangeConfigurationConfirmation message) {
                 changeConfigurationConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
+            } else if (confirmation instanceof ClearCacheConfirmation message) {
+                clearCacheConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
             } else if (confirmation instanceof ResetConfirmation message) {
                 resetConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
             } else if (confirmation instanceof SendLocalListConfirmation message) {
