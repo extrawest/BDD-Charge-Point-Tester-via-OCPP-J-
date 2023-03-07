@@ -41,7 +41,9 @@ public class ClearChargingProfileRequestBddHandler extends OutcomingMessageField
                 STACK_LEVEL, defaultStackLevel
         );
 
-        this.requiredFieldsSetup = Map.of(
+        this.requiredFieldsSetup = Collections.emptyMap();
+
+        this.optionalFieldsSetup = Map.of(
                 ID, (req, id) -> req.setId(
                         getValidatedIntegerOrThrow(id, defaultId, ID)),
                 CONNECTOR_ID, (req, connectorId) -> req.setConnectorId(
@@ -51,8 +53,6 @@ public class ClearChargingProfileRequestBddHandler extends OutcomingMessageField
                 STACK_LEVEL, (req, stackLevel) -> req.setStackLevel(
                         getValidatedIntegerOrThrow(stackLevel, defaultStackLevel, STACK_LEVEL))
         );
-
-        this.optionalFieldsSetup = Collections.emptyMap();
     }
 
     @Override
