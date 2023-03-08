@@ -115,7 +115,7 @@ public abstract class IncomingMessageFieldsAssertionFactory<T extends Validatabl
         return assertionFactory.entrySet().stream()
                 .filter(pair -> !pair.getValue().apply(expectedParams, actual))
                 .map(Map.Entry::getKey)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     protected <E extends Enum<E>> E getValidatedEnumValueOrThrow(Class<E> clazz, String value, String fieldName) {
