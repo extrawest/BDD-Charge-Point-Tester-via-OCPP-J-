@@ -207,6 +207,7 @@ public class MessagingServiceImpl implements MessagingService {
                         bddDataRepository.removeRequestedMessage(chargePointId, request);
                         return Optional.of(request);
                     }
+                    break;
                 case BOOT_NOTIFICATION:
                     if (request instanceof BootNotificationRequest) {
                         bddDataRepository.removeRequestedMessage(chargePointId, request);
