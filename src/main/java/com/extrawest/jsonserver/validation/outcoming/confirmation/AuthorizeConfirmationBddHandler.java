@@ -25,8 +25,6 @@ public class AuthorizeConfirmationBddHandler
 
     @PostConstruct
     private void init() {
-        String className = AuthorizeConfirmation.class.getName();
-
         this.defaultValues = Map.of(
                 ID_TAG_INFO_REQUIRED, defaultIdTagInfo
         );

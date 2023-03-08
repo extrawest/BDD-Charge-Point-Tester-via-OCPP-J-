@@ -23,8 +23,6 @@ public class HeartbeatConfirmationBddHandler
 
     @PostConstruct
     private void init() {
-        String className = HeartbeatConfirmation.class.getName();
-
         this.defaultValues = Map.of(
                 CURRENT_TIME_REQUIRED, defaultCurrentTime
         );

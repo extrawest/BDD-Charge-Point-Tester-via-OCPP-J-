@@ -26,8 +26,6 @@ public class DataTransferOutcomingConfirmationBddHandler
 
     @PostConstruct
     private void init() {
-        String className = DataTransferConfirmation.class.getName();
-
         this.defaultValues = Map.of(
                 STATUS_REQUIRED, defaultStatus,
                 DATA, defaultData

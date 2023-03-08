@@ -19,8 +19,6 @@ public class MeterValuesConfirmationBddHandler
 
     @PostConstruct
     private void init() {
-        String className = getParameterizeClassName();
-
         this.defaultValues = Collections.emptyMap();
         this.requiredFieldsSetup = Collections.emptyMap();
         this.optionalFieldsSetup = Collections.emptyMap();
