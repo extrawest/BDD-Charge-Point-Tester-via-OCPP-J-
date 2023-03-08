@@ -30,6 +30,7 @@ public enum ImplementedMessageType {
     CLEAR_CACHE("ClearCache"),
     CLEAR_CHARGING_PROFILE("ClearChargingProfile"),
     SET_CHARGING_PROFILE("SetChargingProfile"),
+    GET_COMPOSITE_SCHEDULE("GetCompositeSchedule"),
     RESET("Reset"),
     SEND_LOCAL_LIST("SendLocalList"),
     TRIGGER_MESSAGE("TriggerMessage"),

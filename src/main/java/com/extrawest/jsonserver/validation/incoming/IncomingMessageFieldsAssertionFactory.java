@@ -19,7 +19,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
-import java.util.stream.Collectors;
 import com.extrawest.jsonserver.model.exception.AssertionException;
 import com.extrawest.jsonserver.model.exception.BddTestingException;
 import com.extrawest.jsonserver.model.exception.ValidationException;
@@ -27,6 +26,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.chargetime.ocpp.PropertyConstraintException;
 import eu.chargetime.ocpp.model.Validatable;
+import eu.chargetime.ocpp.model.core.*;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -126,6 +126,31 @@ public abstract class IncomingMessageFieldsAssertionFactory<T extends Validatabl
         }
         throw new ValidationException(String.format(INVALID_REQUIRED_PARAM.getValue(),
                 fieldName, getParameterizeClassName()));
+    }
+
+    protected ChargingSchedule getValidatedChargingSchedule(String paramValue, String fieldName) {
+        if (Objects.equals(paramValue, wildCard)) {
+            ChargingSchedule chargingSchedule = new ChargingSchedule();
+            chargingSchedule.setDuration(1);
+            chargingSchedule.setStartSchedule(ZonedDateTime.now().plusHours(1L));
+            chargingSchedule.setChargingSchedulePeriod(new ChargingSchedulePeriod[1]);
+            chargingSchedule.setChargingRateUnit(ChargingRateUnitType.W);
+            chargingSchedule.setMinChargingRate(1.0);
+            return chargingSchedule;
+        }
+        return parseModelFromJson(paramValue, fieldName, ChargingSchedule.class);
+    }
+
+    private  <M extends Validatable> M parseModelFromJson(String value, String fieldName, Class<M> clazz) {
+        try {
+            log.info("JSON string for parsing: " + value);
+            M model = mapper.readValue(value, clazz);
+            log.info("Model parsed from string: " + model);
+            return model;
+        } catch (JsonProcessingException e) {
+            throw new ValidationException(
+                    String.format(INVALID_FIELD_VALUE.getValue(), getParameterizeClassName(), fieldName, value));
+        }
     }
 
     protected boolean compareStringsIncludeWildCard(Map<String, String> expectedParams,
