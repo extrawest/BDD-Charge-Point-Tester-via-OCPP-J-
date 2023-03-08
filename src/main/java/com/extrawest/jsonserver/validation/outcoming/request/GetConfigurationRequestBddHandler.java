@@ -24,7 +24,9 @@ public class GetConfigurationRequestBddHandler extends OutcomingMessageFieldsVal
 
     @PostConstruct
     private void init() {
-        this.defaultValues = Collections.emptyMap();
+        this.defaultValues = Map.of(
+                KEY, defaultKey
+        );
 
         this.requiredFieldsSetup = Collections.emptyMap();
 

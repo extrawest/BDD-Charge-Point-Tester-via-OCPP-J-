@@ -37,7 +37,13 @@ public class GetDiagnosticsRequestBddHandler extends OutcomingMessageFieldsValid
 
     @PostConstruct
     private void init() {
-        this.defaultValues = Collections.emptyMap();
+        this.defaultValues = Map.of(
+                LOCATION_REQUIRED, defaultLocation,
+                RETRIES, defaultRetries,
+                RETRY_INTERVAL, defaultRetryInterval,
+                START_TIME, defaultStartTime,
+                STOP_TIME, defaultStopTime
+        );
 
         this.requiredFieldsSetup = Map.of(
                 LOCATION_REQUIRED, (req, location) -> req.setLocation(
