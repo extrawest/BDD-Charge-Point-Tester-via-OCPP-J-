@@ -23,8 +23,8 @@ The simulator provides a set of predefined OCPP messages that can be sent and re
 - [Cucumber for Java](https://cucumber.io/docs/cucumber/api/?lang=java)
 - [OCPP library EuChargetime](https://github.com/ChargeTimeEU/Java-OCA-OCPP)
 ## Requirements
-- Java 17 or higher
-- Maven 3.6 or higher
+- [Java 17 or higher](https://www.oracle.com/java/)
+- [Maven 3.6 or higher](https://maven.apache.org/)
 ## Features
 Operations Initiated by Charge Point:
 - Authorize

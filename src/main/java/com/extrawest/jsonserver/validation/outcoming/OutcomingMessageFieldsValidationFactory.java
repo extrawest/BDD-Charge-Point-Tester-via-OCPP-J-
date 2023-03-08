@@ -36,11 +36,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
- * defaultValues<FIELD_NAME, DEFAULT_VALUE> - required only if the parametrized class is an inheritor of
+ * defaultValues(FIELD_NAME, DEFAULT_VALUE) - required only if the parametrized class is an inheritor of
  *                  Validatable.class. Must contain default values for every field of parametrized model.
- * requiredFieldsSetup<FIELD_NAME, BiConsumer> - must contain BiConsumer to set up field value from given string value.
+ * requiredFieldsSetup(FIELD_NAME, BiConsumer) - must contain BiConsumer to set up field value from given string value.
  *                  Mandatory for all required fields of parametrized model.
- * optionalFieldsSetup<FIELD_NAME, BiConsumer> - must contain BiConsumer to set up field value from given string value.
+ * optionalFieldsSetup(FIELD_NAME, BiConsumer) - must contain BiConsumer to set up field value from given string value.
  *                  Mandatory for all optional fields of parametrized model.
  */
 

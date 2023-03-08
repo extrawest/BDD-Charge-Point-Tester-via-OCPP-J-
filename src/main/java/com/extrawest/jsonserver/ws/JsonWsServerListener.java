@@ -138,6 +138,7 @@ public class JsonWsServerListener implements Listener {
     }
 
     public void setAsyncRequestHandler(boolean async) {
+        throw new IllegalArgumentException("Not implemented yet!");
     }
 }
 

@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class DataTransferConfirmationBddHandler
+public class DataTransferOutcomingConfirmationBddHandler
         extends OutcomingMessageFieldsValidationFactory<DataTransferConfirmation>
         implements OutgoingMessageFactory<DataTransferConfirmation> {
     public static final String STATUS_REQUIRED = "status";
@@ -26,8 +26,6 @@ public class DataTransferConfirmationBddHandler
 
     @PostConstruct
     private void init() {
-        String className = DataTransferConfirmation.class.getName();
-
         this.defaultValues = Map.of(
                 STATUS_REQUIRED, defaultStatus,
                 DATA, defaultData

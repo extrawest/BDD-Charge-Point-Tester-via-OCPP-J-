@@ -1,45 +1,20 @@
 package com.extrawest.jsonserver.service.impl;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
+import com.extrawest.jsonserver.model.ChargePoint;
+import com.extrawest.jsonserver.model.emun.ImplementedMessageType;
+import com.extrawest.jsonserver.model.exception.BddTestingException;
+import com.extrawest.jsonserver.repository.BddDataRepository;
+import com.extrawest.jsonserver.repository.ServerSessionRepository;
 import com.extrawest.jsonserver.service.MessagingService;
 import com.extrawest.jsonserver.validation.incoming.confirmation.*;
-import com.extrawest.jsonserver.validation.incoming.request.DiagnosticsStatusNotificationRequestBddHandler;
-import com.extrawest.jsonserver.validation.incoming.request.FirmwareStatusNotificationRequestBddHandler;
-import com.extrawest.jsonserver.validation.incoming.request.StatusNotificationRequestBddHandler;
-import com.extrawest.jsonserver.validation.incoming.request.StopTransactionRequestBddHandler;
-import com.extrawest.jsonserver.validation.outcoming.confirmation.AuthorizeConfirmationBddHandler;
-import com.extrawest.jsonserver.validation.outcoming.confirmation.BootNotificationConfirmationBddHandler;
-import com.extrawest.jsonserver.validation.outcoming.confirmation.DataTransferConfirmationBddHandler;
-import com.extrawest.jsonserver.validation.outcoming.confirmation.DiagnosticsStatusNotificationConfirmationBddHandler;
-import com.extrawest.jsonserver.validation.outcoming.confirmation.FirmwareStatusNotificationConfirmationBddHandler;
-import com.extrawest.jsonserver.validation.outcoming.confirmation.HeartbeatConfirmationBddHandler;
-import com.extrawest.jsonserver.validation.outcoming.confirmation.MeterValuesConfirmationBddHandler;
-import com.extrawest.jsonserver.validation.outcoming.confirmation.StartTransactionConfirmationBddHandler;
-import com.extrawest.jsonserver.validation.incoming.request.AuthorizeRequestBddHandler;
-import com.extrawest.jsonserver.validation.incoming.request.BootNotificationRequestBddHandler;
-import com.extrawest.jsonserver.validation.incoming.request.DataTransferRequestBddHandler;
-import com.extrawest.jsonserver.validation.incoming.request.HeartbeatRequestBddHandler;
-import com.extrawest.jsonserver.validation.incoming.request.MeterValuesRequestBddHandler;
-import com.extrawest.jsonserver.validation.incoming.request.StartTransactionRequestBddHandler;
-import com.extrawest.jsonserver.validation.outcoming.confirmation.StatusNotificationConfirmationBddHandler;
-import com.extrawest.jsonserver.validation.outcoming.confirmation.StopTransactionConfirmationBddHandler;
+import com.extrawest.jsonserver.validation.incoming.request.*;
+import com.extrawest.jsonserver.validation.outcoming.confirmation.*;
 import com.extrawest.jsonserver.validation.outcoming.request.*;
+import com.extrawest.jsonserver.ws.JsonWsServer;
 import com.extrawest.jsonserver.ws.handler.ServerCoreEventHandlerImpl;
 import eu.chargetime.ocpp.NotConnectedException;
 import eu.chargetime.ocpp.OccurenceConstraintException;
 import eu.chargetime.ocpp.UnsupportedFeatureException;
-import com.extrawest.jsonserver.model.emun.ImplementedMessageType;
-import com.extrawest.jsonserver.model.exception.BddTestingException;
-import com.extrawest.jsonserver.model.ChargePoint;
-import com.extrawest.jsonserver.repository.BddDataRepository;
-import com.extrawest.jsonserver.repository.ServerSessionRepository;
-import com.extrawest.jsonserver.ws.JsonWsServer;
 import eu.chargetime.ocpp.model.Confirmation;
 import eu.chargetime.ocpp.model.Request;
 import eu.chargetime.ocpp.model.core.*;
@@ -50,11 +25,16 @@ import eu.chargetime.ocpp.model.localauthlist.SendLocalListConfirmation;
 import eu.chargetime.ocpp.model.remotetrigger.TriggerMessageConfirmation;
 import eu.chargetime.ocpp.model.remotetrigger.TriggerMessageRequest;
 import eu.chargetime.ocpp.model.reservation.CancelReservationConfirmation;
+import eu.chargetime.ocpp.model.smartcharging.ClearChargingProfileConfirmation;
 import eu.chargetime.ocpp.model.smartcharging.SetChargingProfileConfirmation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
+
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import static com.extrawest.jsonserver.util.TimeUtil.waitHalfSecond;
 import static com.extrawest.jsonserver.util.TimeUtil.waitOneSecond;
@@ -72,8 +52,8 @@ public class MessagingServiceImpl implements MessagingService {
     private final AuthorizeConfirmationBddHandler authorizeConfirmationBddHandler;
     private final BootNotificationRequestBddHandler bootNotificationRequestBddHandler;
     private final BootNotificationConfirmationBddHandler bootNotificationConfirmationBddHandler;
-    private final DataTransferRequestBddHandler dataTransferRequestBddHandler;
-    private final DataTransferConfirmationBddHandler dataTransferConfirmationBddHandler;
+    private final DataTransferIncomingRequestBddHandler dataTransferIncomingRequestBddHandler;
+    private final DataTransferOutcomingConfirmationBddHandler dataTransferOutcomingConfirmationBddHandler;
     private final DiagnosticsStatusNotificationRequestBddHandler diagnosticsStatusNotificationRequestBddHandler;
     private final DiagnosticsStatusNotificationConfirmationBddHandler
             diagnosticsStatusNotificationConfirmationBddHandler;
@@ -98,6 +78,10 @@ public class MessagingServiceImpl implements MessagingService {
     private final ChangeConfigurationConfirmationBddHandler changeConfigurationConfirmationBddHandler;
     private final ClearCacheRequestBddHandler clearCacheRequestBddHandler;
     private final ClearCacheConfirmationBddHandler clearCacheConfirmationBddHandler;
+    private final ClearChargingProfileRequestBddHandler clearChargingProfileRequestBddHandler;
+    private final ClearChargingProfileConfirmationBddHandler clearChargingProfileConfirmationBddHandler;
+    private final DataTransferOutcomingRequestBddHandler dataTransferOutComingRequestBddHandler;
+    private final DataTransferIncomingConfirmationBddHandler dataTransferIncomingConfirmationBddHandler;
     private final ResetRequestBddHandler resetRequestBddHandler;
     private final ResetConfirmationBddHandler resetConfirmationBddHandler;
     private final SendLocalListRequestBddHandler sendLocalListRequestBddHandler;
@@ -125,6 +109,10 @@ public class MessagingServiceImpl implements MessagingService {
             case CHANGE_CONFIGURATION -> request = changeConfigurationRequestBddHandler
                     .createMessageWithValidatedParams(params);
             case CLEAR_CACHE -> request = clearCacheRequestBddHandler
+                    .createMessageWithValidatedParams(params);
+            case CLEAR_CHARGING_PROFILE -> request = clearChargingProfileRequestBddHandler
+                    .createMessageWithValidatedParams(params);
+            case DATA_TRANSFER -> request = dataTransferOutComingRequestBddHandler
                     .createMessageWithValidatedParams(params);
             case RESET -> request = resetRequestBddHandler
                     .createMessageWithValidatedParams(params);
@@ -289,7 +277,7 @@ public class MessagingServiceImpl implements MessagingService {
             authorizeRequestBddHandler.validateAndAssertFieldsWithParams(parameters, message);
             return ImplementedMessageType.AUTHORIZE;
         } else if (request instanceof DataTransferRequest message) {
-            dataTransferRequestBddHandler.validateAndAssertFieldsWithParams(parameters, message);
+            dataTransferIncomingRequestBddHandler.validateAndAssertFieldsWithParams(parameters, message);
             return ImplementedMessageType.DATA_TRANSFER;
         } else if (request instanceof DiagnosticsStatusNotificationRequest message) {
             diagnosticsStatusNotificationRequestBddHandler.validateAndAssertFieldsWithParams(parameters, message);
@@ -333,7 +321,7 @@ public class MessagingServiceImpl implements MessagingService {
             case AUTHORIZE ->  response =
                     authorizeConfirmationBddHandler.createMessageWithValidatedParams(parameters);
             case DATA_TRANSFER -> response =
-                    dataTransferConfirmationBddHandler.createMessageWithValidatedParams(parameters);
+                    dataTransferOutcomingConfirmationBddHandler.createMessageWithValidatedParams(parameters);
             case DIAGNOSTICS_STATUS_NOTIFICATION -> response =
                     diagnosticsStatusNotificationConfirmationBddHandler
                             .createMessageWithValidatedParams(parameters);
@@ -375,6 +363,10 @@ public class MessagingServiceImpl implements MessagingService {
                 changeConfigurationConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
             } else if (confirmation instanceof ClearCacheConfirmation message) {
                 clearCacheConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
+            } else if (confirmation instanceof ClearChargingProfileConfirmation message) {
+                clearChargingProfileConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
+            } else if (confirmation instanceof DataTransferConfirmation message) {
+                dataTransferIncomingConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
             } else if (confirmation instanceof ResetConfirmation message) {
                 resetConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
             } else if (confirmation instanceof SendLocalListConfirmation message) {

@@ -34,11 +34,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
- * requiredFieldsSetup<FIELD_NAME, BiConsumer> - must contain BiConsumer to set up field value from given string value.
+ * requiredFieldsSetup(FIELD_NAME, BiConsumer) - must contain BiConsumer to set up field value from given string value.
  *                  Mandatory for all required fields of parametrized model.
- * optionalFieldsSetup<FIELD_NAME, BiConsumer> - must contain BiConsumer to set up field value from given string value.
+ * optionalFieldsSetup(FIELD_NAME, BiConsumer) - must contain BiConsumer to set up field value from given string value.
  *                  Mandatory for all optional fields of parametrized model.
- * assertionFactory<FIELD_NAME, BiFunction> - must contain BiFunction to compare field value from given parameters
+ * assertionFactory(FIELD_NAME, BiFunction) - must contain BiFunction to compare field value from given parameters
  *                  with relevant field of parametrized model. Mandatory for all parametrized model's fields.
  */
 
@@ -115,7 +115,7 @@ public abstract class IncomingMessageFieldsAssertionFactory<T extends Validatabl
         return assertionFactory.entrySet().stream()
                 .filter(pair -> !pair.getValue().apply(expectedParams, actual))
                 .map(Map.Entry::getKey)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     protected <E extends Enum<E>> E getValidatedEnumValueOrThrow(Class<E> clazz, String value, String fieldName) {
