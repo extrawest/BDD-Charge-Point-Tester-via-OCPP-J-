@@ -10,6 +10,8 @@
 
     <name>${project.groupId}:${project.artifactId}</name>
     <description>OCPP operation tester for the Charge Points</description>
+    <url>https://github.com/extrawest/BDD-Charge-Point-Tester-via-OCPP-J-</url>
+    <inceptionYear>2023</inceptionYear>
     <licenses>
         <license>
             <name>The Apache License, Version 2.0</name>
