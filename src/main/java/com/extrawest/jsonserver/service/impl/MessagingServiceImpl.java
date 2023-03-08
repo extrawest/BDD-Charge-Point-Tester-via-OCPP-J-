@@ -85,6 +85,8 @@ public class MessagingServiceImpl implements MessagingService {
     private final DataTransferIncomingConfirmationBddHandler dataTransferIncomingConfirmationBddHandler;
     private final GetCompositeScheduleRequestBddHandler getCompositeScheduleRequestBddHandler;
     private final GetCompositeScheduleConfirmationBddHandler getCompositeScheduleConfirmationBddHandler;
+    private final GetConfigurationRequestBddHandler getConfigurationRequestBddHandler;
+    private final GetConfigurationConfirmationBddHandler getConfigurationConfirmationBddHandler;
     private final ResetRequestBddHandler resetRequestBddHandler;
     private final ResetConfirmationBddHandler resetConfirmationBddHandler;
     private final SendLocalListRequestBddHandler sendLocalListRequestBddHandler;
@@ -118,6 +120,8 @@ public class MessagingServiceImpl implements MessagingService {
             case DATA_TRANSFER -> request = dataTransferOutComingRequestBddHandler
                     .createMessageWithValidatedParams(params);
             case GET_COMPOSITE_SCHEDULE -> request = getCompositeScheduleRequestBddHandler
+                    .createMessageWithValidatedParams(params);
+            case GET_CONFIGURATION -> request = getConfigurationRequestBddHandler
                     .createMessageWithValidatedParams(params);
             case RESET -> request = resetRequestBddHandler
                     .createMessageWithValidatedParams(params);
@@ -374,6 +378,8 @@ public class MessagingServiceImpl implements MessagingService {
                 dataTransferIncomingConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
             }else if (confirmation instanceof GetCompositeScheduleConfirmation message) {
                 getCompositeScheduleConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
+            }else if (confirmation instanceof GetConfigurationConfirmation message) {
+                getConfigurationConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
             } else if (confirmation instanceof ResetConfirmation message) {
                 resetConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
             } else if (confirmation instanceof SendLocalListConfirmation message) {
