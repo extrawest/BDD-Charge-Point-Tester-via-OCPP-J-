@@ -141,6 +141,17 @@ public abstract class IncomingMessageFieldsAssertionFactory<T extends Validatabl
         return parseModelFromJson(paramValue, fieldName, ChargingSchedule.class);
     }
 
+    protected KeyValueType[] getValidatedKeyValueType(String paramValue, String fieldName) {
+        if (Objects.equals(paramValue, wildCard)) {
+            KeyValueType keyValueType = new KeyValueType();
+            keyValueType.setKey("Key");
+            keyValueType.setValue("Value");
+            keyValueType.setReadonly(false);
+            return new KeyValueType[]{keyValueType};
+        }
+        return new KeyValueType[]{parseModelFromJson(paramValue, fieldName, KeyValueType.class)};
+    }
+
     private  <M extends Validatable> M parseModelFromJson(String value, String fieldName, Class<M> clazz) {
         try {
             log.info("JSON string for parsing: " + value);
@@ -157,6 +168,16 @@ public abstract class IncomingMessageFieldsAssertionFactory<T extends Validatabl
                                                     String actual, String fieldName) {
         String expected = expectedParams.get(fieldName);
         boolean result = Objects.equals(expected, wildCard) || Objects.equals(expected, actual);
+        if (!result) {
+            log.warn(String.format(nonMatchMessage, getParameterizeClassName(), fieldName, expected, actual));
+        }
+        return result;
+    }
+
+    protected boolean compareChargingScheduleIncludeWildCard(Map<String, String> expectedParams,
+                                                             ChargingSchedule actual, String fieldName) {
+        ChargingSchedule expected = parseModelFromJson(expectedParams.get(fieldName), fieldName, ChargingSchedule.class);
+        boolean result = Objects.equals(expected, actual);
         if (!result) {
             log.warn(String.format(nonMatchMessage, getParameterizeClassName(), fieldName, expected, actual));
         }
