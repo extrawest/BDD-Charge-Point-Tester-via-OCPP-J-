@@ -223,12 +223,12 @@
         </repository>
 
         <!-- GitHub Releases -->
-        <repository>
+        <snapshotRepository>
             <id>github-releases</id>
             <url>https://maven.pkg.github.com/username/repo</url>
             <name>GitHub Package Registry</name>
             <uniqueVersion>false</uniqueVersion>
-        </repository>
+        </snapshotRepository>
     </distributionManagement>
 
 </project>
