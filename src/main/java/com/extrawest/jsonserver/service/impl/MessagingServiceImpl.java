@@ -95,6 +95,8 @@ public class MessagingServiceImpl implements MessagingService {
     private final GetLocalListVersionConfirmationBddHandler getLocalListVersionConfirmationBddHandler;
     private final RemoteStartTransactionRequestBddHandler remoteStartTransactionRequestBddHandler;
     private final RemoteStartTransactionConfirmationBddHandler remoteStartTransactionConfirmationBddHandler;
+    private final RemoteStopTransactionRequestBddHandler remoteStopTransactionRequestBddHandler;
+    private final RemoteStopTransactionConfirmationBddHandler remoteStopTransactionConfirmationBddHandler;
     private final ResetRequestBddHandler resetRequestBddHandler;
     private final ResetConfirmationBddHandler resetConfirmationBddHandler;
     private final SendLocalListRequestBddHandler sendLocalListRequestBddHandler;
@@ -136,6 +138,8 @@ public class MessagingServiceImpl implements MessagingService {
             case GET_LOCAL_LIST_VERSION -> request = getLocalListVersionRequestBddHandler
                     .createMessageWithValidatedParams(params);
             case REMOTE_START_TRANSACTION -> request = remoteStartTransactionRequestBddHandler
+                    .createMessageWithValidatedParams(params);
+            case REMOTE_STOP_TRANSACTION -> request = remoteStopTransactionRequestBddHandler
                     .createMessageWithValidatedParams(params);
             case RESET -> request = resetRequestBddHandler
                     .createMessageWithValidatedParams(params);
@@ -400,6 +404,8 @@ public class MessagingServiceImpl implements MessagingService {
                 getLocalListVersionConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
             } else if (confirmation instanceof RemoteStartTransactionConfirmation message) {
                 remoteStartTransactionConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
+            }else if (confirmation instanceof RemoteStopTransactionConfirmation message) {
+                remoteStopTransactionConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
             } else if (confirmation instanceof ResetConfirmation message) {
                 resetConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
             } else if (confirmation instanceof SendLocalListConfirmation message) {
