@@ -33,6 +33,7 @@ public enum ImplementedMessageType {
     GET_COMPOSITE_SCHEDULE("GetCompositeSchedule"),
     GET_CONFIGURATION("GetConfiguration"),
     GET_DIAGNOSTICS("GetDiagnostics"),
+    GET_LOCAL_LIST_VERSION("GetLocalListVersion"),
     RESET("Reset"),
     SEND_LOCAL_LIST("SendLocalList"),
     TRIGGER_MESSAGE("TriggerMessage"),
