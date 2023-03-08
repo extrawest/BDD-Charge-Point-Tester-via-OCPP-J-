@@ -57,6 +57,17 @@
         <cucumber.version>7.11.0</cucumber.version>
     </properties>
 
+
+    <distributionManagement>
+        <!-- GitHub Releases -->
+        <repository>
+            <id>github-releases</id>
+            <url>https://maven.pkg.github.com/extrawest/BDD-Charge-Point-Tester-via-OCPP-J-</url>
+            <name>GitHub Package Registry</name>
+            <uniqueVersion>false</uniqueVersion>
+        </repository>
+    </distributionManagement>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -214,21 +225,5 @@
             </build>
         </profile>
     </profiles>
-
-    <distributionManagement>
-        <!-- Sonatype Repository -->
-        <repository>
-            <id>sonatype-nexus-releases</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-
-        <!-- GitHub Releases -->
-        <snapshotRepository>
-            <id>github-releases</id>
-            <url>https://maven.pkg.github.com/username/repo</url>
-            <name>GitHub Package Registry</name>
-            <uniqueVersion>false</uniqueVersion>
-        </snapshotRepository>
-    </distributionManagement>
 
 </project>
