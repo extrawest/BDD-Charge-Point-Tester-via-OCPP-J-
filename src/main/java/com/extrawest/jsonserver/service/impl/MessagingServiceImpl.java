@@ -27,6 +27,7 @@ import eu.chargetime.ocpp.model.localauthlist.SendLocalListConfirmation;
 import eu.chargetime.ocpp.model.remotetrigger.TriggerMessageConfirmation;
 import eu.chargetime.ocpp.model.remotetrigger.TriggerMessageRequest;
 import eu.chargetime.ocpp.model.reservation.CancelReservationConfirmation;
+import eu.chargetime.ocpp.model.reservation.ReserveNowConfirmation;
 import eu.chargetime.ocpp.model.smartcharging.ClearChargingProfileConfirmation;
 import eu.chargetime.ocpp.model.smartcharging.GetCompositeScheduleConfirmation;
 import eu.chargetime.ocpp.model.smartcharging.SetChargingProfileConfirmation;
@@ -97,6 +98,8 @@ public class MessagingServiceImpl implements MessagingService {
     private final RemoteStartTransactionConfirmationBddHandler remoteStartTransactionConfirmationBddHandler;
     private final RemoteStopTransactionRequestBddHandler remoteStopTransactionRequestBddHandler;
     private final RemoteStopTransactionConfirmationBddHandler remoteStopTransactionConfirmationBddHandler;
+    private final ReserveNowRequestBddHandler reserveNowRequestBddHandler;
+    private final ReserveNowConfirmationBddHandler reserveNowConfirmationBddHandler;
     private final ResetRequestBddHandler resetRequestBddHandler;
     private final ResetConfirmationBddHandler resetConfirmationBddHandler;
     private final SendLocalListRequestBddHandler sendLocalListRequestBddHandler;
@@ -140,6 +143,8 @@ public class MessagingServiceImpl implements MessagingService {
             case REMOTE_START_TRANSACTION -> request = remoteStartTransactionRequestBddHandler
                     .createMessageWithValidatedParams(params);
             case REMOTE_STOP_TRANSACTION -> request = remoteStopTransactionRequestBddHandler
+                    .createMessageWithValidatedParams(params);
+            case RESERVE_NOW -> request = reserveNowRequestBddHandler
                     .createMessageWithValidatedParams(params);
             case RESET -> request = resetRequestBddHandler
                     .createMessageWithValidatedParams(params);
@@ -406,6 +411,8 @@ public class MessagingServiceImpl implements MessagingService {
                 remoteStartTransactionConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
             }else if (confirmation instanceof RemoteStopTransactionConfirmation message) {
                 remoteStopTransactionConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
+            }else if (confirmation instanceof ReserveNowConfirmation message) {
+                reserveNowConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
             } else if (confirmation instanceof ResetConfirmation message) {
                 resetConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
             } else if (confirmation instanceof SendLocalListConfirmation message) {
