@@ -10,7 +10,6 @@
 
     <name>${project.groupId}:${project.artifactId}</name>
     <description>OCPP operation tester for the Charge Points</description>
-
     <licenses>
         <license>
             <name>The Apache License, Version 2.0</name>
@@ -35,7 +34,6 @@
         <name>Extrawest</name>
         <url>https://www.extrawest.com/</url>
     </organization>
-
     <scm>
         <connection>scm:git:git@github.com:extrawest/BDD-Charge-Point-Tester-via-OCPP-J-.git</connection>
         <developerConnection>scm:git:ssh://github.com:extrawest/BDD-Charge-Point-Tester-via-OCPP-J-.git</developerConnection>
@@ -174,6 +172,14 @@
                 <version>1.5.0</version>
                 <configuration>
                     <jreleaser>
+                        <project>
+                            <description>app -- Sample Quarkus CLI application</description>
+                            <website>https://github.com/extrawest/BDD-Charge-Point-Tester-via-OCPP-J-/tree/main</website>
+                            <docsUrl>https://github.com/extrawest/BDD-Charge-Point-Tester-via-OCPP-J-/tree/main</docsUrl>
+                            <license>APACHE-2.0</license>
+                            <authors>Yevhenii Khudolii</authors>
+                            <copyright>2023 Extrawest</copyright>
+                        </project>
                         <signing>
                             <active>ALWAYS</active>
                             <armored>true</armored>
