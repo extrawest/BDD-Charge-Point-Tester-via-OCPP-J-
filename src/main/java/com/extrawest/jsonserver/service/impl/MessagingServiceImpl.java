@@ -26,6 +26,7 @@ import eu.chargetime.ocpp.model.remotetrigger.TriggerMessageConfirmation;
 import eu.chargetime.ocpp.model.remotetrigger.TriggerMessageRequest;
 import eu.chargetime.ocpp.model.reservation.CancelReservationConfirmation;
 import eu.chargetime.ocpp.model.smartcharging.ClearChargingProfileConfirmation;
+import eu.chargetime.ocpp.model.smartcharging.GetCompositeScheduleConfirmation;
 import eu.chargetime.ocpp.model.smartcharging.SetChargingProfileConfirmation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -82,6 +83,8 @@ public class MessagingServiceImpl implements MessagingService {
     private final ClearChargingProfileConfirmationBddHandler clearChargingProfileConfirmationBddHandler;
     private final DataTransferOutcomingRequestBddHandler dataTransferOutComingRequestBddHandler;
     private final DataTransferIncomingConfirmationBddHandler dataTransferIncomingConfirmationBddHandler;
+    private final GetCompositeScheduleRequestBddHandler getCompositeScheduleRequestBddHandler;
+    private final GetCompositeScheduleConfirmationBddHandler getCompositeScheduleConfirmationBddHandler;
     private final ResetRequestBddHandler resetRequestBddHandler;
     private final ResetConfirmationBddHandler resetConfirmationBddHandler;
     private final SendLocalListRequestBddHandler sendLocalListRequestBddHandler;
@@ -113,6 +116,8 @@ public class MessagingServiceImpl implements MessagingService {
             case CLEAR_CHARGING_PROFILE -> request = clearChargingProfileRequestBddHandler
                     .createMessageWithValidatedParams(params);
             case DATA_TRANSFER -> request = dataTransferOutComingRequestBddHandler
+                    .createMessageWithValidatedParams(params);
+            case GET_COMPOSITE_SCHEDULE -> request = getCompositeScheduleRequestBddHandler
                     .createMessageWithValidatedParams(params);
             case RESET -> request = resetRequestBddHandler
                     .createMessageWithValidatedParams(params);
@@ -367,6 +372,8 @@ public class MessagingServiceImpl implements MessagingService {
                 clearChargingProfileConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
             } else if (confirmation instanceof DataTransferConfirmation message) {
                 dataTransferIncomingConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
+            }else if (confirmation instanceof GetCompositeScheduleConfirmation message) {
+                getCompositeScheduleConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
             } else if (confirmation instanceof ResetConfirmation message) {
                 resetConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
             } else if (confirmation instanceof SendLocalListConfirmation message) {
