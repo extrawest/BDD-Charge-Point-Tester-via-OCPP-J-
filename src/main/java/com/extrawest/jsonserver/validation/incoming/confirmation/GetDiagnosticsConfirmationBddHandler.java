@@ -4,11 +4,17 @@ import com.extrawest.jsonserver.validation.incoming.IncomingMessageFactory;
 import com.extrawest.jsonserver.validation.incoming.IncomingMessageFieldsAssertionFactory;
 import eu.chargetime.ocpp.model.firmware.GetDiagnosticsConfirmation;
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 
+@Slf4j
+@Component
+@RequiredArgsConstructor
 public class GetDiagnosticsConfirmationBddHandler extends IncomingMessageFieldsAssertionFactory<GetDiagnosticsConfirmation>
         implements IncomingMessageFactory<GetDiagnosticsConfirmation> {
 
