@@ -35,6 +35,7 @@ public enum ImplementedMessageType {
     GET_DIAGNOSTICS("GetDiagnostics"),
     GET_LOCAL_LIST_VERSION("GetLocalListVersion"),
     REMOTE_START_TRANSACTION("RemoteStartTransaction"),
+    REMOTE_STOP_TRANSACTION("RemoteStopTransaction"),
     RESET("Reset"),
     SEND_LOCAL_LIST("SendLocalList"),
     TRIGGER_MESSAGE("TriggerMessage"),
