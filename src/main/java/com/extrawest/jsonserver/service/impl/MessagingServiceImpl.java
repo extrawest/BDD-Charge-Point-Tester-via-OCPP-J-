@@ -20,6 +20,7 @@ import eu.chargetime.ocpp.model.Request;
 import eu.chargetime.ocpp.model.core.*;
 import eu.chargetime.ocpp.model.firmware.DiagnosticsStatusNotificationRequest;
 import eu.chargetime.ocpp.model.firmware.FirmwareStatusNotificationRequest;
+import eu.chargetime.ocpp.model.firmware.GetDiagnosticsConfirmation;
 import eu.chargetime.ocpp.model.firmware.UpdateFirmwareConfirmation;
 import eu.chargetime.ocpp.model.localauthlist.SendLocalListConfirmation;
 import eu.chargetime.ocpp.model.remotetrigger.TriggerMessageConfirmation;
@@ -87,6 +88,8 @@ public class MessagingServiceImpl implements MessagingService {
     private final GetCompositeScheduleConfirmationBddHandler getCompositeScheduleConfirmationBddHandler;
     private final GetConfigurationRequestBddHandler getConfigurationRequestBddHandler;
     private final GetConfigurationConfirmationBddHandler getConfigurationConfirmationBddHandler;
+    private final GetDiagnosticsRequestBddHandler getDiagnosticsRequestBddHandler;
+    private final GetDiagnosticsConfirmationBddHandler getDiagnosticsConfirmationBddHandler;
     private final ResetRequestBddHandler resetRequestBddHandler;
     private final ResetConfirmationBddHandler resetConfirmationBddHandler;
     private final SendLocalListRequestBddHandler sendLocalListRequestBddHandler;
@@ -122,6 +125,8 @@ public class MessagingServiceImpl implements MessagingService {
             case GET_COMPOSITE_SCHEDULE -> request = getCompositeScheduleRequestBddHandler
                     .createMessageWithValidatedParams(params);
             case GET_CONFIGURATION -> request = getConfigurationRequestBddHandler
+                    .createMessageWithValidatedParams(params);
+            case GET_DIAGNOSTICS -> request = getDiagnosticsRequestBddHandler
                     .createMessageWithValidatedParams(params);
             case RESET -> request = resetRequestBddHandler
                     .createMessageWithValidatedParams(params);
@@ -380,6 +385,8 @@ public class MessagingServiceImpl implements MessagingService {
                 getCompositeScheduleConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
             }else if (confirmation instanceof GetConfigurationConfirmation message) {
                 getConfigurationConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
+            } else if (confirmation instanceof GetDiagnosticsConfirmation message) {
+                getDiagnosticsConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
             } else if (confirmation instanceof ResetConfirmation message) {
                 resetConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
             } else if (confirmation instanceof SendLocalListConfirmation message) {
