@@ -49,6 +49,7 @@ Operations Initiated by Central System:
 - Trigger Message
 - Unlock Connector
 - Update Firmware
+
 ## Usage
 
 To use this application, you can modify the Cucumber scenarios in the 'src/test/resources/features' directory to fit your testing needs. You can also add new steps in the 'src/test/java/com/extrawest/jsonserver/cucumberglue' directory.
