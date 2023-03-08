@@ -14,7 +14,6 @@ import eu.chargetime.ocpp.Listener;
 import eu.chargetime.ocpp.ListenerEvents;
 import eu.chargetime.ocpp.WebSocketReceiverEvents;
 import eu.chargetime.ocpp.model.SessionInformation;
-import eu.chargetime.ocpp.wss.WssFactoryBuilder;
 import lombok.Getter;
 import lombok.Setter;
 import org.java_websocket.WebSocket;
@@ -34,10 +33,8 @@ public class JsonWsServerListener implements Listener {
     private List<Draft> drafts;
     private final JSONConfiguration configuration;
     private volatile WebSocketServer server;
-    private WssFactoryBuilder wssFactoryBuilder;
     private final Map<WebSocket, JsonWsServerReceiver> sockets;
     private volatile boolean closed;
-    private boolean handleRequestAsync;
 
     public JsonWsServerListener(ISessionFactory sessionFactory, JSONConfiguration configuration, Draft... drafts) {
         this.closed = true;
@@ -90,6 +87,7 @@ public class JsonWsServerListener implements Listener {
             }
 
             public void onMessage(WebSocket webSocket, String message) {
+                logger.info("Incoming message: " + message);
                 JsonWsServerListener.this.sockets.get(webSocket).relay(message);
             }
 
@@ -104,9 +102,6 @@ public class JsonWsServerListener implements Listener {
                 logger.debug("Server socket bound");
             }
         };
-        if (this.wssFactoryBuilder != null) {
-            this.server.setWebSocketFactory(this.wssFactoryBuilder.build());
-        }
 
         this.configure();
         this.server.start();
@@ -117,14 +112,6 @@ public class JsonWsServerListener implements Listener {
         this.server.setReuseAddr(this.configuration.getParameter("REUSE_ADDR", true));
         this.server.setTcpNoDelay(this.configuration.getParameter("TCP_NO_DELAY", false));
         this.server.setConnectionLostTimeout(this.configuration.getParameter("PING_INTERVAL", 60));
-    }
-
-    void enableWSS(WssFactoryBuilder wssFactoryBuilder) {
-        if (this.server != null) {
-            throw new IllegalStateException("Cannot enable WSS on already running server");
-        } else {
-            this.wssFactoryBuilder = wssFactoryBuilder;
-        }
     }
 
     public void close() {
@@ -151,7 +138,7 @@ public class JsonWsServerListener implements Listener {
     }
 
     public void setAsyncRequestHandler(boolean async) {
-        this.handleRequestAsync = async;
+        throw new IllegalArgumentException("Not implemented yet!");
     }
 }
 

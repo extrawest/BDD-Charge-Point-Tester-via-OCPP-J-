@@ -1,13 +1,14 @@
 package com.extrawest.jsonserver.ws.handler;
 
-import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.AUTHORIZE;
-import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.BOOT_NOTIFICATION;
-import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.DATA_TRANSFER;
-import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.HEARTBEAT;
-import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.METER_VALUE;
-import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.START_TRANSACTION;
-import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.STATUS_NOTIFICATION;
-import static com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType.STOP_TRANSACTION;
+import static com.extrawest.jsonserver.model.emun.ApiErrorMessage.UNEXPECTED_MESSAGE_RECEIVED;
+import static com.extrawest.jsonserver.model.emun.ImplementedMessageType.AUTHORIZE;
+import static com.extrawest.jsonserver.model.emun.ImplementedMessageType.BOOT_NOTIFICATION;
+import static com.extrawest.jsonserver.model.emun.ImplementedMessageType.DATA_TRANSFER;
+import static com.extrawest.jsonserver.model.emun.ImplementedMessageType.HEARTBEAT;
+import static com.extrawest.jsonserver.model.emun.ImplementedMessageType.METER_VALUES;
+import static com.extrawest.jsonserver.model.emun.ImplementedMessageType.START_TRANSACTION;
+import static com.extrawest.jsonserver.model.emun.ImplementedMessageType.STATUS_NOTIFICATION;
+import static com.extrawest.jsonserver.model.emun.ImplementedMessageType.STOP_TRANSACTION;
 import static com.extrawest.jsonserver.util.TimeUtil.*;
 import java.util.Arrays;
 import java.util.List;
@@ -15,7 +16,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import eu.chargetime.ocpp.feature.profile.ServerCoreEventHandler;
-import com.extrawest.jsonserver.model.emun.ImplementedReceivedMessageType;
+import com.extrawest.jsonserver.model.emun.ImplementedMessageType;
 import com.extrawest.jsonserver.repository.BddDataRepository;
 import com.extrawest.jsonserver.repository.ServerSessionRepository;
 import eu.chargetime.ocpp.model.Confirmation;
@@ -121,7 +122,7 @@ public class ServerCoreEventHandlerImpl implements ServerCoreEventHandler {
                 .flatMap(x -> Arrays.stream(x.getSampledValue()))
                 .toList()
         );
-        storeMessageIfItIsNeededForBDDPurpose(sessionIndex, request, METER_VALUE);
+        storeMessageIfItIsNeededForBDDPurpose(sessionIndex, request, METER_VALUES);
 
         while (Objects.isNull(response) || !(response instanceof MeterValuesConfirmation)) {
             sleep(defaultSleepAwaitingTime);
@@ -174,11 +175,12 @@ public class ServerCoreEventHandlerImpl implements ServerCoreEventHandler {
     }
 
     private void storeMessageIfItIsNeededForBDDPurpose(UUID sessionIndex, Request request,
-                                                       ImplementedReceivedMessageType type) {
+                                                       ImplementedMessageType type) {
         String chargePointId = sessionRepository.getChargerIdBySession(sessionIndex);
-        Optional<List<ImplementedReceivedMessageType>> requestedMessageTypes =
+        Optional<List<ImplementedMessageType>> requestedMessageTypes =
                 bddDataRepository.getRequestedMessageTypes(chargePointId);
         if (requestedMessageTypes.isEmpty() || !requestedMessageTypes.get().contains(type)) {
+            log.warn(String.format(UNEXPECTED_MESSAGE_RECEIVED.getValue(), request.getClass().getSimpleName(), request));
             return;
         }
         bddDataRepository.addRequestedMessage(chargePointId, request);
