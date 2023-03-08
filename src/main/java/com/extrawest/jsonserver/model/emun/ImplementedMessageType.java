@@ -32,6 +32,7 @@ public enum ImplementedMessageType {
     SET_CHARGING_PROFILE("SetChargingProfile"),
     GET_COMPOSITE_SCHEDULE("GetCompositeSchedule"),
     GET_CONFIGURATION("GetConfiguration"),
+    GET_DIAGNOSTICS("GetDiagnostics"),
     RESET("Reset"),
     SEND_LOCAL_LIST("SendLocalList"),
     TRIGGER_MESSAGE("TriggerMessage"),
