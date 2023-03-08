@@ -39,7 +39,9 @@ public class DataTransferIncomingConfirmationBddHandler extends IncomingMessageF
         );
         this.assertionFactory = Map.of(
                 STATUS_REQUIRED, (expectedParams, actual) -> compareStringsIncludeWildCard(
-                        expectedParams, actual.getStatus().name(), STATUS_REQUIRED)
+                        expectedParams, actual.getStatus().name(), STATUS_REQUIRED),
+                DATA, (expectedParams, actual) -> compareStringsIncludeWildCard(
+                        expectedParams, actual.getData(), DATA)
         );
     }
 

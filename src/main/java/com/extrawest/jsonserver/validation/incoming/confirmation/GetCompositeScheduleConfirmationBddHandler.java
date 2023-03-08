@@ -53,7 +53,13 @@ public class GetCompositeScheduleConfirmationBddHandler extends IncomingMessageF
         );
         this.assertionFactory = Map.of(
                 STATUS_REQUIRED, (expectedParams, actual) -> compareStringsIncludeWildCard(
-                        expectedParams, actual.getStatus().name(), STATUS_REQUIRED)
+                        expectedParams, actual.getStatus().name(), STATUS_REQUIRED),
+                CONNECTOR_ID, (expectedParams, actual) -> compareIntegerIncludeWildCard(
+                        expectedParams, actual.getConnectorId(), CONNECTOR_ID),
+                SCHEDULE_START, (expectedParams, actual) -> compareTimestampIncludeWildCard(
+                        expectedParams, actual.getScheduleStart(), SCHEDULE_START),
+                CHARGING_SCHEDULE, (expectedParams, actual) -> compareChargingScheduleIncludeWildCard(
+                        expectedParams, actual.getChargingSchedule(), CHARGING_SCHEDULE)
         );
     }
 
