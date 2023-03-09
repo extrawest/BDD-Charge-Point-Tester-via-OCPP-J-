@@ -9,7 +9,6 @@ Cucumber is a behavior-driven development (BDD) testing framework that uses the 
 The simulator provides a set of predefined OCPP messages that can be sent and received by the charge point. These messages include basic operations such as boot notification, status notification.
 
 
-
 ## Badges
 ![contr](https://img.shields.io/github/contributors/extrawest/BDD-Charge-Point-Tester-via-OCPP-J-?style=flat-square)
 ![commits](https://img.shields.io/github/commit-activity/w/extrawest/BDD-Charge-Point-Tester-via-OCPP-J-?style=flat-square)
