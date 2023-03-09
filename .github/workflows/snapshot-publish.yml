@@ -1,0 +1,33 @@
+name: Publish Snapshot Artifacts to GitHub Packages
+
+on:
+  push:
+    branches:
+      - dev
+    paths:
+      - 'pom.xml'
+
+jobs:
+  publish-snapshot:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v1
+        with:
+          java-version: '17'
+
+      - name: Build and publish snapshot artifacts
+        run: |
+          mvn -B clean package deploy \
+            -DskipTests=true \
+            -DaltDeploymentRepository=snapshot-repo::default::https://maven.pkg.github.com/extrawest/BDD-Charge-Point-Tester-via-OCPP-J- \
+            -Dmaven.repo.remote=https://maven.pkg.github.com/extrawest/BDD-Charge-Point-Tester-via-OCPP-J- \
+            -Dmaven.wagon.http.ssl.insecure=true \
+            -Dmaven.wagon.http.ssl.allowall=true \
+            -Dgithub.token=${{ secrets.GITHUB_TOKEN }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
