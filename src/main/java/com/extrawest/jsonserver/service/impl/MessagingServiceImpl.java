@@ -20,12 +20,16 @@ import eu.chargetime.ocpp.model.Request;
 import eu.chargetime.ocpp.model.core.*;
 import eu.chargetime.ocpp.model.firmware.DiagnosticsStatusNotificationRequest;
 import eu.chargetime.ocpp.model.firmware.FirmwareStatusNotificationRequest;
+import eu.chargetime.ocpp.model.firmware.GetDiagnosticsConfirmation;
 import eu.chargetime.ocpp.model.firmware.UpdateFirmwareConfirmation;
+import eu.chargetime.ocpp.model.localauthlist.GetLocalListVersionConfirmation;
 import eu.chargetime.ocpp.model.localauthlist.SendLocalListConfirmation;
 import eu.chargetime.ocpp.model.remotetrigger.TriggerMessageConfirmation;
 import eu.chargetime.ocpp.model.remotetrigger.TriggerMessageRequest;
 import eu.chargetime.ocpp.model.reservation.CancelReservationConfirmation;
+import eu.chargetime.ocpp.model.reservation.ReserveNowConfirmation;
 import eu.chargetime.ocpp.model.smartcharging.ClearChargingProfileConfirmation;
+import eu.chargetime.ocpp.model.smartcharging.GetCompositeScheduleConfirmation;
 import eu.chargetime.ocpp.model.smartcharging.SetChargingProfileConfirmation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -82,6 +86,20 @@ public class MessagingServiceImpl implements MessagingService {
     private final ClearChargingProfileConfirmationBddHandler clearChargingProfileConfirmationBddHandler;
     private final DataTransferOutcomingRequestBddHandler dataTransferOutComingRequestBddHandler;
     private final DataTransferIncomingConfirmationBddHandler dataTransferIncomingConfirmationBddHandler;
+    private final GetCompositeScheduleRequestBddHandler getCompositeScheduleRequestBddHandler;
+    private final GetCompositeScheduleConfirmationBddHandler getCompositeScheduleConfirmationBddHandler;
+    private final GetConfigurationRequestBddHandler getConfigurationRequestBddHandler;
+    private final GetConfigurationConfirmationBddHandler getConfigurationConfirmationBddHandler;
+    private final GetDiagnosticsRequestBddHandler getDiagnosticsRequestBddHandler;
+    private final GetDiagnosticsConfirmationBddHandler getDiagnosticsConfirmationBddHandler;
+    private final GetLocalListVersionRequestBddHandler getLocalListVersionRequestBddHandler;
+    private final GetLocalListVersionConfirmationBddHandler getLocalListVersionConfirmationBddHandler;
+    private final RemoteStartTransactionRequestBddHandler remoteStartTransactionRequestBddHandler;
+    private final RemoteStartTransactionConfirmationBddHandler remoteStartTransactionConfirmationBddHandler;
+    private final RemoteStopTransactionRequestBddHandler remoteStopTransactionRequestBddHandler;
+    private final RemoteStopTransactionConfirmationBddHandler remoteStopTransactionConfirmationBddHandler;
+    private final ReserveNowRequestBddHandler reserveNowRequestBddHandler;
+    private final ReserveNowConfirmationBddHandler reserveNowConfirmationBddHandler;
     private final ResetRequestBddHandler resetRequestBddHandler;
     private final ResetConfirmationBddHandler resetConfirmationBddHandler;
     private final SendLocalListRequestBddHandler sendLocalListRequestBddHandler;
@@ -113,6 +131,20 @@ public class MessagingServiceImpl implements MessagingService {
             case CLEAR_CHARGING_PROFILE -> request = clearChargingProfileRequestBddHandler
                     .createMessageWithValidatedParams(params);
             case DATA_TRANSFER -> request = dataTransferOutComingRequestBddHandler
+                    .createMessageWithValidatedParams(params);
+            case GET_COMPOSITE_SCHEDULE -> request = getCompositeScheduleRequestBddHandler
+                    .createMessageWithValidatedParams(params);
+            case GET_CONFIGURATION -> request = getConfigurationRequestBddHandler
+                    .createMessageWithValidatedParams(params);
+            case GET_DIAGNOSTICS -> request = getDiagnosticsRequestBddHandler
+                    .createMessageWithValidatedParams(params);
+            case GET_LOCAL_LIST_VERSION -> request = getLocalListVersionRequestBddHandler
+                    .createMessageWithValidatedParams(params);
+            case REMOTE_START_TRANSACTION -> request = remoteStartTransactionRequestBddHandler
+                    .createMessageWithValidatedParams(params);
+            case REMOTE_STOP_TRANSACTION -> request = remoteStopTransactionRequestBddHandler
+                    .createMessageWithValidatedParams(params);
+            case RESERVE_NOW -> request = reserveNowRequestBddHandler
                     .createMessageWithValidatedParams(params);
             case RESET -> request = resetRequestBddHandler
                     .createMessageWithValidatedParams(params);
@@ -367,6 +399,20 @@ public class MessagingServiceImpl implements MessagingService {
                 clearChargingProfileConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
             } else if (confirmation instanceof DataTransferConfirmation message) {
                 dataTransferIncomingConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
+            }else if (confirmation instanceof GetCompositeScheduleConfirmation message) {
+                getCompositeScheduleConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
+            }else if (confirmation instanceof GetConfigurationConfirmation message) {
+                getConfigurationConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
+            } else if (confirmation instanceof GetDiagnosticsConfirmation message) {
+                getDiagnosticsConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
+            } else if (confirmation instanceof GetLocalListVersionConfirmation message) {
+                getLocalListVersionConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
+            } else if (confirmation instanceof RemoteStartTransactionConfirmation message) {
+                remoteStartTransactionConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
+            }else if (confirmation instanceof RemoteStopTransactionConfirmation message) {
+                remoteStopTransactionConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
+            }else if (confirmation instanceof ReserveNowConfirmation message) {
+                reserveNowConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
             } else if (confirmation instanceof ResetConfirmation message) {
                 resetConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
             } else if (confirmation instanceof SendLocalListConfirmation message) {
