@@ -9,13 +9,20 @@ Cucumber is a behavior-driven development (BDD) testing framework that uses the 
 The simulator provides a set of predefined OCPP messages that can be sent and received by the charge point. These messages include basic operations such as boot notification, status notification.
 
 
-
 ## Badges
-![contr](https://img.shields.io/github/contributors/extrawest/BDD-Charge-Point-Tester-via-OCPP-J-?style=flat-square)
-![commits](https://img.shields.io/github/commit-activity/w/extrawest/BDD-Charge-Point-Tester-via-OCPP-J-?style=flat-square)
-![OCPP](https://img.shields.io/badge/OCPP-1.6-brightgreen?style=flat-square)
-![JDK](https://img.shields.io/badge/JDK-17-yellow?style=flat-square)
-![social](https://img.shields.io/github/forks/extrawest/BDD-Charge-Point-Tester-via-OCPP-J-?style=social)
+![release version](https://img.shields.io/github/v/release/extrawest/BDD-Charge-Point-Tester-via-OCPP-J-?style=for-the-badge)
+![release maven](https://img.shields.io/github/actions/workflow/status/extrawest/BDD-Charge-Point-Tester-via-OCPP-J-/maven-publish.yml?event=push&label=RELEASE%20VERSION%20BUILD&style=for-the-badge)
+![snap](https://img.shields.io/github/actions/workflow/status/extrawest/BDD-Charge-Point-Tester-via-OCPP-J-/snapshot-publish.yml?branch=dev&label=SNAPSHOT%20VERSION%20BUILD&style=for-the-badge)
+![contr](https://img.shields.io/github/contributors/extrawest/BDD-Charge-Point-Tester-via-OCPP-J-?style=for-the-badge)
+![commits](https://img.shields.io/github/commit-activity/w/extrawest/BDD-Charge-Point-Tester-via-OCPP-J-?style=for-the-badge)
+![OCPP](https://img.shields.io/badge/OCPP-1.6-brightgreen?style=for-the-badge)
+![JDK](https://img.shields.io/badge/JDK-17-yellow?style=for-the-badge)
+![social](https://img.shields.io/github/forks/extrawest/BDD-Charge-Point-Tester-via-OCPP-J-?style=for-the-badge)
+
+
+## Publication
+
+You can find the latest version of the release in the [Maven Central repository](https://mvnrepository.com/artifact/io.github.extrawest/bdd-charge-point-tester-via-ocpp-j)
 
 
 ## Technologies used
@@ -25,6 +32,7 @@ The simulator provides a set of predefined OCPP messages that can be sent and re
 ## Requirements
 - [Java 17 or higher](https://www.oracle.com/java/)
 - [Maven 3.6 or higher](https://maven.apache.org/)
+- 
 ## Features
 Operations Initiated by Charge Point:
 - Authorize
@@ -54,7 +62,22 @@ Operations Initiated by Central System:
 
 To use this application, you can modify the Cucumber scenarios in the 'src/test/resources/features' directory to fit your testing needs. You can also add new steps in the 'src/test/java/com/extrawest/jsonserver/cucumberglue' directory.
 
+## Installation
 
+Install 1/2: Add this to pom.xml:
+
+```bash
+<dependency>
+    <groupId>io.github.extrawest</groupId>
+    <artifactId>bdd-charge-point-tester-via-ocpp-j</artifactId>
+    <version>0.1.1</version>
+</dependency>
+```
+
+Install 2/2: Run via command line
+```bash
+mvn install
+```
 
 
 ## Running Tests
