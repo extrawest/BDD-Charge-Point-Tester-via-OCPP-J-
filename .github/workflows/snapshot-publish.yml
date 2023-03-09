@@ -28,6 +28,6 @@ jobs:
             -Dmaven.repo.remote=https://maven.pkg.github.com/extrawest/BDD-Charge-Point-Tester-via-OCPP-J- \
             -Dmaven.wagon.http.ssl.insecure=true \
             -Dmaven.wagon.http.ssl.allowall=true \
-            -Dgithub.token=${{ secrets.GITHUB_TOKEN }}
+            -Dgithub.token=${{ github.token }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
