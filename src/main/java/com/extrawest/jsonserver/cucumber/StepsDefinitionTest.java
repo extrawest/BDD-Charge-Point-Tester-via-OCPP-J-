@@ -1,4 +1,7 @@
-package com.extrawest.jsonserver.cucumberglue;
+package com.extrawest.jsonserver.cucumber;
+
+import static com.extrawest.jsonserver.util.TimeUtil.waitOneSecond;
+import static java.util.Objects.isNull;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -7,14 +10,12 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-
-import com.extrawest.jsonserver.service.StepsSupporterService;
 import com.extrawest.jsonserver.model.emun.ImplementedMessageType;
 import com.extrawest.jsonserver.model.exception.BddTestingException;
-import com.extrawest.jsonserver.model.ChargePoint;
-import com.extrawest.jsonserver.service.MessagingService;
 import com.extrawest.jsonserver.repository.BddDataRepository;
 import com.extrawest.jsonserver.repository.ServerSessionRepository;
+import com.extrawest.jsonserver.service.MessagingService;
+import com.extrawest.jsonserver.service.StepsSupporterService;
 import eu.chargetime.ocpp.model.Confirmation;
 import eu.chargetime.ocpp.model.Request;
 import io.cucumber.datatable.DataTable;
@@ -26,12 +27,14 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import io.cucumber.junit.Cucumber;
+import io.cucumber.junit.CucumberOptions;
+import io.cucumber.spring.CucumberContextConfiguration;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Value;
-
-import static com.extrawest.jsonserver.util.TimeUtil.waitOneSecond;
-import static java.util.Objects.isNull;
+import org.springframework.boot.test.context.SpringBootTest;
 
 /**
  * All time variables in seconds
@@ -39,14 +42,17 @@ import static java.util.Objects.isNull;
 
 @Slf4j
 @RequiredArgsConstructor
-public class MyStepsTest extends SpringIntegrationTest {
+@CucumberContextConfiguration
+@SpringBootTest
+@RunWith(Cucumber.class)
+@CucumberOptions(features = "src/test/resources")
+public class StepsDefinitionTest {
     private final BddDataRepository storage;
     private final ServerSessionRepository sessionRepository;
 
     private final MessagingService messagingService;
     private final StepsSupporterService stepsSupporterService;
 
-    private final ChargePoint chargePoint = new ChargePoint();
     private final int connectionWaitingTime = 300; // in seconds
     private final int messageWaitingTime = 120; // in seconds
 
@@ -55,6 +61,7 @@ public class MyStepsTest extends SpringIntegrationTest {
     private int stepNumber;
 
     private UUID sessionIndex;
+    private String chargePointId = "";
     private ImplementedMessageType waitingMessageType;
     private ImplementedMessageType requestedMessageType;
     private ImplementedMessageType sendingMessageType;
@@ -78,7 +85,7 @@ public class MyStepsTest extends SpringIntegrationTest {
 
     @After
     public void endingScenario() {
-        storage.testFinished(chargePoint.getChargePointId());
+        storage.testFinished(chargePointId);
     }
 
     @Given("the Central System is started")
@@ -102,17 +109,17 @@ public class MyStepsTest extends SpringIntegrationTest {
         while (isNull(sessionIndex) && LocalDateTime.now().isBefore(finishTime)) {
             try {
                 sessionIndex = sessionRepository.getSessionForWildCard();
-                String chargerPointId = sessionRepository.getChargerIdBySession(sessionIndex);
-                chargePoint.setChargePointId(chargerPointId);
+                String chargerId = sessionRepository.getChargerIdBySession(sessionIndex);
+                this.chargePointId = chargerId;
                 log.info(String.format("Scenario №%s, STEP %s: Charge point %s is connected!",
-                        scenarioId, stepNumber, chargerPointId));
+                        scenarioId, stepNumber, chargerId));
             } catch (Exception e) {
                 waitOneSecond();
             }
         }
         if (isNull(sessionIndex)) {
             throw new BddTestingException(String.format("Scenario №%s, STEP %s: %s didn't connect.",
-                    scenarioId, stepNumber, chargePoint.getChargePointId()));
+                    scenarioId, stepNumber, chargePointId));
         }
         this.sessionIndex = sessionIndex;
     }
@@ -131,7 +138,7 @@ public class MyStepsTest extends SpringIntegrationTest {
             try {
                 sessionIndex = sessionRepository.getSessionByChargerId(chargePointId);
                 log.info(String.format("Scenario №%s, STEP %s: Charge point %s is connected!",
-                        scenarioId, stepNumber, chargePoint.getChargePointId()));
+                        scenarioId, stepNumber, chargePointId));
             } catch (Exception e) {
                 waitOneSecond();
                 stepsSupporterService.closeAllSessionsExceptGiven(chargePointId);
@@ -139,7 +146,7 @@ public class MyStepsTest extends SpringIntegrationTest {
         }
         if (isNull(sessionIndex)) {
             throw new BddTestingException(String.format("Scenario №%s, STEP %s: %s didn't connect.",
-                    scenarioId, stepNumber, chargePoint.getChargePointId()));
+                    scenarioId, stepNumber, chargePointId));
         }
         this.sessionIndex = sessionIndex;
     }
@@ -159,7 +166,7 @@ public class MyStepsTest extends SpringIntegrationTest {
         String requestType = messageType.replace(".req", "").replace(".conf", "");
         if (ImplementedMessageType.contains(requestType)) {
             waitingMessageType = ImplementedMessageType.fromValue(requestType);
-            requestedMessageType = messagingService.sendRequest(chargePoint.getChargePointId(), waitingMessageType,
+            requestedMessageType = messagingService.sendRequest(chargePointId, waitingMessageType,
                     parameters);
             log.info(String.format("Scenario №%s, STEP %s: %s request sent. ", scenarioId, stepNumber, messageType));
         } else {
@@ -223,7 +230,7 @@ public class MyStepsTest extends SpringIntegrationTest {
     private void csMustReceiveRequestedMessageWithData(Map<String, String> parameters) {
         log.info(String.format("Scenario №%s, STEP %s: Waiting for request up to %s...",
                 scenarioId, stepNumber, messageWaitingTime));
-        Optional<Request> request = messagingService.waitForRequestedMessage(chargePoint, messageWaitingTime,
+        Optional<Request> request = messagingService.waitForRequestedMessage(chargePointId, messageWaitingTime,
                 requestedMessageType);
         if (request.isEmpty()) {
             throw new BddTestingException(
@@ -252,8 +259,8 @@ public class MyStepsTest extends SpringIntegrationTest {
                 .fromValue(messageType.replace(".req", "").replace(".conf", ""));
         waitingMessageType = type;
         sendingMessageType = type;
-        storage.addRequestedMessageType(chargePoint.getChargePointId(), type);
-        Optional<Request> request = messagingService.waitForRequestedMessage(chargePoint, messageWaitingTime, type);
+        storage.addRequestedMessageType(chargePointId, type);
+        Optional<Request> request = messagingService.waitForRequestedMessage(chargePointId, messageWaitingTime, type);
         if (request.isEmpty()) {
             throw new BddTestingException(
                     String.format("Scenario №%s, STEP %s: %s message is not handled or invalid.",
