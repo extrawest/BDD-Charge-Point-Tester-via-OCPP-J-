@@ -1,7 +1,7 @@
 package com.extrawest.jsonserver.validation.incoming.confirmation;
 
 import com.extrawest.jsonserver.validation.incoming.IncomingMessageFactory;
-import com.extrawest.jsonserver.validation.incoming.IncomingMessageFieldsAssertionFactory;
+import com.extrawest.jsonserver.validation.incoming.IncomingMessageFieldsFactory;
 import eu.chargetime.ocpp.model.core.DataTransferConfirmation;
 import eu.chargetime.ocpp.model.core.DataTransferStatus;
 import jakarta.annotation.PostConstruct;
@@ -15,8 +15,9 @@ import java.util.Objects;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class DataTransferIncomingConfirmationBddHandler extends IncomingMessageFieldsAssertionFactory<DataTransferConfirmation>
+public class DataTransferIncomingConfirmationBddHandler extends IncomingMessageFieldsFactory<DataTransferConfirmation>
         implements IncomingMessageFactory<DataTransferConfirmation> {
+
     public static final String STATUS_REQUIRED = "status";
     public static final String DATA = "data";
 
@@ -53,4 +54,5 @@ public class DataTransferIncomingConfirmationBddHandler extends IncomingMessageF
         super.validateParamsViaLibModel(params);
         super.assertParamsAndMessageFields(params, message);
     }
+
 }

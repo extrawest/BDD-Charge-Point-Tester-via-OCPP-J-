@@ -1,7 +1,7 @@
 package com.extrawest.jsonserver.validation.incoming.confirmation;
 
 import com.extrawest.jsonserver.validation.incoming.IncomingMessageFactory;
-import com.extrawest.jsonserver.validation.incoming.IncomingMessageFieldsAssertionFactory;
+import com.extrawest.jsonserver.validation.incoming.IncomingMessageFieldsFactory;
 import eu.chargetime.ocpp.model.reservation.CancelReservationConfirmation;
 import eu.chargetime.ocpp.model.reservation.CancelReservationStatus;
 import jakarta.annotation.PostConstruct;
@@ -16,8 +16,9 @@ import java.util.Objects;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class CancelReservationConfirmationBddHandler extends IncomingMessageFieldsAssertionFactory<CancelReservationConfirmation>
+public class CancelReservationConfirmationBddHandler extends IncomingMessageFieldsFactory<CancelReservationConfirmation>
         implements IncomingMessageFactory<CancelReservationConfirmation> {
+
     public static final String STATUS_REQUIRED = "status";
 
     @PostConstruct

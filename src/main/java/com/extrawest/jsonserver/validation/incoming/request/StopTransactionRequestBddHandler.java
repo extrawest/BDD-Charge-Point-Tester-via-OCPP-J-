@@ -1,7 +1,7 @@
 package com.extrawest.jsonserver.validation.incoming.request;
 
 import com.extrawest.jsonserver.validation.incoming.IncomingMessageFactory;
-import com.extrawest.jsonserver.validation.incoming.IncomingMessageFieldsAssertionFactory;
+import com.extrawest.jsonserver.validation.incoming.IncomingMessageFieldsFactory;
 import eu.chargetime.ocpp.model.core.*;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,7 @@ import java.util.Objects;
 @Component
 @RequiredArgsConstructor
 public class StopTransactionRequestBddHandler
-        extends IncomingMessageFieldsAssertionFactory<StopTransactionRequest>
+        extends IncomingMessageFieldsFactory<StopTransactionRequest>
         implements IncomingMessageFactory<StopTransactionRequest> {
 
     public static final String ID_TAG = "idTag";

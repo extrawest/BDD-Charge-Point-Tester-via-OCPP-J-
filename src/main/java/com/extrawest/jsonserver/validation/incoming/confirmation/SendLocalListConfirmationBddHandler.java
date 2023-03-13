@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import com.extrawest.jsonserver.validation.incoming.IncomingMessageFactory;
-import com.extrawest.jsonserver.validation.incoming.IncomingMessageFieldsAssertionFactory;
+import com.extrawest.jsonserver.validation.incoming.IncomingMessageFieldsFactory;
 import eu.chargetime.ocpp.model.localauthlist.SendLocalListConfirmation;
 import eu.chargetime.ocpp.model.localauthlist.UpdateStatus;
 import jakarta.annotation.PostConstruct;
@@ -15,8 +15,9 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class SendLocalListConfirmationBddHandler extends IncomingMessageFieldsAssertionFactory<SendLocalListConfirmation>
+public class SendLocalListConfirmationBddHandler extends IncomingMessageFieldsFactory<SendLocalListConfirmation>
         implements IncomingMessageFactory<SendLocalListConfirmation> {
+
     public static final String STATUS_REQUIRED = "status";
 
     @PostConstruct

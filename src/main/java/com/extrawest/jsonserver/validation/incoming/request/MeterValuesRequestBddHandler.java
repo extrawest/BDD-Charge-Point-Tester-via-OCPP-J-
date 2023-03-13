@@ -3,7 +3,7 @@ package com.extrawest.jsonserver.validation.incoming.request;
 import java.util.Map;
 import java.util.Objects;
 import com.extrawest.jsonserver.validation.incoming.IncomingMessageFactory;
-import com.extrawest.jsonserver.validation.incoming.IncomingMessageFieldsAssertionFactory;
+import com.extrawest.jsonserver.validation.incoming.IncomingMessageFieldsFactory;
 import eu.chargetime.ocpp.model.core.MeterValue;
 import eu.chargetime.ocpp.model.core.MeterValuesRequest;
 import jakarta.annotation.PostConstruct;
@@ -15,8 +15,9 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class MeterValuesRequestBddHandler
-        extends IncomingMessageFieldsAssertionFactory<MeterValuesRequest>
+        extends IncomingMessageFieldsFactory<MeterValuesRequest>
         implements IncomingMessageFactory<MeterValuesRequest> {
+
     public static final String CONNECTOR_ID_REQUIRED = "connectorId";
     public static final String METER_VALUES_REQUIRED = "meterValue";
     public static final String TRANSACTION_ID = "transactionId";
