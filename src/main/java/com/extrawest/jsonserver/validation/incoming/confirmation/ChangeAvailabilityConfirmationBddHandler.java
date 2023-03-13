@@ -1,7 +1,7 @@
 package com.extrawest.jsonserver.validation.incoming.confirmation;
 
 import com.extrawest.jsonserver.validation.incoming.IncomingMessageFactory;
-import com.extrawest.jsonserver.validation.incoming.IncomingMessageFieldsAssertionFactory;
+import com.extrawest.jsonserver.validation.incoming.IncomingMessageFieldsFactory;
 import eu.chargetime.ocpp.model.core.AvailabilityStatus;
 import eu.chargetime.ocpp.model.core.ChangeAvailabilityConfirmation;
 import jakarta.annotation.PostConstruct;
@@ -16,8 +16,9 @@ import java.util.Objects;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class ChangeAvailabilityConfirmationBddHandler extends IncomingMessageFieldsAssertionFactory<ChangeAvailabilityConfirmation>
+public class ChangeAvailabilityConfirmationBddHandler extends IncomingMessageFieldsFactory<ChangeAvailabilityConfirmation>
         implements IncomingMessageFactory<ChangeAvailabilityConfirmation> {
+
     public static final String STATUS_REQUIRED = "status";
 
     @PostConstruct

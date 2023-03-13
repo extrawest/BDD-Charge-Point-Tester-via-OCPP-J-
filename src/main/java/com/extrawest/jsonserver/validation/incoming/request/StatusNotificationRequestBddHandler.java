@@ -1,7 +1,7 @@
 package com.extrawest.jsonserver.validation.incoming.request;
 
 import com.extrawest.jsonserver.validation.incoming.IncomingMessageFactory;
-import com.extrawest.jsonserver.validation.incoming.IncomingMessageFieldsAssertionFactory;
+import com.extrawest.jsonserver.validation.incoming.IncomingMessageFieldsFactory;
 import eu.chargetime.ocpp.model.core.ChargePointErrorCode;
 import eu.chargetime.ocpp.model.core.ChargePointStatus;
 import eu.chargetime.ocpp.model.core.StatusNotificationRequest;
@@ -18,7 +18,7 @@ import java.util.Objects;
 @Component
 @RequiredArgsConstructor
 public class StatusNotificationRequestBddHandler
-        extends IncomingMessageFieldsAssertionFactory<StatusNotificationRequest>
+        extends IncomingMessageFieldsFactory<StatusNotificationRequest>
         implements IncomingMessageFactory<StatusNotificationRequest> {
 
     public static final String CONNECTOR_ID_REQUIRED = "connectorId";

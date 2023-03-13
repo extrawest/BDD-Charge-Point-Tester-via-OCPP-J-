@@ -19,7 +19,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
-import java.util.stream.Collectors;
 import com.extrawest.jsonserver.model.exception.AssertionException;
 import com.extrawest.jsonserver.model.exception.BddTestingException;
 import com.extrawest.jsonserver.model.exception.ValidationException;
@@ -44,7 +43,7 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public abstract class IncomingMessageFieldsAssertionFactory<T extends Validatable> {
+public abstract class IncomingMessageFieldsFactory<T extends Validatable> {
     @Autowired @Setter protected ObjectMapper mapper;
 
     @Value("${wildcard:any}")

@@ -1,7 +1,7 @@
 package com.extrawest.jsonserver.validation.incoming.confirmation;
 
 import com.extrawest.jsonserver.validation.incoming.IncomingMessageFactory;
-import com.extrawest.jsonserver.validation.incoming.IncomingMessageFieldsAssertionFactory;
+import com.extrawest.jsonserver.validation.incoming.IncomingMessageFieldsFactory;
 import eu.chargetime.ocpp.model.core.ClearCacheConfirmation;
 import eu.chargetime.ocpp.model.core.ClearCacheStatus;
 import jakarta.annotation.PostConstruct;
@@ -16,8 +16,9 @@ import java.util.Objects;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class ClearCacheConfirmationBddHandler extends IncomingMessageFieldsAssertionFactory<ClearCacheConfirmation>
+public class ClearCacheConfirmationBddHandler extends IncomingMessageFieldsFactory<ClearCacheConfirmation>
         implements IncomingMessageFactory<ClearCacheConfirmation> {
+
     public static final String STATUS_REQUIRED = "status";
 
     @PostConstruct
@@ -45,4 +46,5 @@ public class ClearCacheConfirmationBddHandler extends IncomingMessageFieldsAsser
         super.validateParamsViaLibModel(params);
         super.assertParamsAndMessageFields(params, message);
     }
+
 }
