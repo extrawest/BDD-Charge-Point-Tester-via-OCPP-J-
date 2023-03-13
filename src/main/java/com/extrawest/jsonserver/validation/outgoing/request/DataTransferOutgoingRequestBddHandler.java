@@ -1,7 +1,7 @@
-package com.extrawest.jsonserver.validation.outcoming.request;
+package com.extrawest.jsonserver.validation.outgoing.request;
 
-import com.extrawest.jsonserver.validation.outcoming.OutcomingMessageFieldsValidationFactory;
-import com.extrawest.jsonserver.validation.outcoming.OutgoingMessageFactory;
+import com.extrawest.jsonserver.validation.outgoing.OutgoingMessageFactory;
+import com.extrawest.jsonserver.validation.outgoing.OutgoingMessageFieldsFactory;
 import eu.chargetime.ocpp.model.core.DataTransferRequest;
 import jakarta.annotation.PostConstruct;
 import lombok.NoArgsConstructor;
@@ -14,8 +14,9 @@ import java.util.Map;
 @Slf4j
 @Component
 @NoArgsConstructor
-public class DataTransferOutcomingRequestBddHandler extends OutcomingMessageFieldsValidationFactory<DataTransferRequest>
+public class DataTransferOutgoingRequestBddHandler extends OutgoingMessageFieldsFactory<DataTransferRequest>
         implements OutgoingMessageFactory<DataTransferRequest> {
+
     public static final String VENDOR_ID_REQUIRED = "vendorId";
     public static final String MESSAGE_ID = "messageId";
     public static final String DATA = "data";
@@ -54,4 +55,5 @@ public class DataTransferOutcomingRequestBddHandler extends OutcomingMessageFiel
         log.debug(getParameterizeClassName() + ": " + request);
         return request;
     }
+
 }

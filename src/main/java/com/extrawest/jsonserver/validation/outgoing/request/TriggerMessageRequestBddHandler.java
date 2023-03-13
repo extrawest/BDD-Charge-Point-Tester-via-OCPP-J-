@@ -1,8 +1,8 @@
-package com.extrawest.jsonserver.validation.outcoming.request;
+package com.extrawest.jsonserver.validation.outgoing.request;
 
 import java.util.Map;
-import com.extrawest.jsonserver.validation.outcoming.OutcomingMessageFieldsValidationFactory;
-import com.extrawest.jsonserver.validation.outcoming.OutgoingMessageFactory;
+import com.extrawest.jsonserver.validation.outgoing.OutgoingMessageFactory;
+import com.extrawest.jsonserver.validation.outgoing.OutgoingMessageFieldsFactory;
 import eu.chargetime.ocpp.model.remotetrigger.TriggerMessageRequest;
 import eu.chargetime.ocpp.model.remotetrigger.TriggerMessageRequestType;
 import jakarta.annotation.PostConstruct;
@@ -14,8 +14,9 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class TriggerMessageRequestBddHandler extends OutcomingMessageFieldsValidationFactory<TriggerMessageRequest>
+public class TriggerMessageRequestBddHandler extends OutgoingMessageFieldsFactory<TriggerMessageRequest>
         implements OutgoingMessageFactory<TriggerMessageRequest> {
+
     public static final String REQUESTED_MESSAGE_REQUIRED = "requestedMessage";
     public static final String CONNECTOR_ID = "connectorId";
 

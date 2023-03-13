@@ -1,8 +1,8 @@
-package com.extrawest.jsonserver.validation.outcoming.request;
+package com.extrawest.jsonserver.validation.outgoing.request;
 
 import java.util.Map;
-import com.extrawest.jsonserver.validation.outcoming.OutcomingMessageFieldsValidationFactory;
-import com.extrawest.jsonserver.validation.outcoming.OutgoingMessageFactory;
+import com.extrawest.jsonserver.validation.outgoing.OutgoingMessageFactory;
+import com.extrawest.jsonserver.validation.outgoing.OutgoingMessageFieldsFactory;
 import eu.chargetime.ocpp.model.localauthlist.SendLocalListRequest;
 import eu.chargetime.ocpp.model.localauthlist.UpdateType;
 import jakarta.annotation.PostConstruct;
@@ -14,8 +14,9 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class SendLocalListRequestBddHandler extends OutcomingMessageFieldsValidationFactory<SendLocalListRequest>
+public class SendLocalListRequestBddHandler extends OutgoingMessageFieldsFactory<SendLocalListRequest>
         implements OutgoingMessageFactory<SendLocalListRequest> {
+
     public static final String LIST_VERSION_REQUIRED = "listVersion";
     public static final String UPDATE_TYPE_REQUIRED = "updateType";
     public static final String LOCAL_AUTHORIZATION_LIST = "localAuthorizationList";

@@ -1,9 +1,9 @@
-package com.extrawest.jsonserver.validation.outcoming.request;
+package com.extrawest.jsonserver.validation.outgoing.request;
 
 import java.util.Collections;
 import java.util.Map;
-import com.extrawest.jsonserver.validation.outcoming.OutcomingMessageFieldsValidationFactory;
-import com.extrawest.jsonserver.validation.outcoming.OutgoingMessageFactory;
+import com.extrawest.jsonserver.validation.outgoing.OutgoingMessageFactory;
+import com.extrawest.jsonserver.validation.outgoing.OutgoingMessageFieldsFactory;
 import eu.chargetime.ocpp.model.core.ResetRequest;
 import eu.chargetime.ocpp.model.core.ResetType;
 import jakarta.annotation.PostConstruct;
@@ -15,8 +15,9 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class ResetRequestBddHandler extends OutcomingMessageFieldsValidationFactory<ResetRequest>
-        implements OutgoingMessageFactory<ResetRequest> {
+public class ResetRequestBddHandler extends OutgoingMessageFieldsFactory<ResetRequest>
+    implements OutgoingMessageFactory<ResetRequest> {
+
     public static final String TYPE_REQUIRED = "type";
 
     @Value("${triggerMessage.request.requestedMessage:Soft}")

@@ -1,9 +1,9 @@
-package com.extrawest.jsonserver.validation.outcoming.request;
+package com.extrawest.jsonserver.validation.outgoing.request;
 
 import java.util.Collections;
 import java.util.Map;
-import com.extrawest.jsonserver.validation.outcoming.OutcomingMessageFieldsValidationFactory;
-import com.extrawest.jsonserver.validation.outcoming.OutgoingMessageFactory;
+import com.extrawest.jsonserver.validation.outgoing.OutgoingMessageFactory;
+import com.extrawest.jsonserver.validation.outgoing.OutgoingMessageFieldsFactory;
 import eu.chargetime.ocpp.model.smartcharging.SetChargingProfileRequest;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -15,8 +15,9 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class SetChargingProfileRequestBddHandler
-        extends OutcomingMessageFieldsValidationFactory<SetChargingProfileRequest>
+        extends OutgoingMessageFieldsFactory<SetChargingProfileRequest>
         implements OutgoingMessageFactory<SetChargingProfileRequest> {
+
     public static final String CONNECTOR_ID_REQUIRED = "connectorId";
     public static final String CS_CHARGING_PROFILES_REQUIRED = "csChargingProfiles";
 

@@ -1,8 +1,8 @@
-package com.extrawest.jsonserver.validation.outcoming.request;
+package com.extrawest.jsonserver.validation.outgoing.request;
 
 import java.util.Map;
-import com.extrawest.jsonserver.validation.outcoming.OutcomingMessageFieldsValidationFactory;
-import com.extrawest.jsonserver.validation.outcoming.OutgoingMessageFactory;
+import com.extrawest.jsonserver.validation.outgoing.OutgoingMessageFactory;
+import com.extrawest.jsonserver.validation.outgoing.OutgoingMessageFieldsFactory;
 import eu.chargetime.ocpp.model.firmware.UpdateFirmwareRequest;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -13,8 +13,9 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class UpdateFirmwareRequestBddFactory extends OutcomingMessageFieldsValidationFactory<UpdateFirmwareRequest>
+public class UpdateFirmwareRequestBddFactory extends OutgoingMessageFieldsFactory<UpdateFirmwareRequest>
         implements OutgoingMessageFactory<UpdateFirmwareRequest> {
+
     public static final String LOCATION_REQUIRED = "location";
     public static final String RETRIEVE_DATE_REQUIRED = "retrieveDate";
     public static final String RETRIES = "retries";

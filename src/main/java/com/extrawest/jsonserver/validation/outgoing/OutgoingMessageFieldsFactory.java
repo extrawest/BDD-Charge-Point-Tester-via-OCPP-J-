@@ -1,4 +1,4 @@
-package com.extrawest.jsonserver.validation.outcoming;
+package com.extrawest.jsonserver.validation.outgoing;
 
 import static com.extrawest.jsonserver.model.emun.ApiErrorMessage.BUG_CREATING_INSTANCE;
 import static com.extrawest.jsonserver.model.emun.ApiErrorMessage.INVALID_FIELD_VALUE;
@@ -46,7 +46,7 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public abstract class OutcomingMessageFieldsValidationFactory<T extends Validatable> {
+public abstract class OutgoingMessageFieldsFactory<T extends Validatable> {
     @Autowired @Setter protected ObjectMapper mapper;
 
     @Value("${wildcard:any}")

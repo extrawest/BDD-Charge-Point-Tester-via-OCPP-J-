@@ -1,8 +1,8 @@
-package com.extrawest.jsonserver.validation.outcoming.confirmation;
+package com.extrawest.jsonserver.validation.outgoing.confirmation;
 
 import java.util.Map;
-import com.extrawest.jsonserver.validation.outcoming.OutgoingMessageFactory;
-import com.extrawest.jsonserver.validation.outcoming.OutcomingMessageFieldsValidationFactory;
+import com.extrawest.jsonserver.validation.outgoing.OutgoingMessageFactory;
+import com.extrawest.jsonserver.validation.outgoing.OutgoingMessageFieldsFactory;
 import eu.chargetime.ocpp.model.core.DataTransferConfirmation;
 import eu.chargetime.ocpp.model.core.DataTransferStatus;
 import jakarta.annotation.PostConstruct;
@@ -14,9 +14,10 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class DataTransferOutcomingConfirmationBddHandler
-        extends OutcomingMessageFieldsValidationFactory<DataTransferConfirmation>
+public class DataTransferOutgoingConfirmationBddHandler
+        extends OutgoingMessageFieldsFactory<DataTransferConfirmation>
         implements OutgoingMessageFactory<DataTransferConfirmation> {
+
     public static final String STATUS_REQUIRED = "status";
     public static final String DATA = "data";
     @Value("${bootNotification.confirmation.status:Accepted}")
@@ -43,9 +44,9 @@ public class DataTransferOutcomingConfirmationBddHandler
 
     @Override
     public DataTransferConfirmation createMessageWithValidatedParams(Map<String, String> params) {
-        DataTransferConfirmation request = super.createMessageWithValidatedParamsViaLibModel(params);
-        log.debug(getParameterizeClassName() + ": " + request);
-        return request;
+        DataTransferConfirmation message = super.createMessageWithValidatedParamsViaLibModel(params);
+        log.debug(getParameterizeClassName() + ": " + message);
+        return message;
     }
 
 }

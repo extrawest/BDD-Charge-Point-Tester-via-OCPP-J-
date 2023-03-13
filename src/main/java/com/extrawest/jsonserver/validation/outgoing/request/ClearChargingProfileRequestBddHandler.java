@@ -1,7 +1,7 @@
-package com.extrawest.jsonserver.validation.outcoming.request;
+package com.extrawest.jsonserver.validation.outgoing.request;
 
-import com.extrawest.jsonserver.validation.outcoming.OutcomingMessageFieldsValidationFactory;
-import com.extrawest.jsonserver.validation.outcoming.OutgoingMessageFactory;
+import com.extrawest.jsonserver.validation.outgoing.OutgoingMessageFactory;
+import com.extrawest.jsonserver.validation.outgoing.OutgoingMessageFieldsFactory;
 import eu.chargetime.ocpp.model.core.ChargingProfilePurposeType;
 import eu.chargetime.ocpp.model.smartcharging.ClearChargingProfileRequest;
 import jakarta.annotation.PostConstruct;
@@ -16,8 +16,9 @@ import java.util.Map;
 @Slf4j
 @Component
 @NoArgsConstructor
-public class ClearChargingProfileRequestBddHandler extends OutcomingMessageFieldsValidationFactory<ClearChargingProfileRequest>
+public class ClearChargingProfileRequestBddHandler extends OutgoingMessageFieldsFactory<ClearChargingProfileRequest>
         implements OutgoingMessageFactory<ClearChargingProfileRequest> {
+
     public static final String ID = "id";
     public static final String CONNECTOR_ID = "connectorId";
     public static final String CHARGING_PROFILE_PURPOSE = "chargingProfilePurpose";
@@ -61,4 +62,5 @@ public class ClearChargingProfileRequestBddHandler extends OutcomingMessageField
         log.debug(getParameterizeClassName() + ": " + request);
         return request;
     }
+
 }

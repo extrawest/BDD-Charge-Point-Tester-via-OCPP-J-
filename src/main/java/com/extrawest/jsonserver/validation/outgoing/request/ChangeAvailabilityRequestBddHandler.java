@@ -1,7 +1,7 @@
-package com.extrawest.jsonserver.validation.outcoming.request;
+package com.extrawest.jsonserver.validation.outgoing.request;
 
-import com.extrawest.jsonserver.validation.outcoming.OutcomingMessageFieldsValidationFactory;
-import com.extrawest.jsonserver.validation.outcoming.OutgoingMessageFactory;
+import com.extrawest.jsonserver.validation.outgoing.OutgoingMessageFactory;
+import com.extrawest.jsonserver.validation.outgoing.OutgoingMessageFieldsFactory;
 import eu.chargetime.ocpp.model.core.AvailabilityType;
 import eu.chargetime.ocpp.model.core.ChangeAvailabilityRequest;
 import jakarta.annotation.PostConstruct;
@@ -16,7 +16,7 @@ import java.util.Map;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class ChangeAvailabilityRequestBddHandler extends OutcomingMessageFieldsValidationFactory<ChangeAvailabilityRequest>
+public class ChangeAvailabilityRequestBddHandler extends OutgoingMessageFieldsFactory<ChangeAvailabilityRequest>
         implements OutgoingMessageFactory<ChangeAvailabilityRequest> {
 
     public static final String CONNECTOR_ID_REQUIRED = "connectorId";

@@ -1,9 +1,9 @@
-package com.extrawest.jsonserver.validation.outcoming.confirmation;
+package com.extrawest.jsonserver.validation.outgoing.confirmation;
 
 import java.util.Collections;
 import java.util.Map;
-import com.extrawest.jsonserver.validation.outcoming.OutgoingMessageFactory;
-import com.extrawest.jsonserver.validation.outcoming.OutcomingMessageFieldsValidationFactory;
+import com.extrawest.jsonserver.validation.outgoing.OutgoingMessageFactory;
+import com.extrawest.jsonserver.validation.outgoing.OutgoingMessageFieldsFactory;
 import eu.chargetime.ocpp.model.core.HeartbeatConfirmation;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -15,8 +15,9 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class HeartbeatConfirmationBddHandler
-        extends OutcomingMessageFieldsValidationFactory<HeartbeatConfirmation>
+        extends OutgoingMessageFieldsFactory<HeartbeatConfirmation>
         implements OutgoingMessageFactory<HeartbeatConfirmation> {
+
     public static final String CURRENT_TIME_REQUIRED = "currentTime";
     @Value("${heartbeat.confirmation.currentTime:}")
     private String defaultCurrentTime;
@@ -38,9 +39,9 @@ public class HeartbeatConfirmationBddHandler
 
     @Override
     public HeartbeatConfirmation createMessageWithValidatedParams(Map<String, String> params) {
-        HeartbeatConfirmation request = super.createMessageWithValidatedParamsViaLibModel(params);
-        log.debug(getParameterizeClassName() + ": " + request);
-        return request;
+        HeartbeatConfirmation message = super.createMessageWithValidatedParamsViaLibModel(params);
+        log.debug(getParameterizeClassName() + ": " + message);
+        return message;
     }
 
 }

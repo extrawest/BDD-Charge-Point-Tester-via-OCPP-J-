@@ -1,9 +1,9 @@
-package com.extrawest.jsonserver.validation.outcoming.confirmation;
+package com.extrawest.jsonserver.validation.outgoing.confirmation;
 
 import java.util.Collections;
 import java.util.Map;
-import com.extrawest.jsonserver.validation.outcoming.OutgoingMessageFactory;
-import com.extrawest.jsonserver.validation.outcoming.OutcomingMessageFieldsValidationFactory;
+import com.extrawest.jsonserver.validation.outgoing.OutgoingMessageFactory;
+import com.extrawest.jsonserver.validation.outgoing.OutgoingMessageFieldsFactory;
 import eu.chargetime.ocpp.model.core.BootNotificationConfirmation;
 import eu.chargetime.ocpp.model.core.RegistrationStatus;
 import jakarta.annotation.PostConstruct;
@@ -16,8 +16,9 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class BootNotificationConfirmationBddHandler
-        extends OutcomingMessageFieldsValidationFactory<BootNotificationConfirmation>
+        extends OutgoingMessageFieldsFactory<BootNotificationConfirmation>
         implements OutgoingMessageFactory<BootNotificationConfirmation> {
+
     public static final String CURRENT_TIME_REQUIRED = "currentTime";
     public static final String INTERVAL_REQUIRED = "interval";
     public static final String STATUS_REQUIRED = "status";
@@ -52,9 +53,9 @@ public class BootNotificationConfirmationBddHandler
 
     @Override
     public BootNotificationConfirmation createMessageWithValidatedParams(Map<String, String> params) {
-        BootNotificationConfirmation request = super.createMessageWithValidatedParamsViaLibModel(params);
-        log.debug(getParameterizeClassName() + ": " + request);
-        return request;
+        BootNotificationConfirmation message = super.createMessageWithValidatedParamsViaLibModel(params);
+        log.debug(getParameterizeClassName() + ": " + message);
+        return message;
     }
 
 }

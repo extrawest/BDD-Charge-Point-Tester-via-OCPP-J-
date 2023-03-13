@@ -1,4 +1,4 @@
-package com.extrawest.jsonserver.validation.outcoming;
+package com.extrawest.jsonserver.validation.outgoing;
 
 import java.util.Map;
 import eu.chargetime.ocpp.model.Validatable;

@@ -1,7 +1,7 @@
-package com.extrawest.jsonserver.validation.outcoming.confirmation;
+package com.extrawest.jsonserver.validation.outgoing.confirmation;
 
-import com.extrawest.jsonserver.validation.outcoming.OutcomingMessageFieldsValidationFactory;
-import com.extrawest.jsonserver.validation.outcoming.OutgoingMessageFactory;
+import com.extrawest.jsonserver.validation.outgoing.OutgoingMessageFactory;
+import com.extrawest.jsonserver.validation.outgoing.OutgoingMessageFieldsFactory;
 import eu.chargetime.ocpp.model.core.StopTransactionConfirmation;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -17,10 +17,11 @@ import java.util.Map;
 @Component
 @RequiredArgsConstructor
 public class StopTransactionConfirmationBddHandler
-        extends OutcomingMessageFieldsValidationFactory<StopTransactionConfirmation>
+        extends OutgoingMessageFieldsFactory<StopTransactionConfirmation>
         implements OutgoingMessageFactory<StopTransactionConfirmation> {
 
     public static final String ID_TAG_INFO_REQUIRED = "idTagInfo";
+
     @Value("${startTransaction.confirmation.idTagInfo:}")
     private String defaultIdTagInfo;
     @Setter
@@ -42,9 +43,9 @@ public class StopTransactionConfirmationBddHandler
 
     @Override
     public StopTransactionConfirmation createMessageWithValidatedParams(Map<String, String> params) {
-        StopTransactionConfirmation request = super.createMessageWithValidatedParamsViaLibModel(params);
-        log.debug(getParameterizeClassName() + ": " + request);
-        return request;
+        StopTransactionConfirmation message = super.createMessageWithValidatedParamsViaLibModel(params);
+        log.debug(getParameterizeClassName() + ": " + message);
+        return message;
     }
 
 }

@@ -1,9 +1,9 @@
-package com.extrawest.jsonserver.validation.outcoming.confirmation;
+package com.extrawest.jsonserver.validation.outgoing.confirmation;
 
 import java.util.Collections;
 import java.util.Map;
-import com.extrawest.jsonserver.validation.outcoming.OutgoingMessageFactory;
-import com.extrawest.jsonserver.validation.outcoming.OutcomingMessageFieldsValidationFactory;
+import com.extrawest.jsonserver.validation.outgoing.OutgoingMessageFactory;
+import com.extrawest.jsonserver.validation.outgoing.OutgoingMessageFieldsFactory;
 import eu.chargetime.ocpp.model.core.AuthorizeConfirmation;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -16,8 +16,9 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class AuthorizeConfirmationBddHandler
-        extends OutcomingMessageFieldsValidationFactory<AuthorizeConfirmation>
+        extends OutgoingMessageFieldsFactory<AuthorizeConfirmation>
         implements OutgoingMessageFactory<AuthorizeConfirmation> {
+
     public static final String ID_TAG_INFO_REQUIRED = "idTagInfo";
     @Value("${authorize.confirmation.idTagInfo:{\"expiryDate\":\"2023-12-31T23:23:59.278930403Z\",\"parentIdTag\":\"idTag-chargePointId\",\"status\":\"Accepted\"}}")
     private String defaultIdTagInfo;
@@ -39,9 +40,9 @@ public class AuthorizeConfirmationBddHandler
 
     @Override
     public AuthorizeConfirmation createMessageWithValidatedParams(Map<String, String> params) {
-        AuthorizeConfirmation request = super.createMessageWithValidatedParamsViaLibModel(params);
-        log.debug(getParameterizeClassName() + ": " + request);
-        return request;
+        AuthorizeConfirmation message = super.createMessageWithValidatedParamsViaLibModel(params);
+        log.debug(getParameterizeClassName() + ": " + message);
+        return message;
     }
 
 }

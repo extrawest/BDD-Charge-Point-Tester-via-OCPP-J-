@@ -1,7 +1,7 @@
-package com.extrawest.jsonserver.validation.outcoming.request;
+package com.extrawest.jsonserver.validation.outgoing.request;
 
-import com.extrawest.jsonserver.validation.outcoming.OutcomingMessageFieldsValidationFactory;
-import com.extrawest.jsonserver.validation.outcoming.OutgoingMessageFactory;
+import com.extrawest.jsonserver.validation.outgoing.OutgoingMessageFactory;
+import com.extrawest.jsonserver.validation.outgoing.OutgoingMessageFieldsFactory;
 import eu.chargetime.ocpp.model.reservation.CancelReservationRequest;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +15,7 @@ import java.util.Map;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class CancelReservationRequestBddHandler extends OutcomingMessageFieldsValidationFactory<CancelReservationRequest>
+public class CancelReservationRequestBddHandler extends OutgoingMessageFieldsFactory<CancelReservationRequest>
         implements OutgoingMessageFactory<CancelReservationRequest> {
 
     public static final String RESERVATION_ID_REQUIRED = "reservationId";
@@ -42,4 +42,5 @@ public class CancelReservationRequestBddHandler extends OutcomingMessageFieldsVa
         log.debug(getParameterizeClassName() + ": " + request);
         return request;
     }
+
 }

@@ -1,9 +1,9 @@
-package com.extrawest.jsonserver.validation.outcoming.request;
+package com.extrawest.jsonserver.validation.outgoing.request;
 
 import java.util.Collections;
 import java.util.Map;
-import com.extrawest.jsonserver.validation.outcoming.OutcomingMessageFieldsValidationFactory;
-import com.extrawest.jsonserver.validation.outcoming.OutgoingMessageFactory;
+import com.extrawest.jsonserver.validation.outgoing.OutgoingMessageFactory;
+import com.extrawest.jsonserver.validation.outgoing.OutgoingMessageFieldsFactory;
 import eu.chargetime.ocpp.model.core.UnlockConnectorRequest;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -14,8 +14,9 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class UnlockConnectorRequestBddHandler extends OutcomingMessageFieldsValidationFactory<UnlockConnectorRequest>
+public class UnlockConnectorRequestBddHandler extends OutgoingMessageFieldsFactory<UnlockConnectorRequest>
         implements OutgoingMessageFactory<UnlockConnectorRequest> {
+
     public static final String CONNECTOR_ID_REQUIRED = "connectorId";
 
     @Value("${unlockConnector.request.connectorId:1}")

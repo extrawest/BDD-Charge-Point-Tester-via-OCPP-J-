@@ -1,9 +1,9 @@
-package com.extrawest.jsonserver.validation.outcoming.confirmation;
+package com.extrawest.jsonserver.validation.outgoing.confirmation;
 
 import java.util.Collections;
 import java.util.Map;
-import com.extrawest.jsonserver.validation.outcoming.OutcomingMessageFieldsValidationFactory;
-import com.extrawest.jsonserver.validation.outcoming.OutgoingMessageFactory;
+import com.extrawest.jsonserver.validation.outgoing.OutgoingMessageFactory;
+import com.extrawest.jsonserver.validation.outgoing.OutgoingMessageFieldsFactory;
 import eu.chargetime.ocpp.model.firmware.DiagnosticsStatusNotificationConfirmation;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class DiagnosticsStatusNotificationConfirmationBddHandler
-        extends OutcomingMessageFieldsValidationFactory<DiagnosticsStatusNotificationConfirmation>
+        extends OutgoingMessageFieldsFactory<DiagnosticsStatusNotificationConfirmation>
         implements OutgoingMessageFactory<DiagnosticsStatusNotificationConfirmation> {
 
     @PostConstruct
@@ -26,9 +26,9 @@ public class DiagnosticsStatusNotificationConfirmationBddHandler
 
     @Override
     public DiagnosticsStatusNotificationConfirmation createMessageWithValidatedParams(Map<String, String> params) {
-        DiagnosticsStatusNotificationConfirmation request = super.createMessageWithValidatedParamsViaLibModel(params);
-        log.debug(getParameterizeClassName() + ": " + request);
-        return request;
+        DiagnosticsStatusNotificationConfirmation message = super.createMessageWithValidatedParamsViaLibModel(params);
+        log.debug(getParameterizeClassName() + ": " + message);
+        return message;
     }
 
 }

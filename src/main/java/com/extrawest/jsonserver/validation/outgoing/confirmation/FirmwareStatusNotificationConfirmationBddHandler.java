@@ -1,9 +1,9 @@
-package com.extrawest.jsonserver.validation.outcoming.confirmation;
+package com.extrawest.jsonserver.validation.outgoing.confirmation;
 
 import java.util.Collections;
 import java.util.Map;
-import com.extrawest.jsonserver.validation.outcoming.OutcomingMessageFieldsValidationFactory;
-import com.extrawest.jsonserver.validation.outcoming.OutgoingMessageFactory;
+import com.extrawest.jsonserver.validation.outgoing.OutgoingMessageFactory;
+import com.extrawest.jsonserver.validation.outgoing.OutgoingMessageFieldsFactory;
 import eu.chargetime.ocpp.model.firmware.FirmwareStatusNotificationConfirmation;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class FirmwareStatusNotificationConfirmationBddHandler
-        extends OutcomingMessageFieldsValidationFactory<FirmwareStatusNotificationConfirmation>
+        extends OutgoingMessageFieldsFactory<FirmwareStatusNotificationConfirmation>
         implements OutgoingMessageFactory<FirmwareStatusNotificationConfirmation> {
 
     @PostConstruct
@@ -26,9 +26,9 @@ public class FirmwareStatusNotificationConfirmationBddHandler
 
     @Override
     public FirmwareStatusNotificationConfirmation createMessageWithValidatedParams(Map<String, String> params) {
-        FirmwareStatusNotificationConfirmation request = super.createMessageWithValidatedParamsViaLibModel(params);
-        log.debug(getParameterizeClassName() + ": " + request);
-        return request;
+        FirmwareStatusNotificationConfirmation message = super.createMessageWithValidatedParamsViaLibModel(params);
+        log.debug(getParameterizeClassName() + ": " + message);
+        return message;
     }
 
 }

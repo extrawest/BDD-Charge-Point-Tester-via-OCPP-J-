@@ -1,7 +1,7 @@
-package com.extrawest.jsonserver.validation.outcoming.request;
+package com.extrawest.jsonserver.validation.outgoing.request;
 
-import com.extrawest.jsonserver.validation.outcoming.OutcomingMessageFieldsValidationFactory;
-import com.extrawest.jsonserver.validation.outcoming.OutgoingMessageFactory;
+import com.extrawest.jsonserver.validation.outgoing.OutgoingMessageFactory;
+import com.extrawest.jsonserver.validation.outgoing.OutgoingMessageFieldsFactory;
 import eu.chargetime.ocpp.model.core.ChangeConfigurationRequest;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -15,8 +15,9 @@ import java.util.Map;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class ChangeConfigurationRequestBddHandler extends OutcomingMessageFieldsValidationFactory<ChangeConfigurationRequest>
+public class ChangeConfigurationRequestBddHandler extends OutgoingMessageFieldsFactory<ChangeConfigurationRequest>
         implements OutgoingMessageFactory<ChangeConfigurationRequest> {
+
     public static final String KEY_REQUIRED = "key";
     public static final String VALUE_REQUIRED = "value";
 
@@ -44,8 +45,9 @@ public class ChangeConfigurationRequestBddHandler extends OutcomingMessageFields
 
     @Override
     public ChangeConfigurationRequest createMessageWithValidatedParams(Map<String, String> params) {
-        ChangeConfigurationRequest request = super.createMessageWithValidatedParamsViaLibModel(params);
-        log.debug(getParameterizeClassName() + ": " + request);
-        return request;
+        ChangeConfigurationRequest message = super.createMessageWithValidatedParamsViaLibModel(params);
+        log.debug(getParameterizeClassName() + ": " + message);
+        return message;
     }
+
 }

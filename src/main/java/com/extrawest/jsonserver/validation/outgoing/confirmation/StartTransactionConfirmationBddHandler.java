@@ -1,9 +1,9 @@
-package com.extrawest.jsonserver.validation.outcoming.confirmation;
+package com.extrawest.jsonserver.validation.outgoing.confirmation;
 
 import java.util.Collections;
 import java.util.Map;
-import com.extrawest.jsonserver.validation.outcoming.OutgoingMessageFactory;
-import com.extrawest.jsonserver.validation.outcoming.OutcomingMessageFieldsValidationFactory;
+import com.extrawest.jsonserver.validation.outgoing.OutgoingMessageFactory;
+import com.extrawest.jsonserver.validation.outgoing.OutgoingMessageFieldsFactory;
 import eu.chargetime.ocpp.model.core.StartTransactionConfirmation;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -16,14 +16,17 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class StartTransactionConfirmationBddHandler
-        extends OutcomingMessageFieldsValidationFactory<StartTransactionConfirmation>
+        extends OutgoingMessageFieldsFactory<StartTransactionConfirmation>
         implements OutgoingMessageFactory<StartTransactionConfirmation> {
+
     public static final String ID_TAG_INFO_REQUIRED = "idTagInfo";
     public static final String TRANSACTION_ID_REQUIRED = "transactionId";
+
     @Value("${startTransaction.confirmation.idTagInfo:}")
     private String defaultIdTagInfo;
     @Value("${startTransaction.confirmation.transactionId:1111}")
     private String defaultTransactionId;
+
     @Setter private String receivedIdTag = null;
 
     @PostConstruct
@@ -45,9 +48,9 @@ public class StartTransactionConfirmationBddHandler
 
     @Override
     public StartTransactionConfirmation createMessageWithValidatedParams(Map<String, String> params) {
-        StartTransactionConfirmation request = super.createMessageWithValidatedParamsViaLibModel(params);
-        log.debug(getParameterizeClassName() + ": " + request);
-        return request;
+        StartTransactionConfirmation message = super.createMessageWithValidatedParamsViaLibModel(params);
+        log.debug(getParameterizeClassName() + ": " + message);
+        return message;
     }
 
 }
