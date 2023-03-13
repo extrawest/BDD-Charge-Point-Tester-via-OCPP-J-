@@ -1,6 +1,5 @@
 package com.extrawest.jsonserver.service.impl;
 
-import com.extrawest.jsonserver.model.ChargePoint;
 import com.extrawest.jsonserver.model.emun.ImplementedMessageType;
 import com.extrawest.jsonserver.model.exception.BddTestingException;
 import com.extrawest.jsonserver.repository.BddDataRepository;
@@ -87,10 +86,9 @@ public class MessagingServiceImpl implements MessagingService {
     }
 
     @Override
-    public Optional<Request> waitForRequestedMessage(ChargePoint chargePoint,
+    public Optional<Request> waitForRequestedMessage(String chargePointId,
                                                      int waitingTimeSec,
                                                      ImplementedMessageType type) {
-        String chargePointId = chargePoint.getChargePointId();
         Optional<List<ImplementedMessageType>> messageTypes = bddDataRepository.getRequestedMessageTypes(chargePointId);
         if (messageTypes.isEmpty() || !messageTypes.get().contains(type)) {
             throw new BddTestingException("There are no message requests awaiting with type: " + type);
