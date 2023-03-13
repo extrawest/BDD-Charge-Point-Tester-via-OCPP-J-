@@ -1,0 +1,32 @@
+name: Publish Snapshot to GitHub Packages
+
+on:
+  push:
+    branches:
+      - dev
+
+env:
+  GITHUB_USERNAME: ${{ secrets.GITHUB_USERNAME }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3.10.0
+        with:
+          java-version: 17
+          distribution: 'temurin'
+
+      - name: Build and Publish Snapshot
+        env:
+          USERNAME: ${{ env.GITHUB_USERNAME }}
+          TOKEN: ${{ env.GITHUB_TOKEN }}
+        run: |
+          mvn deploy -DskipTests=true -Dmaven.javadoc.skip=true \
+            -DaltDeploymentRepository=github::default::https://maven.pkg.github.com/extrawest/BDD-Charge-Point-Tester-via-OCPP-J- \
+            -Dusername=${USERNAME} -Dpassword=${TOKEN}

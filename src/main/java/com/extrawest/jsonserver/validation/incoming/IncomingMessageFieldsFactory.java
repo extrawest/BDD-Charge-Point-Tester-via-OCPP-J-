@@ -26,6 +26,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.chargetime.ocpp.PropertyConstraintException;
 import eu.chargetime.ocpp.model.Validatable;
+import eu.chargetime.ocpp.model.core.*;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -127,10 +128,56 @@ public abstract class IncomingMessageFieldsFactory<T extends Validatable> {
                 fieldName, getParameterizeClassName()));
     }
 
+    protected ChargingSchedule getValidatedChargingSchedule(String paramValue, String fieldName) {
+        if (Objects.equals(paramValue, wildCard)) {
+            ChargingSchedule chargingSchedule = new ChargingSchedule();
+            chargingSchedule.setDuration(1);
+            chargingSchedule.setStartSchedule(ZonedDateTime.now().plusHours(1L));
+            chargingSchedule.setChargingSchedulePeriod(new ChargingSchedulePeriod[1]);
+            chargingSchedule.setChargingRateUnit(ChargingRateUnitType.W);
+            chargingSchedule.setMinChargingRate(1.0);
+            return chargingSchedule;
+        }
+        return parseModelFromJson(paramValue, fieldName, ChargingSchedule.class);
+    }
+
+    protected KeyValueType[] getValidatedKeyValueType(String paramValue, String fieldName) {
+        if (Objects.equals(paramValue, wildCard)) {
+            KeyValueType keyValueType = new KeyValueType();
+            keyValueType.setKey("Key");
+            keyValueType.setValue("Value");
+            keyValueType.setReadonly(false);
+            return new KeyValueType[]{keyValueType};
+        }
+        return new KeyValueType[]{parseModelFromJson(paramValue, fieldName, KeyValueType.class)};
+    }
+
+    private  <M extends Validatable> M parseModelFromJson(String value, String fieldName, Class<M> clazz) {
+        try {
+            log.info("JSON string for parsing: " + value);
+            M model = mapper.readValue(value, clazz);
+            log.info("Model parsed from string: " + model);
+            return model;
+        } catch (JsonProcessingException e) {
+            throw new ValidationException(
+                    String.format(INVALID_FIELD_VALUE.getValue(), getParameterizeClassName(), fieldName, value));
+        }
+    }
+
     protected boolean compareStringsIncludeWildCard(Map<String, String> expectedParams,
                                                     String actual, String fieldName) {
         String expected = expectedParams.get(fieldName);
         boolean result = Objects.equals(expected, wildCard) || Objects.equals(expected, actual);
+        if (!result) {
+            log.warn(String.format(nonMatchMessage, getParameterizeClassName(), fieldName, expected, actual));
+        }
+        return result;
+    }
+
+    protected boolean compareChargingScheduleIncludeWildCard(Map<String, String> expectedParams,
+                                                             ChargingSchedule actual, String fieldName) {
+        ChargingSchedule expected = parseModelFromJson(expectedParams.get(fieldName), fieldName, ChargingSchedule.class);
+        boolean result = Objects.equals(expected, actual);
         if (!result) {
             log.warn(String.format(nonMatchMessage, getParameterizeClassName(), fieldName, expected, actual));
         }

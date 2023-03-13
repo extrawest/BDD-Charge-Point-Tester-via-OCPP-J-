@@ -6,7 +6,7 @@
 
     <groupId>io.github.extrawest</groupId>
     <artifactId>bdd-charge-point-tester-via-ocpp-j</artifactId>
-    <version>0.1.0</version>
+    <version>0.1.2-SNAPSHOT</version>
 
     <name>${project.groupId}:${project.artifactId}</name>
     <description>OCPP operation tester for the Charge Points</description>
@@ -233,7 +233,7 @@
         <!-- GitHub Releases -->
         <snapshotRepository>
             <id>github-releases</id>
-            <url>https://maven.pkg.github.com/username/repo</url>
+            <url>https://maven.pkg.github.com/extrawest/BDD-Charge-Point-Tester-via-OCPP-J-</url>
             <name>GitHub Package Registry</name>
             <uniqueVersion>false</uniqueVersion>
         </snapshotRepository>
