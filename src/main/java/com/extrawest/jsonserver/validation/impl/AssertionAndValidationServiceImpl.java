@@ -13,7 +13,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import com.extrawest.jsonserver.model.emun.ImplementedMessageType;
 import com.extrawest.jsonserver.model.exception.BddTestingException;
-import com.extrawest.jsonserver.validation.ValidationService;
+import com.extrawest.jsonserver.validation.AssertionAndValidationService;
 import com.extrawest.jsonserver.validation.incoming.confirmation.CancelReservationConfirmationBddHandler;
 import com.extrawest.jsonserver.validation.incoming.confirmation.ChangeAvailabilityConfirmationBddHandler;
 import com.extrawest.jsonserver.validation.incoming.confirmation.ChangeConfigurationConfirmationBddHandler;
@@ -84,11 +84,13 @@ import eu.chargetime.ocpp.model.remotetrigger.TriggerMessageConfirmation;
 import eu.chargetime.ocpp.model.reservation.CancelReservationConfirmation;
 import eu.chargetime.ocpp.model.smartcharging.ClearChargingProfileConfirmation;
 import eu.chargetime.ocpp.model.smartcharging.SetChargingProfileConfirmation;
-import org.springframework.context.ApplicationContext;
+import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ValidationServiceImpl implements ValidationService {
+@RequiredArgsConstructor
+public class AssertionAndValidationServiceImpl implements AssertionAndValidationService {
     private final AuthorizeConfirmationBddHandler authorizeConfirmationBddHandler;
 
     private final AuthorizeRequestBddHandler authorizeRequestBddHandler;
@@ -143,60 +145,12 @@ public class ValidationServiceImpl implements ValidationService {
     Map<ImplementedMessageType, OutgoingMessageFactory<? extends Confirmation>>
             outgoingConfirmationHandlers;
 
-    public ValidationServiceImpl(ApplicationContext springBootContext) {
-        this.authorizeRequestBddHandler = springBootContext.getBean(AuthorizeRequestBddHandler.class);
-        this.bootNotificationRequestBddHandler = springBootContext.getBean(BootNotificationRequestBddHandler.class);
-        this.dataTransferIncomingRequestBddHandler = springBootContext.getBean(DataTransferIncomingRequestBddHandler.class);
-        this.diagnosticsStatusNotificationRequestBddHandler = springBootContext.getBean(DiagnosticsStatusNotificationRequestBddHandler.class);
-        this.firmwareStatusNotificationRequestBddHandler = springBootContext.getBean(FirmwareStatusNotificationRequestBddHandler.class);
-        this.heartbeatRequestBddHandler = springBootContext.getBean(HeartbeatRequestBddHandler.class);
-        this.meterValuesRequestBddHandler = springBootContext.getBean(MeterValuesRequestBddHandler.class);
-        this.startTransactionRequestBddHandler = springBootContext.getBean(StartTransactionRequestBddHandler.class);
-        this.statusNotificationRequestBddHandler = springBootContext.getBean(StatusNotificationRequestBddHandler.class);
-        this.stopTransactionRequestBddHandler = springBootContext.getBean(StopTransactionRequestBddHandler.class);
-
-        this.authorizeConfirmationBddHandler = springBootContext.getBean(AuthorizeConfirmationBddHandler.class);
-        this.startTransactionConfirmationBddHandler = springBootContext.getBean(StartTransactionConfirmationBddHandler.class);
-        this.stopTransactionConfirmationBddHandler = springBootContext.getBean(StopTransactionConfirmationBddHandler.class);
-
-        this.cancelReservationConfirmationBddHandler = springBootContext.getBean(CancelReservationConfirmationBddHandler.class);
-        this.changeAvailabilityConfirmationBddHandler = springBootContext.getBean(ChangeAvailabilityConfirmationBddHandler.class);
-        this.changeConfigurationConfirmationBddHandler = springBootContext.getBean(ChangeConfigurationConfirmationBddHandler.class);
-        this.clearCacheConfirmationBddHandler = springBootContext.getBean(ClearCacheConfirmationBddHandler.class);
-        this.clearChargingProfileConfirmationBddHandler = springBootContext.getBean(ClearChargingProfileConfirmationBddHandler.class);
-        this.dataTransferIncomingConfirmationBddHandler = springBootContext.getBean(DataTransferIncomingConfirmationBddHandler.class);
-        this.resetConfirmationBddHandler = springBootContext.getBean(ResetConfirmationBddHandler.class);
-        this.sendLocalListConfirmationBddHandler = springBootContext.getBean(SendLocalListConfirmationBddHandler.class);
-        this.setChargingProfileConfirmationBddHandler = springBootContext.getBean(SetChargingProfileConfirmationBddHandler.class);
-        this.triggerMessageConfirmationBddHandler = springBootContext.getBean(TriggerMessageConfirmationBddHandler.class);
-        this.unlockConnectorConfirmationBddHandler = springBootContext.getBean(UnlockConnectorConfirmationBddHandler.class);
-        this.updateFirmwareConfirmationBddHandler = springBootContext.getBean(UpdateFirmwareConfirmationBddHandler.class);
-
+    @PostConstruct
+    public void init() {
         createOutgoingConfirmationHandlers();
         createOutgoingRequestHandlers();
 
         validateForFactoriesForImplementedMessageTypes();
-
-        bootNotificationConfirmationBddHandler = springBootContext.getBean(BootNotificationConfirmationBddHandler.class);
-        dataTransferOutgoingConfirmationBddHandler = springBootContext.getBean(DataTransferOutgoingConfirmationBddHandler.class);
-        diagnosticsStatusNotificationConfirmationBddHandler = springBootContext.getBean(DiagnosticsStatusNotificationConfirmationBddHandler.class);
-        firmwareStatusNotificationConfirmationBddHandler = springBootContext.getBean(FirmwareStatusNotificationConfirmationBddHandler.class);
-        heartbeatConfirmationBddHandler = springBootContext.getBean(HeartbeatConfirmationBddHandler.class);
-        meterValuesConfirmationBddHandler = springBootContext.getBean(MeterValuesConfirmationBddHandler.class);
-        statusNotificationConfirmationBddHandler = springBootContext.getBean(StatusNotificationConfirmationBddHandler.class);
-
-        cancelReservationRequestBddHandler = springBootContext.getBean(CancelReservationRequestBddHandler.class);
-        clearCacheRequestBddHandler = springBootContext.getBean(ClearCacheRequestBddHandler.class);
-        changeAvailabilityRequestBddHandler = springBootContext.getBean(ChangeAvailabilityRequestBddHandler.class);
-        changeConfigurationRequestBddHandler = springBootContext.getBean(ChangeConfigurationRequestBddHandler.class);
-        clearChargingProfileRequestBddHandler = springBootContext.getBean(ClearChargingProfileRequestBddHandler.class);
-        dataTransferOutgoingRequestBddHandler = springBootContext.getBean(DataTransferOutgoingRequestBddHandler.class);
-        resetRequestBddHandler = springBootContext.getBean(ResetRequestBddHandler.class);
-        sendLocalListRequestBddHandler = springBootContext.getBean(SendLocalListRequestBddHandler.class);
-        setChargingProfileRequestBddHandler = springBootContext.getBean(SetChargingProfileRequestBddHandler.class);
-        triggerMessageRequestBddHandler = springBootContext.getBean(TriggerMessageRequestBddHandler.class);
-        unlockConnectorRequestBddHandler = springBootContext.getBean(UnlockConnectorRequestBddHandler.class);
-        updateFirmwareRequestBddFactory = springBootContext.getBean(UpdateFirmwareRequestBddFactory.class);
     }
 
     private void createOutgoingConfirmationHandlers() {
@@ -212,18 +166,6 @@ public class ValidationServiceImpl implements ValidationService {
                 STATUS_NOTIFICATION, statusNotificationConfirmationBddHandler,
                 STOP_TRANSACTION, stopTransactionConfirmationBddHandler
         );
-/*        outgoingConfirmationHandlers = Map.of(
-                AUTHORIZE, authorizeConfirmationBddHandler,
-                BOOT_NOTIFICATION, new BootNotificationConfirmationBddHandler(),
-                DATA_TRANSFER_INCOMING, new DataTransferOutgoingConfirmationBddHandler(),
-                DIAGNOSTICS_STATUS_NOTIFICATION, new DiagnosticsStatusNotificationConfirmationBddHandler(),
-                FIRMWARE_STATUS_NOTIFICATION, new FirmwareStatusNotificationConfirmationBddHandler(),
-                HEARTBEAT, new HeartbeatConfirmationBddHandler(),
-                METER_VALUES, new MeterValuesConfirmationBddHandler(),
-                START_TRANSACTION, startTransactionConfirmationBddHandler,
-                STATUS_NOTIFICATION, new StatusNotificationConfirmationBddHandler(),
-                STOP_TRANSACTION, stopTransactionConfirmationBddHandler
-        );*/
     }
 
     private void createOutgoingRequestHandlers() {
@@ -244,22 +186,6 @@ public class ValidationServiceImpl implements ValidationService {
                 UNLOCK_CONNECTOR, unlockConnectorRequestBddHandler,
                 UPDATE_FIRMWARE, updateFirmwareRequestBddFactory
         );
-/*        Map<ImplementedMessageType, OutgoingMessageFactory<? extends Request>> theFirstPart = Map.of(
-                CANCEL_RESERVATION, new CancelReservationRequestBddHandler(),
-                CHANGE_AVAILABILITY, new ChangeAvailabilityRequestBddHandler(),
-                CHANGE_CONFIGURATION, new ChangeConfigurationRequestBddHandler(),
-                CLEAR_CACHE, new ClearCacheRequestBddHandler(),
-                CLEAR_CHARGING_PROFILE, new ClearChargingProfileRequestBddHandler(),
-                DATA_TRANSFER_OUTGOING, new DataTransferOutgoingRequestBddHandler(),
-                RESET, new ResetRequestBddHandler(),
-                SEND_LOCAL_LIST, new SendLocalListRequestBddHandler(),
-                SET_CHARGING_PROFILE, new SetChargingProfileRequestBddHandler(),
-                TRIGGER_MESSAGE, new TriggerMessageRequestBddHandler()
-        );
-        Map<ImplementedMessageType, OutgoingMessageFactory<? extends Request>> theSecondPart = Map.of(
-                UNLOCK_CONNECTOR, new UnlockConnectorRequestBddHandler(),
-                UPDATE_FIRMWARE, new UpdateFirmwareRequestBddFactory()
-        );*/
 
         handlers.putAll(theFirstPart);
         handlers.putAll(theSecondPart);
