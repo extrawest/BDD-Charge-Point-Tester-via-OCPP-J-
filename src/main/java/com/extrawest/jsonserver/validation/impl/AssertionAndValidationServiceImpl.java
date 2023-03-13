@@ -20,6 +20,13 @@ import com.extrawest.jsonserver.validation.incoming.confirmation.ChangeConfigura
 import com.extrawest.jsonserver.validation.incoming.confirmation.ClearCacheConfirmationBddHandler;
 import com.extrawest.jsonserver.validation.incoming.confirmation.ClearChargingProfileConfirmationBddHandler;
 import com.extrawest.jsonserver.validation.incoming.confirmation.DataTransferIncomingConfirmationBddHandler;
+import com.extrawest.jsonserver.validation.incoming.confirmation.GetCompositeScheduleConfirmationBddHandler;
+import com.extrawest.jsonserver.validation.incoming.confirmation.GetConfigurationConfirmationBddHandler;
+import com.extrawest.jsonserver.validation.incoming.confirmation.GetDiagnosticsConfirmationBddHandler;
+import com.extrawest.jsonserver.validation.incoming.confirmation.GetLocalListVersionConfirmationBddHandler;
+import com.extrawest.jsonserver.validation.incoming.confirmation.RemoteStartTransactionConfirmationBddHandler;
+import com.extrawest.jsonserver.validation.incoming.confirmation.RemoteStopTransactionConfirmationBddHandler;
+import com.extrawest.jsonserver.validation.incoming.confirmation.ReserveNowConfirmationBddHandler;
 import com.extrawest.jsonserver.validation.incoming.confirmation.ResetConfirmationBddHandler;
 import com.extrawest.jsonserver.validation.incoming.confirmation.SendLocalListConfirmationBddHandler;
 import com.extrawest.jsonserver.validation.incoming.confirmation.SetChargingProfileConfirmationBddHandler;
@@ -54,6 +61,13 @@ import com.extrawest.jsonserver.validation.outgoing.request.ChangeConfigurationR
 import com.extrawest.jsonserver.validation.outgoing.request.ClearCacheRequestBddHandler;
 import com.extrawest.jsonserver.validation.outgoing.request.ClearChargingProfileRequestBddHandler;
 import com.extrawest.jsonserver.validation.outgoing.request.DataTransferOutgoingRequestBddHandler;
+import com.extrawest.jsonserver.validation.outgoing.request.GetCompositeScheduleRequestBddHandler;
+import com.extrawest.jsonserver.validation.outgoing.request.GetConfigurationRequestBddHandler;
+import com.extrawest.jsonserver.validation.outgoing.request.GetDiagnosticsRequestBddHandler;
+import com.extrawest.jsonserver.validation.outgoing.request.GetLocalListVersionRequestBddHandler;
+import com.extrawest.jsonserver.validation.outgoing.request.RemoteStartTransactionRequestBddHandler;
+import com.extrawest.jsonserver.validation.outgoing.request.RemoteStopTransactionRequestBddHandler;
+import com.extrawest.jsonserver.validation.outgoing.request.ReserveNowRequestBddHandler;
 import com.extrawest.jsonserver.validation.outgoing.request.ResetRequestBddHandler;
 import com.extrawest.jsonserver.validation.outgoing.request.SendLocalListRequestBddHandler;
 import com.extrawest.jsonserver.validation.outgoing.request.SetChargingProfileRequestBddHandler;
@@ -69,8 +83,11 @@ import eu.chargetime.ocpp.model.core.ChangeConfigurationConfirmation;
 import eu.chargetime.ocpp.model.core.ClearCacheConfirmation;
 import eu.chargetime.ocpp.model.core.DataTransferConfirmation;
 import eu.chargetime.ocpp.model.core.DataTransferRequest;
+import eu.chargetime.ocpp.model.core.GetConfigurationConfirmation;
 import eu.chargetime.ocpp.model.core.HeartbeatRequest;
 import eu.chargetime.ocpp.model.core.MeterValuesRequest;
+import eu.chargetime.ocpp.model.core.RemoteStartTransactionConfirmation;
+import eu.chargetime.ocpp.model.core.RemoteStopTransactionConfirmation;
 import eu.chargetime.ocpp.model.core.ResetConfirmation;
 import eu.chargetime.ocpp.model.core.StartTransactionRequest;
 import eu.chargetime.ocpp.model.core.StatusNotificationRequest;
@@ -78,21 +95,23 @@ import eu.chargetime.ocpp.model.core.StopTransactionRequest;
 import eu.chargetime.ocpp.model.core.UnlockConnectorConfirmation;
 import eu.chargetime.ocpp.model.firmware.DiagnosticsStatusNotificationRequest;
 import eu.chargetime.ocpp.model.firmware.FirmwareStatusNotificationRequest;
+import eu.chargetime.ocpp.model.firmware.GetDiagnosticsConfirmation;
 import eu.chargetime.ocpp.model.firmware.UpdateFirmwareConfirmation;
+import eu.chargetime.ocpp.model.localauthlist.GetLocalListVersionConfirmation;
 import eu.chargetime.ocpp.model.localauthlist.SendLocalListConfirmation;
 import eu.chargetime.ocpp.model.remotetrigger.TriggerMessageConfirmation;
 import eu.chargetime.ocpp.model.reservation.CancelReservationConfirmation;
+import eu.chargetime.ocpp.model.reservation.ReserveNowConfirmation;
 import eu.chargetime.ocpp.model.smartcharging.ClearChargingProfileConfirmation;
+import eu.chargetime.ocpp.model.smartcharging.GetCompositeScheduleConfirmation;
 import eu.chargetime.ocpp.model.smartcharging.SetChargingProfileConfirmation;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class AssertionAndValidationServiceImpl implements AssertionAndValidationService {
-    private final AuthorizeConfirmationBddHandler authorizeConfirmationBddHandler;
-
     private final AuthorizeRequestBddHandler authorizeRequestBddHandler;
     private final BootNotificationRequestBddHandler bootNotificationRequestBddHandler;
     private final DataTransferIncomingRequestBddHandler dataTransferIncomingRequestBddHandler;
@@ -110,6 +129,13 @@ public class AssertionAndValidationServiceImpl implements AssertionAndValidation
     private final ClearCacheConfirmationBddHandler clearCacheConfirmationBddHandler;
     private final ClearChargingProfileConfirmationBddHandler clearChargingProfileConfirmationBddHandler;
     private final DataTransferIncomingConfirmationBddHandler dataTransferIncomingConfirmationBddHandler;
+    private final GetCompositeScheduleConfirmationBddHandler getCompositeScheduleConfirmationBddHandler;
+    private final GetConfigurationConfirmationBddHandler getConfigurationConfirmationBddHandler;
+    private final GetDiagnosticsConfirmationBddHandler getDiagnosticsConfirmationBddHandler;
+    private final GetLocalListVersionConfirmationBddHandler getLocalListVersionConfirmationBddHandler;
+    private final RemoteStartTransactionConfirmationBddHandler remoteStartTransactionConfirmationBddHandler;
+    private final RemoteStopTransactionConfirmationBddHandler remoteStopTransactionConfirmationBddHandler;
+    private final ReserveNowConfirmationBddHandler reserveNowConfirmationBddHandler;
     private final ResetConfirmationBddHandler resetConfirmationBddHandler;
     private final SendLocalListConfirmationBddHandler sendLocalListConfirmationBddHandler;
     private final SetChargingProfileConfirmationBddHandler setChargingProfileConfirmationBddHandler;
@@ -117,6 +143,7 @@ public class AssertionAndValidationServiceImpl implements AssertionAndValidation
     private final UnlockConnectorConfirmationBddHandler unlockConnectorConfirmationBddHandler;
     private final UpdateFirmwareConfirmationBddHandler updateFirmwareConfirmationBddHandler;
 
+    private final AuthorizeConfirmationBddHandler authorizeConfirmationBddHandler;
     private final BootNotificationConfirmationBddHandler bootNotificationConfirmationBddHandler;
     private final DataTransferOutgoingConfirmationBddHandler dataTransferOutgoingConfirmationBddHandler;
     private final DiagnosticsStatusNotificationConfirmationBddHandler diagnosticsStatusNotificationConfirmationBddHandler;
@@ -133,6 +160,13 @@ public class AssertionAndValidationServiceImpl implements AssertionAndValidation
     private final ClearCacheRequestBddHandler clearCacheRequestBddHandler;
     private final ClearChargingProfileRequestBddHandler clearChargingProfileRequestBddHandler;
     private final DataTransferOutgoingRequestBddHandler dataTransferOutgoingRequestBddHandler;
+    private final GetCompositeScheduleRequestBddHandler getCompositeScheduleRequestBddHandler;
+    private final GetConfigurationRequestBddHandler getConfigurationRequestBddHandler;
+    private final GetDiagnosticsRequestBddHandler getDiagnosticsRequestBddHandler;
+    private final GetLocalListVersionRequestBddHandler getLocalListVersionRequestBddHandler;
+    private final RemoteStartTransactionRequestBddHandler remoteStartTransactionRequestBddHandler;
+    private final RemoteStopTransactionRequestBddHandler remoteStopTransactionRequestBddHandler;
+    private final ReserveNowRequestBddHandler reserveNowRequestBddHandler;
     private final ResetRequestBddHandler resetRequestBddHandler;
     private final SendLocalListRequestBddHandler sendLocalListRequestBddHandler;
     private final SetChargingProfileRequestBddHandler setChargingProfileRequestBddHandler;
@@ -177,12 +211,19 @@ public class AssertionAndValidationServiceImpl implements AssertionAndValidation
                 CLEAR_CACHE, clearCacheRequestBddHandler,
                 CLEAR_CHARGING_PROFILE, clearChargingProfileRequestBddHandler,
                 DATA_TRANSFER_OUTGOING, dataTransferOutgoingRequestBddHandler,
+                GET_COMPOSITE_SCHEDULE, getCompositeScheduleRequestBddHandler,
+                GET_CONFIGURATION, getConfigurationRequestBddHandler,
+                GET_DIAGNOSTICS, getDiagnosticsRequestBddHandler,
+                GET_LOCAL_LIST_VERSION, getLocalListVersionRequestBddHandler
+        );
+        Map<ImplementedMessageType, OutgoingMessageFactory<? extends Request>> theSecondPart = Map.of(
+                REMOTE_START_TRANSACTION, remoteStartTransactionRequestBddHandler,
+                REMOTE_STOP_TRANSACTION, remoteStopTransactionRequestBddHandler,
+                RESERVE_NOW, reserveNowRequestBddHandler,
                 RESET, resetRequestBddHandler,
                 SEND_LOCAL_LIST, sendLocalListRequestBddHandler,
                 SET_CHARGING_PROFILE, setChargingProfileRequestBddHandler,
-                TRIGGER_MESSAGE, triggerMessageRequestBddHandler
-        );
-        Map<ImplementedMessageType, OutgoingMessageFactory<? extends Request>> theSecondPart = Map.of(
+                TRIGGER_MESSAGE, triggerMessageRequestBddHandler,
                 UNLOCK_CONNECTOR, unlockConnectorRequestBddHandler,
                 UPDATE_FIRMWARE, updateFirmwareRequestBddFactory
         );
@@ -212,7 +253,7 @@ public class AssertionAndValidationServiceImpl implements AssertionAndValidation
             return BOOT_NOTIFICATION;
         } else if (request instanceof DataTransferRequest message) {
             dataTransferIncomingRequestBddHandler.validateAndAssertFieldsWithParams(parameters, message);
-            return DATA_TRANSFER_OUTGOING;
+            return DATA_TRANSFER_INCOMING;
         } else if (request instanceof DiagnosticsStatusNotificationRequest message) {
             diagnosticsStatusNotificationRequestBddHandler.validateAndAssertFieldsWithParams(parameters, message);
             return DIAGNOSTICS_STATUS_NOTIFICATION;
@@ -258,6 +299,20 @@ public class AssertionAndValidationServiceImpl implements AssertionAndValidation
                 clearChargingProfileConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
             } else if (confirmation instanceof DataTransferConfirmation message) {
                 dataTransferIncomingConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
+            } else if (confirmation instanceof GetCompositeScheduleConfirmation message) {
+                getCompositeScheduleConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
+            } else if (confirmation instanceof GetConfigurationConfirmation message) {
+                getConfigurationConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
+            } else if (confirmation instanceof GetDiagnosticsConfirmation message) {
+                getDiagnosticsConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
+            } else if (confirmation instanceof GetLocalListVersionConfirmation message) {
+                getLocalListVersionConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
+            } else if (confirmation instanceof RemoteStartTransactionConfirmation message) {
+                remoteStartTransactionConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
+            } else if (confirmation instanceof RemoteStopTransactionConfirmation message) {
+                remoteStopTransactionConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
+            } else if (confirmation instanceof ReserveNowConfirmation message) {
+                reserveNowConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
             } else if (confirmation instanceof ResetConfirmation message) {
                 resetConfirmationBddHandler.validateAndAssertFieldsWithParams(parameters, message);
             } else if (confirmation instanceof SendLocalListConfirmation message) {
