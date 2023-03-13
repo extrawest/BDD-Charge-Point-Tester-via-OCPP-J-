@@ -5,11 +5,17 @@ import com.extrawest.jsonserver.validation.incoming.IncomingMessageFieldsFactory
 import eu.chargetime.ocpp.model.reservation.ReservationStatus;
 import eu.chargetime.ocpp.model.reservation.ReserveNowConfirmation;
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 
+@Slf4j
+@Component
+@RequiredArgsConstructor
 public class ReserveNowConfirmationBddHandler extends IncomingMessageFieldsFactory<ReserveNowConfirmation>
         implements IncomingMessageFactory<ReserveNowConfirmation> {
 
