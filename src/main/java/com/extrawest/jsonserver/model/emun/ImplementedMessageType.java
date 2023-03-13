@@ -16,7 +16,7 @@ import java.util.Objects;
 public enum ImplementedMessageType {
     AUTHORIZE("Authorize"),
     BOOT_NOTIFICATION("BootNotification"),
-    DATA_TRANSFER("DataTransfer"),
+    DATA_TRANSFER_INCOMING("DataTransfer"),
     DIAGNOSTICS_STATUS_NOTIFICATION("DiagnosticsStatusNotification"),
     FIRMWARE_STATUS_NOTIFICATION("FirmwareStatusNotification"),
     HEARTBEAT("Heartbeat"),
@@ -29,6 +29,7 @@ public enum ImplementedMessageType {
     CHANGE_CONFIGURATION("ChangeConfiguration"),
     CLEAR_CACHE("ClearCache"),
     CLEAR_CHARGING_PROFILE("ClearChargingProfile"),
+    DATA_TRANSFER_OUTGOING("DataTransfer"),
     SET_CHARGING_PROFILE("SetChargingProfile"),
     RESET("Reset"),
     SEND_LOCAL_LIST("SendLocalList"),
