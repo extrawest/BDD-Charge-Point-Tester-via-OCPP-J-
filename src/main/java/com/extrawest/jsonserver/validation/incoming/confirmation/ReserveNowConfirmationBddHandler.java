@@ -1,7 +1,7 @@
 package com.extrawest.jsonserver.validation.incoming.confirmation;
 
 import com.extrawest.jsonserver.validation.incoming.IncomingMessageFactory;
-import com.extrawest.jsonserver.validation.incoming.IncomingMessageFieldsAssertionFactory;
+import com.extrawest.jsonserver.validation.incoming.IncomingMessageFieldsFactory;
 import eu.chargetime.ocpp.model.reservation.ReservationStatus;
 import eu.chargetime.ocpp.model.reservation.ReserveNowConfirmation;
 import jakarta.annotation.PostConstruct;
@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 
-public class ReserveNowConfirmationBddHandler extends IncomingMessageFieldsAssertionFactory<ReserveNowConfirmation>
+public class ReserveNowConfirmationBddHandler extends IncomingMessageFieldsFactory<ReserveNowConfirmation>
         implements IncomingMessageFactory<ReserveNowConfirmation> {
 
     public static final String STATUS_REQUIRED = "status";
@@ -40,4 +40,5 @@ public class ReserveNowConfirmationBddHandler extends IncomingMessageFieldsAsser
         super.validateParamsViaLibModel(params);
         super.assertParamsAndMessageFields(params, message);
     }
+
 }

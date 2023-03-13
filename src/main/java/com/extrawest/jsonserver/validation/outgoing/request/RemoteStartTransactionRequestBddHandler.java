@@ -1,7 +1,7 @@
-package com.extrawest.jsonserver.validation.outcoming.request;
+package com.extrawest.jsonserver.validation.outgoing.request;
 
-import com.extrawest.jsonserver.validation.outcoming.OutcomingMessageFieldsValidationFactory;
-import com.extrawest.jsonserver.validation.outcoming.OutgoingMessageFactory;
+import com.extrawest.jsonserver.validation.outgoing.OutgoingMessageFieldsFactory;
+import com.extrawest.jsonserver.validation.outgoing.OutgoingMessageFactory;
 import eu.chargetime.ocpp.model.core.RemoteStartTransactionRequest;
 import jakarta.annotation.PostConstruct;
 import lombok.NoArgsConstructor;
@@ -14,7 +14,7 @@ import java.util.Map;
 @Slf4j
 @Component
 @NoArgsConstructor
-public class RemoteStartTransactionRequestBddHandler extends OutcomingMessageFieldsValidationFactory<RemoteStartTransactionRequest>
+public class RemoteStartTransactionRequestBddHandler extends OutgoingMessageFieldsFactory<RemoteStartTransactionRequest>
         implements OutgoingMessageFactory<RemoteStartTransactionRequest> {
 
     public static final String CONNECTOR_ID = "connectorId";
@@ -56,4 +56,5 @@ public class RemoteStartTransactionRequestBddHandler extends OutcomingMessageFie
         log.debug(getParameterizeClassName() + ": " + request);
         return request;
     }
+
 }

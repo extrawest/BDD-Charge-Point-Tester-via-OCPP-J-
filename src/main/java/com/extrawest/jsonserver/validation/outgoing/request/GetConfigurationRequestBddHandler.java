@@ -1,7 +1,7 @@
-package com.extrawest.jsonserver.validation.outcoming.request;
+package com.extrawest.jsonserver.validation.outgoing.request;
 
-import com.extrawest.jsonserver.validation.outcoming.OutcomingMessageFieldsValidationFactory;
-import com.extrawest.jsonserver.validation.outcoming.OutgoingMessageFactory;
+import com.extrawest.jsonserver.validation.outgoing.OutgoingMessageFieldsFactory;
+import com.extrawest.jsonserver.validation.outgoing.OutgoingMessageFactory;
 import eu.chargetime.ocpp.model.core.GetConfigurationRequest;
 import jakarta.annotation.PostConstruct;
 import lombok.NoArgsConstructor;
@@ -15,7 +15,7 @@ import java.util.Map;
 @Slf4j
 @Component
 @NoArgsConstructor
-public class GetConfigurationRequestBddHandler extends OutcomingMessageFieldsValidationFactory<GetConfigurationRequest>
+public class GetConfigurationRequestBddHandler extends OutgoingMessageFieldsFactory<GetConfigurationRequest>
         implements OutgoingMessageFactory<GetConfigurationRequest> {
     public static final String KEY = "key";
 
@@ -43,4 +43,5 @@ public class GetConfigurationRequestBddHandler extends OutcomingMessageFieldsVal
         log.debug(getParameterizeClassName() + ": " + request);
         return request;
     }
+
 }

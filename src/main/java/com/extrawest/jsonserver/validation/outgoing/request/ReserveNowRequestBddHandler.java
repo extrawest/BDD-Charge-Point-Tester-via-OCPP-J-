@@ -1,7 +1,7 @@
-package com.extrawest.jsonserver.validation.outcoming.request;
+package com.extrawest.jsonserver.validation.outgoing.request;
 
-import com.extrawest.jsonserver.validation.outcoming.OutcomingMessageFieldsValidationFactory;
-import com.extrawest.jsonserver.validation.outcoming.OutgoingMessageFactory;
+import com.extrawest.jsonserver.validation.outgoing.OutgoingMessageFieldsFactory;
+import com.extrawest.jsonserver.validation.outgoing.OutgoingMessageFactory;
 import eu.chargetime.ocpp.model.reservation.ReserveNowRequest;
 import jakarta.annotation.PostConstruct;
 import lombok.NoArgsConstructor;
@@ -14,7 +14,7 @@ import java.util.Map;
 @Slf4j
 @Component
 @NoArgsConstructor
-public class ReserveNowRequestBddHandler extends OutcomingMessageFieldsValidationFactory<ReserveNowRequest>
+public class ReserveNowRequestBddHandler extends OutgoingMessageFieldsFactory<ReserveNowRequest>
         implements OutgoingMessageFactory<ReserveNowRequest> {
 
     public static final String CONNECTOR_ID_REQUIRED = "connectorId";

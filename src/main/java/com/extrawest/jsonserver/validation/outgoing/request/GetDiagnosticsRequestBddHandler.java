@@ -1,7 +1,7 @@
-package com.extrawest.jsonserver.validation.outcoming.request;
+package com.extrawest.jsonserver.validation.outgoing.request;
 
-import com.extrawest.jsonserver.validation.outcoming.OutcomingMessageFieldsValidationFactory;
-import com.extrawest.jsonserver.validation.outcoming.OutgoingMessageFactory;
+import com.extrawest.jsonserver.validation.outgoing.OutgoingMessageFactory;
+import com.extrawest.jsonserver.validation.outgoing.OutgoingMessageFieldsFactory;
 import eu.chargetime.ocpp.model.firmware.GetDiagnosticsRequest;
 import jakarta.annotation.PostConstruct;
 import lombok.NoArgsConstructor;
@@ -9,13 +9,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
 import java.util.Map;
 
 @Slf4j
 @Component
 @NoArgsConstructor
-public class GetDiagnosticsRequestBddHandler extends OutcomingMessageFieldsValidationFactory<GetDiagnosticsRequest>
+public class GetDiagnosticsRequestBddHandler extends OutgoingMessageFieldsFactory<GetDiagnosticsRequest>
         implements OutgoingMessageFactory<GetDiagnosticsRequest> {
 
     public static final String LOCATION_REQUIRED = "location";
@@ -69,4 +68,5 @@ public class GetDiagnosticsRequestBddHandler extends OutcomingMessageFieldsValid
         log.debug(getParameterizeClassName() + ": " + request);
         return request;
     }
+
 }

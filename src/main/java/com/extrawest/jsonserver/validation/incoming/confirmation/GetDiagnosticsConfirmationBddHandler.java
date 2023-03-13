@@ -1,7 +1,7 @@
 package com.extrawest.jsonserver.validation.incoming.confirmation;
 
 import com.extrawest.jsonserver.validation.incoming.IncomingMessageFactory;
-import com.extrawest.jsonserver.validation.incoming.IncomingMessageFieldsAssertionFactory;
+import com.extrawest.jsonserver.validation.incoming.IncomingMessageFieldsFactory;
 import eu.chargetime.ocpp.model.firmware.GetDiagnosticsConfirmation;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +15,7 @@ import java.util.Objects;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class GetDiagnosticsConfirmationBddHandler extends IncomingMessageFieldsAssertionFactory<GetDiagnosticsConfirmation>
+public class GetDiagnosticsConfirmationBddHandler extends IncomingMessageFieldsFactory<GetDiagnosticsConfirmation>
         implements IncomingMessageFactory<GetDiagnosticsConfirmation> {
 
     public static final String FILE_NAME = "fileName";
@@ -45,4 +45,5 @@ public class GetDiagnosticsConfirmationBddHandler extends IncomingMessageFieldsA
         super.validateParamsViaLibModel(params);
         super.assertParamsAndMessageFields(params, message);
     }
+
 }

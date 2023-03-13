@@ -1,7 +1,7 @@
 package com.extrawest.jsonserver.validation.incoming.confirmation;
 
 import com.extrawest.jsonserver.validation.incoming.IncomingMessageFactory;
-import com.extrawest.jsonserver.validation.incoming.IncomingMessageFieldsAssertionFactory;
+import com.extrawest.jsonserver.validation.incoming.IncomingMessageFieldsFactory;
 import eu.chargetime.ocpp.model.localauthlist.GetLocalListVersionConfirmation;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +15,8 @@ import java.util.Objects;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class GetLocalListVersionConfirmationBddHandler extends IncomingMessageFieldsAssertionFactory<GetLocalListVersionConfirmation>
+public class GetLocalListVersionConfirmationBddHandler
+        extends IncomingMessageFieldsFactory<GetLocalListVersionConfirmation>
         implements IncomingMessageFactory<GetLocalListVersionConfirmation> {
 
     public static final String LIST_VERSION_REQUIRED = "listVersion";

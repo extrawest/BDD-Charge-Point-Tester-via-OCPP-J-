@@ -1,7 +1,7 @@
 package com.extrawest.jsonserver.validation.incoming.confirmation;
 
 import com.extrawest.jsonserver.validation.incoming.IncomingMessageFactory;
-import com.extrawest.jsonserver.validation.incoming.IncomingMessageFieldsAssertionFactory;
+import com.extrawest.jsonserver.validation.incoming.IncomingMessageFieldsFactory;
 import eu.chargetime.ocpp.model.smartcharging.GetCompositeScheduleConfirmation;
 import eu.chargetime.ocpp.model.smartcharging.GetCompositeScheduleStatus;
 import jakarta.annotation.PostConstruct;
@@ -16,7 +16,8 @@ import java.util.Objects;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class GetCompositeScheduleConfirmationBddHandler extends IncomingMessageFieldsAssertionFactory<GetCompositeScheduleConfirmation>
+public class GetCompositeScheduleConfirmationBddHandler
+        extends IncomingMessageFieldsFactory<GetCompositeScheduleConfirmation>
         implements IncomingMessageFactory<GetCompositeScheduleConfirmation> {
 
     public static final String STATUS_REQUIRED = "status";
@@ -71,4 +72,5 @@ public class GetCompositeScheduleConfirmationBddHandler extends IncomingMessageF
         super.validateParamsViaLibModel(params);
         super.assertParamsAndMessageFields(params, message);
     }
+
 }

@@ -1,7 +1,7 @@
-package com.extrawest.jsonserver.validation.outcoming.request;
+package com.extrawest.jsonserver.validation.outgoing.request;
 
-import com.extrawest.jsonserver.validation.outcoming.OutcomingMessageFieldsValidationFactory;
-import com.extrawest.jsonserver.validation.outcoming.OutgoingMessageFactory;
+import com.extrawest.jsonserver.validation.outgoing.OutgoingMessageFactory;
+import com.extrawest.jsonserver.validation.outgoing.OutgoingMessageFieldsFactory;
 import eu.chargetime.ocpp.model.smartcharging.ChargingRateUnitType;
 import eu.chargetime.ocpp.model.smartcharging.GetCompositeScheduleRequest;
 import jakarta.annotation.PostConstruct;
@@ -10,14 +10,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
 import java.util.Map;
 
 @Slf4j
 @Component
 @NoArgsConstructor
-public class GetCompositeScheduleRequestBddHandler extends OutcomingMessageFieldsValidationFactory<GetCompositeScheduleRequest>
+public class GetCompositeScheduleRequestBddHandler extends OutgoingMessageFieldsFactory<GetCompositeScheduleRequest>
         implements OutgoingMessageFactory<GetCompositeScheduleRequest> {
+
     public static final String CONNECTOR_ID_REQUIRED = "connectorId";
     public static final String DURATION_REQUIRED = "duration";
     public static final String CHARGING_RATE_UNIT = "chargingRateUnit";
@@ -58,4 +58,5 @@ public class GetCompositeScheduleRequestBddHandler extends OutcomingMessageField
         log.debug(getParameterizeClassName() + ": " + request);
         return request;
     }
+
 }
