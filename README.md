@@ -180,7 +180,7 @@ Or you can copy scenario script from [the folder](https://github.com/extrawest/B
 
 ### List of available steps:
 - [the Central System is started](#Starting-the-CS)
-- [the Central System is started on "specified domain"](#Starting-the-CS)
+- [the Central System is started on "specified IP"](#Starting-the-CS)
 - [the Charge Point is connected](#Waiting-for-connection)
 - [the Charge Point "specified Charge Point Id" is connected](#Waiting-for-connection)
 - [the Central System must receive "OCPPMessageType.req"](#initiated-by-CP-without-parameters)
@@ -191,11 +191,15 @@ Or you can copy scenario script from [the folder](https://github.com/extrawest/B
 - [the Central System sends "OCPPMessageType.req" request to the Charge Point with given data](#initiated-by-CS-with-parameters)
 - [the Central System receives confirmation](#initiated-by-CS-without-parameters)
 - [the Central System receives confirmation with given data](#initiated-by-CS-with-parameters)
-- the Central System must receive requested message
-- the Central System must receive requested message with given data
+- the Central System must receive requested message. [Used only with TriggerMessage.req](https://github.com/extrawest/BDD-Charge-Point-Tester-via-OCPP-J-/blob/main/src/test/resources/features/outcoming/triggerMessage.feature)
+- the Central System must receive requested message with given data. [Used only with TriggerMessage.req](https://github.com/extrawest/BDD-Charge-Point-Tester-via-OCPP-J-/blob/main/src/test/resources/features/outcoming/triggerMessage.feature)
 
 ### Default values
-###### All messages have the default values for every field. These values can be set in application.properties file. If field value is a complicated type(IdTagInfo for example) then you can specify it via JSON string.  
+###### All messages have the default values for every field. These values can be set in application.properties file. If field value is a complicated type(IdTagInfo for example) then you can specify it via JSON string. Examples:
+- BootNotification.confirmation.interval=60
+- Authorize.confirmation.idTagInfo=IdTagInfo{expiryDate="2023-12-31T23:59:59.712244462+02:00[Europe/Kyiv]", parentIdTag=FH7R5JKK6SQ8, status=Accepted}
+- Reset.request.requestedMessage=Soft
+- TriggerMessage.request.requestedMessage=BootNotification
 
 #### Scenario example:
 * [Authorize](https://github.com/extrawest/BDD-Charge-Point-Tester-via-OCPP-J-/blob/main/src/test/resources/features/incoming/authorize.feature) message
