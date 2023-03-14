@@ -169,11 +169,10 @@
                 <configuration>
                     <jreleaser>
                         <project>
-                            <description>app -- Sample Quarkus CLI application</description>
+                            <description>OCPP operation tester for the Charge Points</description>
                             <website>https://github.com/extrawest/BDD-Charge-Point-Tester-via-OCPP-J-/tree/main</website>
                             <docsUrl>https://github.com/extrawest/BDD-Charge-Point-Tester-via-OCPP-J-/tree/main</docsUrl>
                             <license>APACHE-2.0</license>
-                            <authors>Yevhenii Khudolii</authors>
                             <copyright>2023 Extrawest</copyright>
                         </project>
                         <signing>
