@@ -23,15 +23,15 @@ public class GetDiagnosticsRequestBddHandler extends OutgoingMessageFieldsFactor
     public static final String START_TIME = "startTime";
     public static final String STOP_TIME = "stopTime";
 
-    @Value("${triggerMessage.request.location:geo:37.786971,-122.399677}")
+    @Value("${GetDiagnostics.request.location:url}")
     private String defaultLocation;
-    @Value("${triggerMessage.request.retries:5}")
+    @Value("${GetDiagnostics.request.retries:5}")
     private String defaultRetries;
-    @Value("${triggerMessage.request.retryInterval:5}")
+    @Value("${GetDiagnostics.request.retryInterval:5}")
     private String defaultRetryInterval;
-    @Value("${triggerMessage.request.startTime:2023-03-23T16:43:32.010069453}")
+    @Value("${GetDiagnostics.request.startTime:2023-05-23T16:43:32.010069453Z}")
     private String defaultStartTime;
-    @Value("${triggerMessage.request.stopTime:2024-03-23T16:43:32.010069453}")
+    @Value("${GetDiagnostics.request.stopTime:2024-05-24T16:43:32.010069453Z}")
     private String defaultStopTime;
 
     @PostConstruct

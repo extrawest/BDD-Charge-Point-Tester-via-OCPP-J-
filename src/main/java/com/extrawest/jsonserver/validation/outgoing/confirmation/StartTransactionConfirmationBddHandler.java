@@ -22,9 +22,9 @@ public class StartTransactionConfirmationBddHandler
     public static final String ID_TAG_INFO_REQUIRED = "idTagInfo";
     public static final String TRANSACTION_ID_REQUIRED = "transactionId";
 
-    @Value("${startTransaction.confirmation.idTagInfo:}")
+    @Value("${StartTransaction.confirmation.idTagInfo:}")
     private String defaultIdTagInfo;
-    @Value("${startTransaction.confirmation.transactionId:1111}")
+    @Value("${StartTransaction.confirmation.transactionId:1111}")
     private String defaultTransactionId;
 
     @Setter private String receivedIdTag = null;

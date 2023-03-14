@@ -21,9 +21,9 @@ public class SetChargingProfileRequestBddHandler
     public static final String CONNECTOR_ID_REQUIRED = "connectorId";
     public static final String CS_CHARGING_PROFILES_REQUIRED = "csChargingProfiles";
 
-    @Value("${setChargingProfile.request.connectorId:1}")
+    @Value("${SetChargingProfile.request.connectorId:1}")
     private String defaultConnectorId;
-    @Value("${setChargingProfile.request.csChargingProfiles:}")
+    @Value("${SetChargingProfile.request.csChargingProfiles:}")
     private String defaultCsChargingProfile;
 
     @PostConstruct

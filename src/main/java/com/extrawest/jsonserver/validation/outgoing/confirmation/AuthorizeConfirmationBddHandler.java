@@ -20,7 +20,7 @@ public class AuthorizeConfirmationBddHandler
         implements OutgoingMessageFactory<AuthorizeConfirmation> {
 
     public static final String ID_TAG_INFO_REQUIRED = "idTagInfo";
-    @Value("${authorize.confirmation.idTagInfo:{\"expiryDate\":\"2023-12-31T23:23:59.278930403Z\",\"parentIdTag\":\"idTag-chargePointId\",\"status\":\"Accepted\"}}")
+    @Value("${Authorize.confirmation.idTagInfo:{\"expiryDate\":\"2023-12-31T23:23:59.278930403Z\",\"parentIdTag\":\"idTag-chargePointId\",\"status\":\"Accepted\"}}")
     private String defaultIdTagInfo;
     @Setter private String receivedIdTag = null;
 

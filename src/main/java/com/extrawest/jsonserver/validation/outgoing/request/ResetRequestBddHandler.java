@@ -20,7 +20,7 @@ public class ResetRequestBddHandler extends OutgoingMessageFieldsFactory<ResetRe
 
     public static final String TYPE_REQUIRED = "type";
 
-    @Value("${triggerMessage.request.requestedMessage:Soft}")
+    @Value("${Reset.request.requestedMessage:Soft}")
     private String defaultType;
 
     @PostConstruct

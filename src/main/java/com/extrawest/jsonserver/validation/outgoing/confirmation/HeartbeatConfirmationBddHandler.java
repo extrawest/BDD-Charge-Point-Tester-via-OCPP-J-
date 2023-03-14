@@ -19,7 +19,7 @@ public class HeartbeatConfirmationBddHandler
         implements OutgoingMessageFactory<HeartbeatConfirmation> {
 
     public static final String CURRENT_TIME_REQUIRED = "currentTime";
-    @Value("${heartbeat.confirmation.currentTime:}")
+    @Value("${Heartbeat.confirmation.currentTime:}")
     private String defaultCurrentTime;
 
     @PostConstruct

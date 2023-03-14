@@ -21,9 +21,9 @@ public class ChangeConfigurationRequestBddHandler extends OutgoingMessageFieldsF
     public static final String KEY_REQUIRED = "key";
     public static final String VALUE_REQUIRED = "value";
 
-    @Value("${triggerMessage.request.key:Key}")
+    @Value("${ChangeConfiguration.request.key:Key}")
     private String defaultKey;
-    @Value("${triggerMessage.request.value:Value}")
+    @Value("${ChangeConfiguration.request.value:Value}")
     private String defaultValue;
 
     @PostConstruct

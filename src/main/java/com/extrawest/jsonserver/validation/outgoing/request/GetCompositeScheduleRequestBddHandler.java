@@ -22,11 +22,11 @@ public class GetCompositeScheduleRequestBddHandler extends OutgoingMessageFields
     public static final String DURATION_REQUIRED = "duration";
     public static final String CHARGING_RATE_UNIT = "chargingRateUnit";
 
-    @Value("${triggerMessage.request.connectorId:1}")
+    @Value("${GetCompositeSchedule.request.connectorId:1}")
     private String defaultConnectorId;
-    @Value("${triggerMessage.request.duration:5}")
+    @Value("${GetCompositeSchedule.request.duration:5}")
     private String defaultDuration;
-    @Value("${triggerMessage.request.chargingRateUnit:W}")
+    @Value("${GetCompositeSchedule.request.chargingRateUnit:W}")
     private String defaultChargingRateUnit;
 
     @PostConstruct

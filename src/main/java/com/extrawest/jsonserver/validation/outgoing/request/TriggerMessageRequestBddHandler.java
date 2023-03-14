@@ -20,9 +20,9 @@ public class TriggerMessageRequestBddHandler extends OutgoingMessageFieldsFactor
     public static final String REQUESTED_MESSAGE_REQUIRED = "requestedMessage";
     public static final String CONNECTOR_ID = "connectorId";
 
-    @Value("${triggerMessage.request.requestedMessage:BootNotification}")
+    @Value("${TriggerMessage.request.requestedMessage:BootNotification}")
     private String defaultRequestedMessage;
-    @Value("${triggerMessage.request.connectorId:1111}")
+    @Value("${TriggerMessage.request.connectorId:1111}")
     private String defaultConnectorId;
 
     @PostConstruct

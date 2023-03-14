@@ -22,9 +22,9 @@ public class ChangeAvailabilityRequestBddHandler extends OutgoingMessageFieldsFa
     public static final String CONNECTOR_ID_REQUIRED = "connectorId";
     public static final String TYPE_REQUIRED = "type";
 
-    @Value("${triggerMessage.request.connectorId:1}")
+    @Value("${ChangeAvailability.request.connectorId:1}")
     private String defaultConnectorId;
-    @Value("${triggerMessage.request.requestedMessage:Operative}")
+    @Value("${ChangeAvailability.request.requestedMessage:Operative}")
     private String defaultType;
 
     @PostConstruct

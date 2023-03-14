@@ -20,7 +20,7 @@ public class RemoteStopTransactionRequestBddHandler extends OutgoingMessageField
 
     public static final String TRANSACTION_ID = "transactionId";
 
-    @Value("${triggerMessage.request.transactionId:1111}")
+    @Value("${RemoteStopTransaction.request.transactionId:1111}")
     private String defaultTransactionId;
 
     @PostConstruct
