@@ -21,11 +21,11 @@ public class RemoteStartTransactionRequestBddHandler extends OutgoingMessageFiel
     public static final String ID_TAG_REQUIRED = "idTag";
     public static final String CHARGING_PROFILE = "chargingProfile";
 
-    @Value("${triggerMessage.request.connectorId:1111}")
+    @Value("${RemoteStartTransaction.request.connectorId:1111}")
     private String defaultConnectorId;
-    @Value("${triggerMessage.request.idTag:idToken}")
+    @Value("${RemoteStartTransaction.request.idTag:idToken}")
     private String defaultIdTag;
-    @Value("${triggerMessage.request.chargingProfile:}")
+    @Value("${RemoteStartTransaction.request.chargingProfile:}")
     private String defaultChargingProfile;
 
     @PostConstruct

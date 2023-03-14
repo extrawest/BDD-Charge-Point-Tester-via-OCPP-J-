@@ -23,15 +23,15 @@ public class ReserveNowRequestBddHandler extends OutgoingMessageFieldsFactory<Re
     public static final String PARENT_ID_TAG = "parentIdTag";
     public static final String RESERVATION_ID_REQUIRED = "reservationId";
 
-    @Value("${triggerMessage.request.connectorId:1111}")
+    @Value("${ReserveNow.request.connectorId:1111}")
     private String defaultConnectorId;
-    @Value("${triggerMessage.request.expiryDate:2024-03-23T16:43:32.010069453}")
+    @Value("${ReserveNow.request.expiryDate:2024-03-23T16:43:32.010069453}")
     private String defaultExpiryDate;
-    @Value("${triggerMessage.request.idTag:idToken}")
+    @Value("${ReserveNow.request.idTag:idToken}")
     private String defaultIdTag;
-    @Value("${triggerMessage.request.parentIdTag:parentIdToken}")
+    @Value("${ReserveNow.request.parentIdTag:parentIdToken}")
     private String defaultParentIdTag;
-    @Value("${triggerMessage.request.reservationId:1111}")
+    @Value("${ReserveNow.request.reservationId:1111}")
     private String defaultReservationId;
 
     @PostConstruct
@@ -50,7 +50,7 @@ public class ReserveNowRequestBddHandler extends OutgoingMessageFieldsFactory<Re
                 EXPIRY_DATE_REQUIRED, (req, expiryDate) -> req.setExpiryDate(
                         getValidatedZonedDateTimeOrCurrentTimeIfEmptyOrThrow(expiryDate, defaultExpiryDate, EXPIRY_DATE_REQUIRED)),
                 ID_TAG_REQUIRED, (req, idTag) -> req.setIdTag(
-                        getValidatedStringValueOrThrow(idTag, defaultParentIdTag)),
+                        getValidatedStringValueOrThrow(idTag, defaultIdTag)),
                 RESERVATION_ID_REQUIRED, (req, reservationId) -> req.setReservationId(
                         getValidatedIntegerOrThrow(reservationId, defaultReservationId, RESERVATION_ID_REQUIRED))
 

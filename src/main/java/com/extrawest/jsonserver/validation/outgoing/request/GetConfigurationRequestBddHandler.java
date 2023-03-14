@@ -19,7 +19,7 @@ public class GetConfigurationRequestBddHandler extends OutgoingMessageFieldsFact
         implements OutgoingMessageFactory<GetConfigurationRequest> {
     public static final String KEY = "key";
 
-    @Value("${triggerMessage.request.key:Key}")
+    @Value("${GetConfiguration.request.key:Key}")
     private String defaultKey;
 
     @PostConstruct

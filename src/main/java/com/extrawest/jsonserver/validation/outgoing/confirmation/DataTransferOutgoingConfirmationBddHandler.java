@@ -20,9 +20,9 @@ public class DataTransferOutgoingConfirmationBddHandler
 
     public static final String STATUS_REQUIRED = "status";
     public static final String DATA = "data";
-    @Value("${bootNotification.confirmation.status:Accepted}")
+    @Value("${DataTransfer.confirmation.status:Accepted}")
     private String defaultStatus;
-    @Value("${bootNotification.confirmation.data:Extrawest}")
+    @Value("${DataTransfer.confirmation.data:}")
     private String defaultData;
 
     @PostConstruct

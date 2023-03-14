@@ -22,11 +22,11 @@ public class BootNotificationConfirmationBddHandler
     public static final String CURRENT_TIME_REQUIRED = "currentTime";
     public static final String INTERVAL_REQUIRED = "interval";
     public static final String STATUS_REQUIRED = "status";
-    @Value("${bootNotification.confirmation.currentTime:}")
+    @Value("${BootNotification.confirmation.currentTime:}")
     private String defaultCurrentTime;
-    @Value("${bootNotification.confirmation.interval:60}")
+    @Value("${BootNotification.confirmation.interval:60}")
     private String defaultInterval;
-    @Value("${bootNotification.confirmation.status:Accepted}")
+    @Value("${BootNotification.confirmation.status:Accepted}")
     private String defaultStatus;
 
     @PostConstruct

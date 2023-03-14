@@ -19,7 +19,7 @@ public class CancelReservationRequestBddHandler extends OutgoingMessageFieldsFac
         implements OutgoingMessageFactory<CancelReservationRequest> {
 
     public static final String RESERVATION_ID_REQUIRED = "reservationId";
-    @Value("${triggerMessage.request.reservationId:1}")
+    @Value("${CancelReservation.request.reservationId:1}")
     private String defaultReservationId;
 
     @PostConstruct

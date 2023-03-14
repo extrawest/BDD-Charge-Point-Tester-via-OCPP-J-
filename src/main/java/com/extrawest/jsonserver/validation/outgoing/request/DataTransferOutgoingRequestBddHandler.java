@@ -21,11 +21,11 @@ public class DataTransferOutgoingRequestBddHandler extends OutgoingMessageFields
     public static final String MESSAGE_ID = "messageId";
     public static final String DATA = "data";
 
-    @Value("${SendLocalList.request.defaultVendorId:1}")
+    @Value("${DataTransfer.request.defaultVendorId:1}")
     private String defaultVendorId;
-    @Value("${SendLocalList.request.defaultMessageId:1}")
+    @Value("${DataTransfer.request.defaultMessageId:1}")
     private String defaultMessageId;
-    @Value("${SendLocalList.request.defaultData:Data}")
+    @Value("${DataTransfer.request.defaultData:Data}")
     private String defaultData;
 
     @PostConstruct

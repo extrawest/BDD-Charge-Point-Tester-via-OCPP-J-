@@ -21,13 +21,13 @@ public class UpdateFirmwareRequestBddFactory extends OutgoingMessageFieldsFactor
     public static final String RETRIES = "retries";
     public static final String RETRY_INTERVAL = "retryInterval";
 
-    @Value("${updateFirmware.request.location:https://google.com}")
+    @Value("${UpdateFirmware.request.location:https://google.com}")
     private String defaultLocation;
-    @Value("${updateFirmware.request.retrieveDate:}")
+    @Value("${UpdateFirmware.request.retrieveDate:}")
     private String defaultRetrieveDate;
-    @Value("${updateFirmware.request.retries:3}")
+    @Value("${UpdateFirmware.request.retries:3}")
     private String defaultRetries;
-    @Value("${updateFirmware.request.retryInterval:5}")
+    @Value("${UpdateFirmware.request.retryInterval:5}")
     private String defaultRetryInterval;
 
     @PostConstruct

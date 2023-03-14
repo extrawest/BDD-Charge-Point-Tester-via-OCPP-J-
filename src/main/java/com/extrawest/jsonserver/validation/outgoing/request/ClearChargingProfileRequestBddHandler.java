@@ -24,13 +24,13 @@ public class ClearChargingProfileRequestBddHandler extends OutgoingMessageFields
     public static final String CHARGING_PROFILE_PURPOSE = "chargingProfilePurpose";
     public static final String STACK_LEVEL = "stackLevel";
 
-    @Value("${SendLocalList.request.defaultId:1}")
+    @Value("${ClearChargingProfile.request.defaultId:1}")
     private String defaultId;
-    @Value("${SendLocalList.request.defaultConnectorId:1}")
+    @Value("${ClearChargingProfile.request.defaultConnectorId:1}")
     private String defaultConnectorId;
-    @Value("${SendLocalList.request.chargingProfilePurpose:ChargePointMaxProfile}")
+    @Value("${ClearChargingProfile.request.chargingProfilePurpose:ChargePointMaxProfile}")
     private String defaultChargingProfilePurpose;
-    @Value("${SendLocalList.request.stackLevel:1}")
+    @Value("${ClearChargingProfile.request.stackLevel:1}")
     private String defaultStackLevel;
 
     @PostConstruct

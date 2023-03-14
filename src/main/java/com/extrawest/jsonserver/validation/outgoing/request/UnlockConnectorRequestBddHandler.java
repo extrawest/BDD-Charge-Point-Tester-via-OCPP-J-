@@ -19,7 +19,7 @@ public class UnlockConnectorRequestBddHandler extends OutgoingMessageFieldsFacto
 
     public static final String CONNECTOR_ID_REQUIRED = "connectorId";
 
-    @Value("${unlockConnector.request.connectorId:1}")
+    @Value("${UnlockConnector.request.connectorId:1}")
     private String defaultConnectorId;
 
     @PostConstruct
