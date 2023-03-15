@@ -234,10 +234,10 @@ public class AssertionAndValidationServiceImpl implements AssertionAndValidation
     }
 
     private void validateForFactoriesForImplementedMessageTypes() {
-        Arrays.stream(ImplementedMessageType.values()).forEach((t) -> {
-                if (!outgoingRequestHandlers.containsKey(t) && !outgoingConfirmationHandlers.containsKey(t)) {
-                    throw new BddTestingException(String.format(INVALID_OUTGOING_FACTORY.getValue(), t.getValue()));
-                }
+        Arrays.stream(ImplementedMessageType.values()).forEach(type -> {
+            if (!outgoingRequestHandlers.containsKey(type) && !outgoingConfirmationHandlers.containsKey(type)) {
+                throw new BddTestingException(String.format(INVALID_OUTGOING_FACTORY.getValue(), type.getValue()));
+            }
         });
     }
     
