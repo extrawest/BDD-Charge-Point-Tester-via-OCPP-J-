@@ -87,7 +87,7 @@ public class JsonWsServerListener implements Listener {
             }
 
             public void onMessage(WebSocket webSocket, String message) {
-                logger.info("Incoming message: " + message);
+                logger.info("Incoming message: {}", message);
                 JsonWsServerListener.this.sockets.get(webSocket).relay(message);
             }
 
