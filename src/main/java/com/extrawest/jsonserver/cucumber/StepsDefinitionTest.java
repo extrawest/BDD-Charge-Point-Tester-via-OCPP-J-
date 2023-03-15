@@ -53,8 +53,8 @@ public class StepsDefinitionTest {
     private final MessagingService messagingService;
     private final StepsSupporterService stepsSupporterService;
 
-    private final int connectionWaitingTime = 300; // in seconds
-    private final int messageWaitingTime = 120; // in seconds
+    private static final int CONNECTION_WAITING_TIME = 300; // in seconds
+    private static final int MESSAGE_WAITING_TIME = 120; // in seconds
 
     private int scenarioId;
     private String scenarioName;
@@ -103,9 +103,9 @@ public class StepsDefinitionTest {
     @Given("the Charge Point is connected")
     public void chargePointIsConnected() {
         UUID sessionIndex = null;
-        LocalDateTime finishTime = LocalDateTime.now().plusSeconds(connectionWaitingTime);
+        LocalDateTime finishTime = LocalDateTime.now().plusSeconds(CONNECTION_WAITING_TIME);
         log.info(String.format("Scenario №%s, STEP %s: waiting for any connection up to %s seconds...",
-                scenarioId, stepNumber, connectionWaitingTime));
+                scenarioId, stepNumber, CONNECTION_WAITING_TIME));
         while (isNull(sessionIndex) && LocalDateTime.now().isBefore(finishTime)) {
             try {
                 sessionIndex = sessionRepository.getSessionForWildCard();
@@ -131,9 +131,9 @@ public class StepsDefinitionTest {
             return;
         }
         UUID sessionIndex = null;
-        LocalDateTime finishTime = LocalDateTime.now().plusSeconds(connectionWaitingTime);
+        LocalDateTime finishTime = LocalDateTime.now().plusSeconds(CONNECTION_WAITING_TIME);
         log.info(String.format("Scenario №%s, STEP %s: waiting for %s connection up to %s seconds...",
-                scenarioId, stepNumber, chargePointId, connectionWaitingTime));
+                scenarioId, stepNumber, chargePointId, CONNECTION_WAITING_TIME));
         while (isNull(sessionIndex) && LocalDateTime.now().isBefore(finishTime)) {
             try {
                 sessionIndex = sessionRepository.getSessionByChargerId(chargePointId);
@@ -191,7 +191,7 @@ public class StepsDefinitionTest {
         log.info(String.format("Scenario №%s, STEP %s: Waiting for confirmation response...",
                 scenarioId, stepNumber));
         Optional<CompletableFuture<Confirmation>> future =
-                messagingService.waitForSuccessfulResponse(sessionIndex, messageWaitingTime, parameters);
+                messagingService.waitForSuccessfulResponse(sessionIndex, MESSAGE_WAITING_TIME, parameters);
         if (future.isEmpty()) {
             throw new BddTestingException(
                     String.format("Scenario №%s, STEP %s: response to the trigger message is not valid.",
@@ -229,8 +229,8 @@ public class StepsDefinitionTest {
 
     private void csMustReceiveRequestedMessageWithData(Map<String, String> parameters) {
         log.info(String.format("Scenario №%s, STEP %s: Waiting for request up to %s...",
-                scenarioId, stepNumber, messageWaitingTime));
-        Optional<Request> request = messagingService.waitForRequestedMessage(chargePointId, messageWaitingTime,
+                scenarioId, stepNumber, MESSAGE_WAITING_TIME));
+        Optional<Request> request = messagingService.waitForRequestedMessage(chargePointId, MESSAGE_WAITING_TIME,
                 requestedMessageType);
         if (request.isEmpty()) {
             throw new BddTestingException(
@@ -260,7 +260,7 @@ public class StepsDefinitionTest {
         waitingMessageType = type;
         sendingMessageType = type;
         storage.addRequestedMessageType(chargePointId, type);
-        Optional<Request> request = messagingService.waitForRequestedMessage(chargePointId, messageWaitingTime, type);
+        Optional<Request> request = messagingService.waitForRequestedMessage(chargePointId, MESSAGE_WAITING_TIME, type);
         if (request.isEmpty()) {
             throw new BddTestingException(
                     String.format("Scenario №%s, STEP %s: %s message is not handled or invalid.",
