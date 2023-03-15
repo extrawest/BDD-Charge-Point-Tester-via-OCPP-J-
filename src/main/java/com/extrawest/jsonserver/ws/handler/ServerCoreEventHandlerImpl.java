@@ -3,7 +3,7 @@ package com.extrawest.jsonserver.ws.handler;
 import static com.extrawest.jsonserver.model.emun.ApiErrorMessage.UNEXPECTED_MESSAGE_RECEIVED;
 import static com.extrawest.jsonserver.model.emun.ImplementedMessageType.AUTHORIZE;
 import static com.extrawest.jsonserver.model.emun.ImplementedMessageType.BOOT_NOTIFICATION;
-import static com.extrawest.jsonserver.model.emun.ImplementedMessageType.DATA_TRANSFER;
+import static com.extrawest.jsonserver.model.emun.ImplementedMessageType.DATA_TRANSFER_INCOMING;
 import static com.extrawest.jsonserver.model.emun.ImplementedMessageType.HEARTBEAT;
 import static com.extrawest.jsonserver.model.emun.ImplementedMessageType.METER_VALUES;
 import static com.extrawest.jsonserver.model.emun.ImplementedMessageType.START_TRANSACTION;
@@ -92,7 +92,7 @@ public class ServerCoreEventHandlerImpl implements ServerCoreEventHandler {
     @Override
     public DataTransferConfirmation handleDataTransferRequest(UUID sessionIndex, DataTransferRequest request) {
         log.debug("DataTransferRequest: " + request);
-        storeMessageIfItIsNeededForBDDPurpose(sessionIndex, request, DATA_TRANSFER);
+        storeMessageIfItIsNeededForBDDPurpose(sessionIndex, request, DATA_TRANSFER_INCOMING);
 
         while (Objects.isNull(response) || !(response instanceof DataTransferConfirmation)) {
             sleep(defaultSleepAwaitingTime);

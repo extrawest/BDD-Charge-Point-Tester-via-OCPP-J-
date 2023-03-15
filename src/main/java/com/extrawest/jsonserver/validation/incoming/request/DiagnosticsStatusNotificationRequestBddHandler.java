@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import com.extrawest.jsonserver.validation.incoming.IncomingMessageFactory;
-import com.extrawest.jsonserver.validation.incoming.IncomingMessageFieldsAssertionFactory;
+import com.extrawest.jsonserver.validation.incoming.IncomingMessageFieldsFactory;
 import eu.chargetime.ocpp.model.firmware.DiagnosticsStatus;
 import eu.chargetime.ocpp.model.firmware.DiagnosticsStatusNotificationRequest;
 import jakarta.annotation.PostConstruct;
@@ -16,8 +16,9 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class DiagnosticsStatusNotificationRequestBddHandler
-        extends IncomingMessageFieldsAssertionFactory<DiagnosticsStatusNotificationRequest>
+        extends IncomingMessageFieldsFactory<DiagnosticsStatusNotificationRequest>
         implements IncomingMessageFactory<DiagnosticsStatusNotificationRequest> {
+
     public static final String STATUS_REQUIRED = "status";
 
     @PostConstruct

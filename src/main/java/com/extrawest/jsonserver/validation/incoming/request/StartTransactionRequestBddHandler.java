@@ -4,7 +4,7 @@ import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.Objects;
 import com.extrawest.jsonserver.validation.incoming.IncomingMessageFactory;
-import com.extrawest.jsonserver.validation.incoming.IncomingMessageFieldsAssertionFactory;
+import com.extrawest.jsonserver.validation.incoming.IncomingMessageFieldsFactory;
 import eu.chargetime.ocpp.model.core.StartTransactionRequest;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -15,8 +15,9 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class StartTransactionRequestBddHandler
-        extends IncomingMessageFieldsAssertionFactory<StartTransactionRequest>
+        extends IncomingMessageFieldsFactory<StartTransactionRequest>
         implements IncomingMessageFactory<StartTransactionRequest> {
+
     public static final String CONNECTOR_ID_REQUIRED = "connectorId";
     public static final String ID_TAG_REQUIRED = "idTag";
     public static final String METER_START_REQUIRED = "meterStart";

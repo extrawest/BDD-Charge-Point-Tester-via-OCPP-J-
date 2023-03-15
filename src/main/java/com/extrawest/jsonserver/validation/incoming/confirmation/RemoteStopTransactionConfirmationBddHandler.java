@@ -1,7 +1,7 @@
 package com.extrawest.jsonserver.validation.incoming.confirmation;
 
 import com.extrawest.jsonserver.validation.incoming.IncomingMessageFactory;
-import com.extrawest.jsonserver.validation.incoming.IncomingMessageFieldsAssertionFactory;
+import com.extrawest.jsonserver.validation.incoming.IncomingMessageFieldsFactory;
 import eu.chargetime.ocpp.model.core.RemoteStartStopStatus;
 import eu.chargetime.ocpp.model.core.RemoteStopTransactionConfirmation;
 import jakarta.annotation.PostConstruct;
@@ -16,8 +16,10 @@ import java.util.Objects;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class RemoteStopTransactionConfirmationBddHandler extends IncomingMessageFieldsAssertionFactory<RemoteStopTransactionConfirmation>
+public class RemoteStopTransactionConfirmationBddHandler
+        extends IncomingMessageFieldsFactory<RemoteStopTransactionConfirmation>
         implements IncomingMessageFactory<RemoteStopTransactionConfirmation> {
+
     public static final String STATUS_REQUIRED = "status";
 
     @PostConstruct
@@ -45,4 +47,5 @@ public class RemoteStopTransactionConfirmationBddHandler extends IncomingMessage
         super.validateParamsViaLibModel(params);
         super.assertParamsAndMessageFields(params, message);
     }
+
 }

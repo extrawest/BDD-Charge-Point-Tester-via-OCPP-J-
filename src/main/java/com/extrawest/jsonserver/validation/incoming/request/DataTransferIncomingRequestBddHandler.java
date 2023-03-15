@@ -3,7 +3,7 @@ package com.extrawest.jsonserver.validation.incoming.request;
 import java.util.Map;
 import java.util.Objects;
 import com.extrawest.jsonserver.validation.incoming.IncomingMessageFactory;
-import com.extrawest.jsonserver.validation.incoming.IncomingMessageFieldsAssertionFactory;
+import com.extrawest.jsonserver.validation.incoming.IncomingMessageFieldsFactory;
 import eu.chargetime.ocpp.model.core.DataTransferRequest;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -13,9 +13,9 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class DataTransferIncomingRequestBddHandler
-        extends IncomingMessageFieldsAssertionFactory<DataTransferRequest>
+public class DataTransferIncomingRequestBddHandler extends IncomingMessageFieldsFactory<DataTransferRequest>
         implements IncomingMessageFactory<DataTransferRequest> {
+
     public static final String VENDOR_ID_REQUIRED = "vendorId";
     public static final String MESSAGE_ID = "messageId";
     public static final String DATA = "data";

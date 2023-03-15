@@ -1,7 +1,7 @@
 package com.extrawest.jsonserver.validation.incoming.confirmation;
 
 import com.extrawest.jsonserver.validation.incoming.IncomingMessageFactory;
-import com.extrawest.jsonserver.validation.incoming.IncomingMessageFieldsAssertionFactory;
+import com.extrawest.jsonserver.validation.incoming.IncomingMessageFieldsFactory;
 import eu.chargetime.ocpp.model.smartcharging.ClearChargingProfileConfirmation;
 import eu.chargetime.ocpp.model.smartcharging.ClearChargingProfileStatus;
 import jakarta.annotation.PostConstruct;
@@ -16,8 +16,9 @@ import java.util.Objects;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class ClearChargingProfileConfirmationBddHandler extends IncomingMessageFieldsAssertionFactory<ClearChargingProfileConfirmation>
+public class ClearChargingProfileConfirmationBddHandler extends IncomingMessageFieldsFactory<ClearChargingProfileConfirmation>
         implements IncomingMessageFactory<ClearChargingProfileConfirmation> {
+
     public static final String STATUS_REQUIRED = "status";
 
     @PostConstruct

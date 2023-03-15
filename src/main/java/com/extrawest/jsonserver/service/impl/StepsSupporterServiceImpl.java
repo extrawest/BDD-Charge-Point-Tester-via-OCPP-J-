@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import com.extrawest.jsonserver.config.ApplicationConfiguration;
+import com.extrawest.jsonserver.config.JsonServerConfig;
 import com.extrawest.jsonserver.repository.ServerSessionRepository;
 import com.extrawest.jsonserver.service.StepsSupporterService;
 import com.extrawest.jsonserver.ws.JsonWsServer;
@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class StepsSupporterServiceImpl implements StepsSupporterService {
-    private final ApplicationConfiguration applicationConfiguration;
+    private final JsonServerConfig jsonServerConfig;
     private final ServerEvents serverEvents;
     private final ServerSessionRepository sessionRepository;
     private final JsonWsServer server;
@@ -38,11 +38,11 @@ public class StepsSupporterServiceImpl implements StepsSupporterService {
             server.close();
         }
         if (Objects.isNull(hostAddress) || hostAddress.isBlank()) {
-            hostAddress = applicationConfiguration.getHostAddress();
+            hostAddress = jsonServerConfig.getHostAddress();
         }
 
         setAvailableOcppProtocol(availableProtocol);
-        server.open(hostAddress, applicationConfiguration.getServerPort(), serverEvents);
+        server.open(hostAddress, jsonServerConfig.getServerPort(), serverEvents);
         return hostAddress;
     }
 

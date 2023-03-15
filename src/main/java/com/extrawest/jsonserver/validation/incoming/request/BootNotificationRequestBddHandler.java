@@ -3,7 +3,7 @@ package com.extrawest.jsonserver.validation.incoming.request;
 import java.util.Map;
 import java.util.Objects;
 import com.extrawest.jsonserver.validation.incoming.IncomingMessageFactory;
-import com.extrawest.jsonserver.validation.incoming.IncomingMessageFieldsAssertionFactory;
+import com.extrawest.jsonserver.validation.incoming.IncomingMessageFieldsFactory;
 import eu.chargetime.ocpp.model.core.BootNotificationRequest;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -14,8 +14,9 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class BootNotificationRequestBddHandler
-        extends IncomingMessageFieldsAssertionFactory<BootNotificationRequest>
+        extends IncomingMessageFieldsFactory<BootNotificationRequest>
         implements IncomingMessageFactory<BootNotificationRequest> {
+
     public static final String CHARGE_BOX_SERIAL_NUMBER = "chargeBoxSerialNumber";
     public static final String CHARGE_POINT_MODEL_REQUIRED = "chargePointModel";
     public static final String CHARGE_POINT_SERIAL_NUMBER = "chargePointSerialNumber";

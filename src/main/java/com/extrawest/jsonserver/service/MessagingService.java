@@ -5,7 +5,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import com.extrawest.jsonserver.model.emun.ImplementedMessageType;
-import com.extrawest.jsonserver.model.ChargePoint;
 import eu.chargetime.ocpp.model.Confirmation;
 import eu.chargetime.ocpp.model.Request;
 
@@ -15,7 +14,7 @@ public interface MessagingService {
     Optional<CompletableFuture<Confirmation>> waitForSuccessfulResponse(UUID sessionIndex, int waitingTimeSec,
                                                                         Map<String, String> parameters);
 
-    Optional<Request> waitForRequestedMessage(ChargePoint chargePoint, int waitingTimeSec, ImplementedMessageType type);
+    Optional<Request> waitForRequestedMessage(String chargePoint, int waitingTimeSec, ImplementedMessageType type);
 
     ImplementedMessageType validateRequest(Map<String, String> parameters, Request request);
 
