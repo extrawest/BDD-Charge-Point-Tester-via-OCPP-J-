@@ -71,9 +71,9 @@ Install 1/2: Add this to pom.xml:
 
 ```
 <dependency>
-    <groupId>io.github.extrawest</groupId>
+    <groupId>com.extrawest</groupId>
     <artifactId>bdd-charge-point-tester-via-ocpp-j</artifactId>
-    <version>0.1.1</version>
+    <version>0.1.2</version>
 </dependency>
 ```
 
