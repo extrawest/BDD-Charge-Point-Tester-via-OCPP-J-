@@ -177,13 +177,17 @@ public class ServerCoreEventHandlerImpl implements ServerCoreEventHandler {
     private void storeMessageIfItIsNeededForBDDPurpose(UUID sessionIndex, Request request,
                                                        ImplementedMessageType type) {
         String chargePointId = sessionRepository.getChargerIdBySession(sessionIndex);
-        Optional<List<ImplementedMessageType>> requestedMessageTypes =
-                bddDataRepository.getRequestedMessageTypes(chargePointId);
-        if (requestedMessageTypes.isEmpty() || !requestedMessageTypes.get().contains(type)) {
-            log.warn(String.format(UNEXPECTED_MESSAGE_RECEIVED.getValue(), request.getClass().getSimpleName(), request));
-            return;
+
+        for (int i = 1; i <= 5; i++) {
+            Optional<List<ImplementedMessageType>> requestedMessageTypes =
+                    bddDataRepository.getRequestedMessageTypes(chargePointId);
+            if (requestedMessageTypes.isPresent() && requestedMessageTypes.get().contains(type)) {
+                bddDataRepository.addRequestedMessage(chargePointId, request);
+                return;
+            }
+            sleep(1000L);
         }
-        bddDataRepository.addRequestedMessage(chargePointId, request);
+        log.warn(String.format(UNEXPECTED_MESSAGE_RECEIVED.getValue(), request.getClass().getSimpleName(), request));
     }
 
 }
