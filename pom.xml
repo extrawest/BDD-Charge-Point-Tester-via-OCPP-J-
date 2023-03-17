@@ -8,7 +8,7 @@
     <artifactId>bdd-charge-point-tester-via-ocpp-j</artifactId>
     <version>0.1.2</version>
 
-    <name>${project.groupId}:${project.artifactId}</name>
+    <name>bdd-charge-point-tester-via-ocpp-j</name>
     <description>OCPP operation tester for the Charge Points</description>
     <url>https://github.com/extrawest/BDD-Charge-Point-Tester-via-OCPP-J-</url>
     <inceptionYear>2023</inceptionYear>
