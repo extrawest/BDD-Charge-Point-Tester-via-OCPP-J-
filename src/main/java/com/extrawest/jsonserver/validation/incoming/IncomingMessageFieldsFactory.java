@@ -113,6 +113,7 @@ public abstract class IncomingMessageFieldsFactory<T extends Validatable> {
 
     private List<String> nonMatchValues(Map<String, String> expectedParams, T actual) {
         return assertionFactory.entrySet().stream()
+                .filter(pair -> expectedParams.containsKey(pair.getKey()))
                 .filter(pair -> !pair.getValue().apply(expectedParams, actual))
                 .map(Map.Entry::getKey)
                 .toList();
@@ -154,9 +155,9 @@ public abstract class IncomingMessageFieldsFactory<T extends Validatable> {
 
     private  <M extends Validatable> M parseModelFromJson(String value, String fieldName, Class<M> clazz) {
         try {
-            log.info("JSON string for parsing: " + value);
+            log.debug("JSON string for parsing: " + value);
             M model = mapper.readValue(value, clazz);
-            log.info("Model parsed from string: " + model);
+            log.debug("Model parsed from string: " + model);
             return model;
         } catch (JsonProcessingException e) {
             throw new ValidationException(
@@ -240,9 +241,9 @@ public abstract class IncomingMessageFieldsFactory<T extends Validatable> {
 
     protected <M extends Validatable> M[] parseModelsFromJson(String value, String fieldName, Class<M> clazz) {
         try {
-            log.info("JSON string for array parsing: " + value);
+            log.debug("JSON string for array parsing: " + value);
             M[] result = mapper.readerForArrayOf(clazz).readValue(value);
-            log.info("Models parsed from string: " + Arrays.toString(result));
+            log.debug("Models parsed from string: " + Arrays.toString(result));
             return result;
         } catch (JsonProcessingException e) {
             throw new ValidationException(
@@ -253,7 +254,7 @@ public abstract class IncomingMessageFieldsFactory<T extends Validatable> {
     protected <M extends Validatable> String parseModelsToString(M[] values, String clazzName) {
         try {
             String result = mapper.writeValueAsString(values);
-            log.info("Array as JSON string: " + result);
+            log.debug("Array as JSON string: " + result);
             return result;
         } catch (JsonProcessingException e) {
             throw new BddTestingException(String.format(BUG_PARSING_MODEL.getValue(), clazzName));

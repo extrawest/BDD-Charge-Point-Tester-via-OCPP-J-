@@ -205,9 +205,9 @@ public abstract class OutgoingMessageFieldsFactory<T extends Validatable> {
 
     private  <M extends Validatable> M parseModelFromJson(String value, String fieldName, Class<M> clazz) {
         try {
-            log.info("JSON string for parsing: " + value);
+            log.debug("JSON string for parsing: " + value);
             M model = mapper.readValue(value, clazz);
-            log.info("Model parsed from string: " + model);
+            log.debug("Model parsed from string: " + model);
             return model;
         } catch (JsonProcessingException e) {
             throw new ValidationException(
