@@ -65,19 +65,15 @@ Operations Initiated by Central System:
 - Unlock Connector
 - Update Firmware
 
-## Usage
-
-To use this application, you can modify the Cucumber scenarios in the 'src/test/resources/features' directory to fit your testing needs. You can also add new steps in the 'src/test/java/com/extrawest/jsonserver/cucumberglue' directory.
-
 ## Installation
 
 Install 1/2: Add this to pom.xml:
 
 ```
 <dependency>
-    <groupId>io.github.extrawest</groupId>
+    <groupId>com.extrawest</groupId>
     <artifactId>bdd-charge-point-tester-via-ocpp-j</artifactId>
-    <version>0.1.1</version>
+    <version>0.1.2</version>
 </dependency>
 ```
 
